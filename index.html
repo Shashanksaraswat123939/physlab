@@ -1,0 +1,2133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="description" content="Measurement practicals for CBSE Class XI physics — read a vernier calliper and a screw gauge on screen, tabulate, and work the result out.">
+<title>PhysLab · Physics Practicals (CBSE XI)</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Crect x='8' y='20' width='48' height='13' rx='2' fill='%23e2e8f0'/%3E%3Cg stroke='%230f172a' stroke-width='2'%3E%3Cpath d='M16 20v7M24 20v5M32 20v7M40 20v5M48 20v7'/%3E%3C/g%3E%3Crect x='22' y='33' width='30' height='11' rx='2' fill='%232dd4bf'/%3E%3Cg stroke='%230f172a' stroke-width='1.6'%3E%3Cpath d='M28 44v-6M34 44v-6M40 44v-6M46 44v-6'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+/* ---------- theme ----------
+   Two hand-picked palettes. Dark mode is not an inversion: the instruments keep
+   their own materials (steel stays steel, brass stays brass, the paper scale
+   stays paper) and only the room around them is re-lit. */
+:root{
+  --surface:#fff;--panel:#fff;--bg:#eef2f7;
+  --ink:#101828;--ink2:#28303d;--muted:#525c6b;--line:#d8dee8;
+  --chip:#eef1f6;--hover:#f6f8fc;--field:#f9fafb;
+  --accent:#0f766e;--accent-soft:#ccfbf1;--accent-bg:#f0fdfa;--accent-line:#7fd7c8;--accent-ink:#115e59;
+  --ok:#15803d;--ok-soft:#dcfce7;--warn:#92400e;--warn-soft:#fef3c7;--bad:#b91c1c;
+  --page:linear-gradient(180deg,#eaf0f8,#e3e9f2);
+  --bench-air:#f7f9fc;--wood1:#d8c3a3;--wood2:#cbb28f;--bench-gloss:rgba(255,255,255,.35);
+  --bad-soft:#fee2e2;--paper:#fffdf7;--mark:#fde047;--mine:#fff7db;
+  --sb:#c6cedb;--sb-hover:#98a4b6;
+  /* instrument materials */
+  --steel:#cbd5e1;--steel2:#94a3b8;--steel-line:#64748b;--steel-dark:#475569;
+  --brass:#d9b45f;--brass2:#b08a35;
+  --scale-face:#f8fafc;--scale-ink:#1e293b;--scale-tick:#334155;
+  --vern-face:#ccfbf1;--vern-ink:#134e4a;
+  --lens:rgba(255,255,255,.55);--board:#fffdf5;--board-line:#cbd5e1;--thread:#3f3f46;
+  color-scheme:light;
+  --radius:16px;--shadow:0 6px 24px rgba(16,24,40,.08);
+  --focus:0 0 0 3px var(--panel),0 0 0 5px var(--accent);
+}
+[data-theme="dark"]{
+  --surface:#18212f;--panel:#161e2b;--bg:#0b1220;
+  --ink:#e9eef7;--ink2:#c6d0e0;--muted:#9aa7bc;--line:#2b3648;
+  --chip:#212c3d;--hover:#1e2836;--field:#121a27;
+  --accent:#5eead4;--accent-soft:#123a36;--accent-bg:#0f2a28;--accent-line:#2c6e66;--accent-ink:#99f6e4;
+  --ok:#6ee7a8;--ok-soft:#13301f;--warn:#fbbf24;--warn-soft:#39290a;--bad:#fda4a4;
+  --page:linear-gradient(180deg,#0b1220,#0e1727);
+  --bench-air:#131c2a;--wood1:#4b3a29;--wood2:#3a2d20;--bench-gloss:rgba(255,255,255,.06);
+  --bad-soft:#3a1a1a;--paper:#141c29;--mark:#6b5a12;--mine:#33280d;
+  --sb:#39445a;--sb-hover:#4d5b74;
+  --steel:#5b6778;--steel2:#78869a;--steel-line:#9aa7bc;--steel-dark:#8f9db2;
+  --brass:#a8863f;--brass2:#7d6127;
+  --scale-face:#233044;--scale-ink:#dbe4f0;--scale-tick:#b8c6da;
+  --vern-face:#123a36;--vern-ink:#7fe9d8;
+  --lens:rgba(148,197,255,.10);--board:#1b2433;--board-line:#33415a;--thread:#cbd5e1;
+  --shadow:0 6px 24px rgba(0,0,0,.45);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+/* ---------- scrollbars ---------- */
+*{scrollbar-width:thin;scrollbar-color:var(--sb) transparent}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--sb);background-clip:content-box;border:3px solid transparent;border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--sb-hover);background-clip:content-box}
+::-webkit-scrollbar-corner{background:transparent}
+html,body{margin:0;height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',sans-serif;
+  background:var(--page);color:var(--ink);font-size:14.5px;
+  -webkit-text-size-adjust:100%;text-size-adjust:100%;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 12px;transition:.15s;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+button:hover:not(:disabled){border-color:var(--accent);box-shadow:0 2px 8px rgba(15,118,110,.18)}
+button:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+[data-theme="dark"] button.primary{color:#06201d}
+button.primary:hover:not(:disabled){background:var(--accent-ink);border-color:var(--accent-ink)}
+[data-theme="dark"] button.primary:hover:not(:disabled){background:var(--accent-ink);color:#06201d}
+button.ghostbtn{background:transparent}
+select,input[type=number],input[type=text]{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);width:100%;color:var(--ink)}
+h1,h2,h3{margin:0}
+:focus-visible{outline:none;box-shadow:var(--focus);border-radius:10px}
+.ic{width:1.05em;height:1.05em;flex:0 0 auto;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.ic .dot{fill:currentColor;stroke:none}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+@media (prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+/* ---------- header ---------- */
+header{height:60px;display:flex;align-items:center;gap:18px;padding:0 18px;background:var(--surface);border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:20;transform:translateZ(0)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}
+.brand small{font-weight:500;color:var(--muted);font-size:12px;display:block}
+.brand .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#0ea5e9);display:grid;place-items:center;color:#fff;font-size:18px}
+.exp-tag{margin-left:auto;background:var(--accent-soft);color:var(--accent-ink);padding:6px 12px;border-radius:999px;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34ch}
+.actions{display:flex;gap:8px;align-items:center}
+.modesw{display:inline-flex;background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:2px;gap:2px}
+.modesw button{border:0;background:transparent;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--muted);box-shadow:none}
+.modesw button:hover:not(:disabled){box-shadow:none;color:var(--ink);border-color:transparent}
+.modesw button.on{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(16,24,40,.18)}
+/* ---------- layout ---------- */
+main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);height:calc(100vh - 60px);gap:0;padding:14px}
+@supports (height:100dvh){ main{height:calc(100dvh - 60px)} }
+:root{--colL:280px;--colR:420px}
+/* Pin each item to its own column. Without this, hiding a panel takes it out of
+   the grid entirely and auto-placement slides everything one column left. */
+#shelfPanel{grid-column:1;container:shelf/inline-size}
+#splitL{grid-column:2}
+.bench{grid-column:3}
+#splitR{grid-column:4}
+#sidePanel{grid-column:5;container:side/inline-size}
+.split{position:relative;cursor:col-resize;touch-action:none;display:grid;place-items:center;z-index:6}
+.split:before{content:"";width:4px;height:46px;border-radius:999px;background:var(--line);transition:.15s}
+.split:hover:before,.split.dragging:before{background:var(--accent);height:76px}
+.split:focus-visible{outline:none}
+.split:focus-visible:before{background:var(--accent);height:76px;box-shadow:0 0 0 3px rgba(15,118,110,.3)}
+.split[aria-hidden="true"]{display:none}
+.split .tog{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:20px;height:38px;padding:0;
+  border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:7px;
+  box-shadow:0 2px 8px rgba(16,24,40,.16);display:grid;place-items:center;z-index:3;cursor:pointer}
+.split .tog:hover:not(:disabled){border-color:var(--accent);color:var(--accent);box-shadow:0 3px 10px rgba(15,118,110,.25)}
+.split .tog .ic{width:13px;height:13px}
+.split.folded{cursor:default}
+.split.folded:before{opacity:.3;height:26px}
+.panel.is-hidden{display:none}
+.panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.panel-h{padding:12px 14px;border-bottom:1px solid var(--line);font-weight:700;font-size:13px;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px}
+/* ---------- left panel: the experiment list and the apparatus ---------- */
+.tabs{display:flex;gap:4px;padding:8px 10px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{display:block;text-align:center;flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:7px 4px;font-size:12px;border-radius:8px;border-color:transparent;background:var(--chip)}
+.tabs button.active{background:var(--accent);color:#fff}
+[data-theme="dark"] .tabs button.active{color:#06201d}
+.explist{padding:8px;overflow:auto;display:flex;flex-direction:column;gap:6px}
+.exprow{display:flex;align-items:flex-start;gap:10px;text-align:left;padding:9px 11px;border-radius:11px;border:1px solid var(--line);background:var(--surface);line-height:1.4;justify-content:flex-start}
+.exprow:hover{border-color:var(--accent);background:var(--accent-bg)}
+.exprow.on{border-color:var(--accent);background:var(--accent-bg);box-shadow:inset 3px 0 0 var(--accent)}
+.exprow .n{flex:0 0 auto;width:22px;height:22px;border-radius:7px;background:var(--chip);color:var(--muted);display:grid;place-items:center;font-size:11.5px;font-weight:700}
+.exprow.on .n{background:var(--accent);color:#fff}
+[data-theme="dark"] .exprow.on .n{color:#06201d}
+.exprow.done .n{background:var(--ok-soft);color:var(--ok)}
+.exprow b{display:block;font-size:13px;font-weight:700}
+.exprow small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+.appa{padding:10px;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.appa .ac{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.appa .ac svg{width:42px;height:36px;flex:0 0 auto}
+.appa .ac b{display:block;font-size:12.5px}
+.appa .ac small{display:block;color:var(--muted);font-size:11px;line-height:1.4}
+.appa h4{margin:6px 2px 0;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+.appa .lcbox{border:1px solid var(--accent-line);background:var(--accent-bg);border-radius:12px;padding:10px 11px}
+.appa .lcbox b{font-size:12px;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.3px}
+.appa .lcbox .lcrow{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;margin-top:6px;line-height:1.45}
+.appa .lcbox .lcrow span:last-child{font-weight:700;white-space:nowrap}
+.appa .lcbox .q{margin-top:8px;font-size:11.5px;color:var(--muted);line-height:1.5}
+/* ---------- bench ---------- */
+.bench{container:bench/inline-size;position:relative;--ap:1;display:flex;flex-direction:column;background:
+  radial-gradient(1200px 400px at 50% 120%,var(--bench-gloss),transparent),
+  linear-gradient(180deg,var(--bench-air) 0%,var(--bench-air) 74%,var(--wood1) 74%,var(--wood2) 100%);}
+.bench-top{display:flex;gap:12px;padding:14px 18px 0;position:relative;z-index:2;flex:0 0 auto}
+.spec-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;transition:.15s;min-width:0}
+.spec-card.pick{cursor:pointer}
+.spec-card.pick:hover{box-shadow:var(--shadow);border-color:var(--accent-line)}
+.spec-card.on{border-color:var(--accent);background:var(--accent-bg);box-shadow:inset 0 0 0 1px var(--accent)}
+.spec-card svg{width:46px;height:46px;flex:0 0 auto}
+.spec-card b{display:block;font-size:13px}
+.spec-card small{color:var(--muted);font-size:11px;display:block;line-height:1.35}
+.bench-main{--ap:1;flex:1 1 auto;min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(10px*var(--ap));padding:12px 18px 0}
+@container bench (max-width:820px){.bench-main{--ap:.92}}
+@container bench (max-width:720px){.bench-main{--ap:.82}}
+@container bench (max-width:620px){.bench-main{--ap:.72}}
+@container bench (max-width:520px){.bench-main{--ap:.62}}
+@container bench (max-width:440px){.bench-main{--ap:.54}}
+.instr{width:100%;max-width:calc(940px*var(--ap));position:relative}
+.bench.wide .instr{max-width:calc(1060px*var(--ap))}
+.bench.wide .bench-main{justify-content:flex-start;padding-top:6px}
+/* The drawing paper is taller than it is wide once it is on the bench, so it is
+   fitted to the height that is going rather than to the width, and centred. */
+.bench.paper .bench-main{padding-bottom:6px}
+.bench.paper .instr{flex:1 1 auto;min-height:0;max-width:100%;display:flex;justify-content:center}
+.bench.paper .instr svg{width:auto;height:100%;max-width:100%}
+.instr svg{width:100%;height:auto;display:block;overflow:visible;touch-action:none}
+.grab{cursor:grab}
+.grab:active{cursor:grabbing}
+/* the magnified strip under the instrument: this is what you actually read */
+.mag{width:100%;max-width:calc(940px*var(--ap));background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);padding:9px 12px 11px;position:relative}
+.mag h5{margin:0 0 6px;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.mag h5 .sp{flex:1}
+.mag h5 em{font-style:normal;color:var(--accent);font-weight:700;letter-spacing:0;text-transform:none;font-size:11.5px}
+.mag svg{width:100%;height:auto;display:block;overflow:visible}
+.mag .nogrip{position:absolute;inset:0;display:grid;place-items:center;background:var(--surface);opacity:.95;
+  border-radius:14px;font-size:13px;font-weight:600;color:var(--muted);text-align:center;padding:14px;line-height:1.5}
+/* the control strip at the foot of the bench */
+.ctrl{flex:0 0 auto;z-index:3;margin:10px 14px 12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:8px 12px;display:flex;align-items:center;gap:10px;min-height:46px;flex-wrap:wrap}
+.ctrl .lbl{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-weight:700}
+.ctrl .sp{flex:1}
+.ctrl button{padding:5px 11px;font-size:12.5px}
+.ctag{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12.5px;white-space:nowrap}
+.ctag.ok{background:var(--ok-soft);color:var(--ok);border-color:var(--ok);font-weight:600}
+.ctag.warn{background:var(--warn-soft);color:var(--warn);border-color:var(--warn);font-weight:600}
+.ctag.dim{background:transparent;border-style:dashed;color:var(--muted)}
+.segs{display:inline-flex;background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:2px;gap:2px}
+.segs button{border:0;background:transparent;border-radius:8px;padding:5px 12px;font-size:12.5px;font-weight:600;color:var(--muted);box-shadow:none}
+.segs button:hover:not(:disabled){box-shadow:none;color:var(--ink);border-color:transparent}
+.segs button.on{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(16,24,40,.18)}
+.wbox{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.wt{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:5px 9px;border-radius:6px;
+  background:linear-gradient(180deg,var(--steel),var(--steel2));border:1px solid var(--steel-line);
+  font-size:12px;font-weight:700;cursor:grab;user-select:none;touch-action:none;color:var(--ink)}
+.wt:hover{border-color:var(--accent);box-shadow:0 2px 8px rgba(15,118,110,.2)}
+.toolbar{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.toolbar button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+[data-theme="dark"] .toolbar button.on{color:#06201d}
+.ghost{position:fixed;left:0;top:0;z-index:1000;pointer-events:none;will-change:transform;
+  background:linear-gradient(180deg,var(--steel),var(--steel2));border:1px solid var(--steel-line);
+  border-radius:6px;padding:5px 10px;font:700 12px system-ui,sans-serif;color:var(--ink);box-shadow:0 8px 20px rgba(0,0,0,.3)}
+/* ---------- right panel ---------- */
+.obs{padding:13px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--surface),var(--accent-bg))}
+.obs .head{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);text-transform:uppercase;letter-spacing:.3px}
+.badge.nbc{margin-left:5px;font-size:10.5px;padding:2px 6px;letter-spacing:0}
+.badge.sec{background:var(--chip);color:var(--ink2);font-weight:600;text-transform:none;letter-spacing:0}
+.obs .row{display:grid;grid-template-columns:92px 1fr;gap:8px;font-size:13.5px;line-height:1.5;margin:5px 0}
+.obs .row b{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding-top:3px}
+.obs .oblist{margin:0;padding:0;list-style:none}
+.obs .oblist li{position:relative;padding-left:15px;margin:2px 0}
+.obs .oblist li:before{content:"";position:absolute;left:2px;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.obs .foot{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;align-items:center}
+.obs .hintq{font-size:12px;color:var(--muted);margin-right:auto;line-height:1.4}
+.side-tabs{display:flex;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.side-tabs::-webkit-scrollbar{display:none}
+.side-tabs button{display:block;text-align:center;flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:0;border-radius:0;background:transparent;
+  padding:11px 4px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;font-size:13px}
+.side-tabs button:hover:not(:disabled){box-shadow:none;color:var(--ink);background:var(--hover)}
+.side-tabs button.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--accent-bg)}
+.side-tabs button:focus-visible{box-shadow:inset 0 0 0 2px var(--accent);border-radius:0}
+.side-body{overflow:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.prog{padding:10px 14px;border-bottom:1px solid var(--line);background:var(--hover);font-size:12.5px;color:var(--muted);line-height:1.5}
+.prog b{color:var(--ink)}
+.prog .bar{height:7px;border-radius:999px;background:var(--line);margin-top:7px;overflow:hidden}
+.prog .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#38bdf8);border-radius:999px;transition:width .45s cubic-bezier(.3,1,.4,1)}
+/* procedure: the record, section by section */
+.guide details{border-bottom:1px solid var(--line)}
+.guide summary{padding:11px 14px;font-weight:700;cursor:pointer;font-size:13.5px;list-style:none;display:flex;align-items:center;gap:9px}
+.guide summary::-webkit-details-marker{display:none}
+.guide summary:hover{background:var(--hover)}
+.guide summary:focus-visible{box-shadow:inset 0 0 0 2px var(--accent);border-radius:0}
+.guide summary:before{content:"";width:7px;height:7px;flex:0 0 auto;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:.2s;margin-left:2px}
+.guide details[open] summary:before{transform:rotate(45deg)}
+.guide .body{padding:2px 16px 13px 30px;font-size:13px;line-height:1.6;color:var(--ink2)}
+.guide .body ol,.guide .body ul{margin:0;padding-left:18px}
+.guide .body li{margin:4px 0}
+.guide .body p{margin:0 0 8px}
+.guide .step{cursor:pointer;border-radius:8px;padding:3px 6px;margin-left:-6px;list-style:decimal}
+.guide .step:hover{background:var(--hover)}
+.guide .step.on{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.guide .fml{background:var(--hover);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;
+  padding:9px 11px;margin:2px 0 8px;font-size:13px;line-height:1.7}
+.guide .fml .eq{font-family:'Cascadia Mono',Consolas,ui-monospace,monospace;font-size:12.5px;color:var(--ink)}
+.guide .fml b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:3px}
+.guide .why{margin:9px 0 2px;background:var(--accent-bg);border:1px solid var(--accent-line);border-radius:8px;padding:8px 10px;font-size:12.5px;line-height:1.55;color:var(--ink2)}
+.guide .why b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--accent-ink);margin-bottom:3px}
+.guide .viva dt{font-weight:700;margin-top:8px;font-size:12.5px}
+.guide .viva dd{margin:2px 0 0;color:var(--ink2);font-size:12.5px;line-height:1.55}
+/* the observation table — the record's own columns, filled in by hand */
+.obt{padding:10px 12px 20px}
+.obt h4{margin:14px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--accent)}
+.obt h4:first-child{margin-top:2px}
+.obt .lead{font-size:12.5px;color:var(--muted);line-height:1.55;margin:0 0 10px;background:var(--accent-bg);border:1px solid var(--accent-line);border-radius:10px;padding:9px 11px}
+.obt table{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
+.obt th,.obt td{border:1px solid var(--line);padding:5px 6px;vertical-align:middle;text-align:left}
+.obt th{background:var(--hover);font-size:10.5px;text-transform:uppercase;letter-spacing:.2px;color:var(--muted);line-height:1.3;padding:6px}
+.obt td.sn{text-align:center;color:var(--muted);width:30px}
+.obt td.tot{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.obt tfoot td{background:var(--hover);font-weight:700}
+.obt input[type=number]{width:100%;padding:5px 6px;font-size:12.5px;border-radius:7px;background:var(--field);text-align:right;
+  font-variant-numeric:tabular-nums;-moz-appearance:textfield;appearance:textfield}
+.obt input[type=number]::-webkit-outer-spin-button,.obt input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.obt input:focus{outline:none;border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px rgba(15,118,110,.15)}
+.obt input.bad{border-color:var(--bad);background:var(--bad-soft)}
+.obt input.good{border-color:var(--ok)}
+.obt tr.pending td{background:var(--mine)}
+.obt .mark{width:22px;text-align:center;padding:0}
+.obt .mark .ic{width:14px;height:14px}
+.obt .mark .y{color:var(--ok)}
+.obt .mark .n{color:var(--bad)}
+.obt .empty{color:var(--muted);text-align:center;padding:26px 10px;font-size:13px;line-height:1.6;border:1px dashed var(--line);border-radius:10px}
+.obt .rowtools{display:flex;gap:8px;margin-top:10px;justify-content:flex-end;flex-wrap:wrap}
+.obt .del{border:0;background:transparent;color:var(--muted);padding:2px 4px;box-shadow:none}
+.obt .del:hover{color:var(--bad);box-shadow:none;border-color:transparent}
+.obt .note{font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:6px}
+/* the calculation and the result */
+.calc{padding:12px 14px 22px}
+.calc .card{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:12px}
+.calc .card h4{margin:0;padding:8px 12px;background:var(--hover);font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+.calc .card .in{padding:11px 13px;font-size:13px;line-height:1.75}
+.calc .line{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line)}
+.calc .line:last-child{border-bottom:0}
+.calc .line span:last-child{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.calc .work{font-family:'Cascadia Mono',Consolas,ui-monospace,monospace;font-size:12px;line-height:1.9;color:var(--ink2);
+  background:var(--field);border-radius:8px;padding:9px 11px;margin:8px 0 0;white-space:pre-wrap;overflow-x:auto}
+.calc .final{background:var(--accent-bg);border:1px solid var(--accent-line);border-radius:12px;padding:12px 14px;font-size:15px;font-weight:700;color:var(--accent-ink);line-height:1.7}
+.calc .final small{display:block;font-weight:500;font-size:12px;color:var(--muted);margin-top:4px}
+.calc .empty{color:var(--muted);text-align:center;padding:30px 12px;font-size:13px;line-height:1.65;border:1px dashed var(--line);border-radius:12px}
+.verdict{margin-top:14px;padding:13px 15px;border-radius:12px;font-weight:600;display:none;line-height:1.6;border:1px solid transparent}
+.verdict.ok{display:block;background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.verdict.bad{display:block;background:var(--bad-soft);color:var(--bad);border-color:var(--bad)}
+.verdict.info{display:block;background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent-line)}
+.verdict ul{margin:8px 0 0;padding-left:18px;font-weight:500}
+.verdict li{margin:3px 0}
+.verdict .vh{display:flex;align-items:center;gap:8px;font-size:15px}
+/* rough notebook */
+.rough{display:flex;flex-direction:column;height:100%;min-height:320px;padding:10px 12px 8px}
+#roughText{flex:1;width:100%;min-height:240px;resize:none;font:13px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;color:var(--ink);
+  padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:
+  repeating-linear-gradient(180deg,transparent,transparent 24px,var(--chip) 24px,var(--chip) 25px) 0 6px/100% 25px,var(--paper)}
+#roughText:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,118,110,.15)}
+.rough-foot{display:flex;align-items:center;gap:8px;padding-top:8px;font-size:11px;color:var(--muted)}
+.rough-foot .sp{flex:1}
+.rough-foot button{padding:4px 10px;font-size:12px;border-radius:8px}
+/* ---------- misc ---------- */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#101828;color:#fff;padding:11px 18px;border-radius:12px;font-size:13.5px;opacity:0;transition:.25s;z-index:1200;pointer-events:none;max-width:70vw;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal-bg{position:fixed;inset:0;background:rgba(17,24,39,.5);display:none;place-items:center;z-index:1100;padding:16px}
+.modal-bg.show{display:grid;animation:fadeIn .18s ease-out}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--surface);border-radius:18px;width:min(640px,94vw);max-height:88vh;overflow:auto;padding:20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.35);animation:popIn .2s cubic-bezier(.2,.9,.3,1.1)}
+@keyframes popIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.modal h2{font-size:19px;margin-bottom:6px}
+.modal p{color:var(--muted);margin:0 0 14px;line-height:1.55}
+.modal label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+.modal .foot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;flex-wrap:wrap}
+.pickgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pick{display:block;text-align:left;padding:16px;border-radius:14px;border:1px solid var(--line);background:var(--surface);cursor:pointer}
+.pick:hover:not(:disabled){border-color:var(--accent);background:var(--accent-bg);box-shadow:0 6px 20px rgba(15,118,110,.16);transform:translateY(-1px)}
+.pick .pi{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--accent-soft);color:var(--accent-ink);margin-bottom:10px}
+.pick .pi .ic{width:20px;height:20px}
+.pick>b{display:block;font-size:16px;margin-bottom:6px}
+.pick small b{font-weight:700;color:var(--ink2)}
+.pick small{display:block;font-size:12.5px;color:var(--muted);line-height:1.55;font-weight:400}
+.pick .for{display:block;margin-top:9px;padding-top:8px;border-top:1px dashed var(--line);font-size:11.5px;font-weight:600;color:var(--accent)}
+.pick.current{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+@media (max-width:700px){.pickgrid{grid-template-columns:1fr}}
+.hint{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+.ver{color:var(--accent);font-weight:600}
+@keyframes flash{0%{background:var(--mine)}100%{background:transparent}}
+.flash{animation:flash 1s}
+#printArea{display:none}
+@media print{
+  body>*{display:none!important}
+  html,body{background:#fff!important;color:#000!important}
+  #printArea{display:block!important;font-family:Calibri,Arial,sans-serif;padding:20px;color:#000;background:#fff}
+  #printArea table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px}
+  #printArea th,#printArea td{border:1px solid #000;padding:5px;vertical-align:top;color:#000}
+  #printArea h2{font-size:15px;margin:14px 0 6px}
+  #printArea h3{font-size:13px;margin:12px 0 4px}
+  @page{margin:14mm}
+}
+@media (max-width:1280px){ :root{--colL:250px;--colR:380px} }
+@media (max-width:1120px){ :root{--colL:210px;--colR:330px} }
+/* ---- these react to the panel's own width, not the window's ---- */
+@container shelf (max-width:240px){
+  .tw{display:none}
+  .tabs button{font-size:10.5px;padding:7px 2px;letter-spacing:-.1px}
+  .exprow small{display:none}
+}
+@container side (max-width:340px){
+  .side-tabs button{font-size:12px;padding:11px 3px}
+  .obs .row{grid-template-columns:1fr;gap:2px}
+  .obt table{font-size:11.5px}
+  .obt th{font-size:9.5px}
+}
+@container bench (max-width:620px){
+  .bench-top{gap:8px;padding:10px 12px 0;overflow-x:auto;scrollbar-width:none}
+  .bench-top::-webkit-scrollbar{display:none}
+  .spec-card{flex:0 0 auto;padding:8px 9px;gap:7px}
+  .spec-card svg{width:34px;height:34px}
+  .spec-card b{font-size:12px}
+  .spec-card small{display:none}
+}
+@media (max-width:900px){           /* portrait tablet and below: stack */
+  header{height:auto;flex-wrap:wrap;gap:10px;padding:10px 14px}
+  .exp-tag{margin-left:0;max-width:100%}
+  main{grid-template-columns:1fr;height:auto;gap:14px}
+  #shelfPanel,#splitL,.bench,#splitR,#sidePanel{grid-column:auto}
+  .split{display:none}
+  .panel.is-hidden{display:flex}    /* nothing folds away once stacked */
+  .bench{min-height:620px}
+  .spec-card small{display:block}
+  .side-body{max-height:none;overflow:visible}
+  #shelfPanel{max-height:420px}
+}
+@media (max-width:700px){
+  body{font-size:15px}
+  header{gap:8px}
+  .actions{width:100%;flex-wrap:wrap}
+  .actions button{flex:1 1 auto}
+  .bench-top{flex-wrap:wrap}
+  .bench{min-height:560px}
+}
+</style>
+</head>
+<body>
+<!-- icon sprite: every icon on the page is a line drawing, not an emoji -->
+<svg class="sr" aria-hidden="true" focusable="false"><defs>
+  <g id="i-book"><path d="M3 4.5A2 2 0 0 1 5 3h5v18H5a2 2 0 0 1-2-2z"/><path d="M21 4.5A2 2 0 0 0 19 3h-5v18h5a2 2 0 0 0 2-2z"/></g>
+  <g id="i-target"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" class="dot"/></g>
+  <g id="i-ruler"><rect x="2.5" y="7" width="19" height="10" rx="2"/><path d="M7 7v4M11 7v6M15 7v4M19 7v6"/></g>
+  <g id="i-gauge"><circle cx="12" cy="12" r="8.5"/><path d="M12 12l4.2-3.2"/><path d="M12 3.5v2M20.5 12h-2M12 20.5v-2M3.5 12h2"/></g>
+  <g id="i-vec"><path d="M4 20L18 6"/><path d="M11 6h7v7"/><path d="M4 20h9M4 20V11"/></g>
+  <g id="i-plus"><path d="M12 5v14M5 12h14"/></g>
+  <g id="i-x"><path d="M6 6l12 12M18 6L6 18"/></g>
+  <g id="i-check"><path d="M4.5 12.5l5 5 10-11"/></g>
+  <g id="i-printer"><path d="M7 9V3h10v6"/><rect x="3.5" y="9" width="17" height="8" rx="2"/><path d="M7 14h10v7H7z"/></g>
+  <g id="i-refresh"><path d="M3.5 12a8.5 8.5 0 0 1 14.6-5.9L21 9"/><path d="M21 4v5h-5"/><path d="M20.5 12a8.5 8.5 0 0 1-14.6 5.9L3 15"/><path d="M3 20v-5h5"/></g>
+  <g id="i-clipboard"><rect x="5" y="4.5" width="14" height="17" rx="2.5"/><rect x="9" y="2.2" width="6" height="4" rx="1.5"/><path d="M9 11h6M9 15h4"/></g>
+  <g id="i-table"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M3 10h18M9.5 10v9.5"/></g>
+  <g id="i-list"><path d="M8 6h12M8 12h12M8 18h12M3.6 6h.01M3.6 12h.01M3.6 18h.01"/></g>
+  <g id="i-calc"><rect x="4.5" y="2.5" width="15" height="19" rx="2.5"/><rect x="8" y="6" width="8" height="3.2" rx="1"/><path d="M8.5 13.5h.01M12 13.5h.01M15.5 13.5h.01M8.5 17.5h.01M12 17.5h.01M15.5 17.5h.01"/></g>
+  <g id="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.4M12 19.2v2.4M2.4 12h2.4M19.2 12h2.4M5.2 5.2l1.7 1.7M17.1 17.1l1.7 1.7M18.8 5.2l-1.7 1.7M6.9 17.1l-1.7 1.7"/></g>
+  <g id="i-moon"><path d="M20.5 14.3A8.6 8.6 0 0 1 9.7 3.5a8.6 8.6 0 1 0 10.8 10.8z"/></g>
+  <g id="i-chevL"><path d="M15 5l-7 7 7 7"/></g>
+  <g id="i-chevR"><path d="M9 5l7 7-7 7"/></g>
+  <g id="i-lens"><circle cx="10.5" cy="10.5" r="6.8"/><path d="M15.4 15.4L21 21"/></g>
+  <g id="i-grip"><path d="M9 4v16M15 4v16"/><path d="M4.5 8.5L2 12l2.5 3.5M19.5 8.5L22 12l-2.5 3.5"/></g>
+</defs></svg>
+<header>
+  <div class="brand">
+    <div class="logo" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px"><use href="#i-ruler"/></svg></div>
+    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 1</span></small></div>
+  </div>
+  <div class="exp-tag" id="expTag">No experiment selected</div>
+  <div class="actions">
+    <div class="modesw" id="modeSw" role="group" aria-label="Mode" title="Learning checks every reading as you take it and shows the working. Test records what you write and marks it at the end.">
+      <button data-mode="learn" class="on" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-book"/></svg>Learning</button><button data-mode="test" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-target"/></svg>Test</button>
+    </div>
+    <button id="btnTheme" aria-pressed="false" title="Switch between the light and dark bench"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-moon" id="themeIcon"/></svg><span id="themeLbl">Dark</span></button>
+    <button id="btnNew" title="Draw a fresh unknown specimen for this experiment"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-refresh"/></svg>New specimen</button>
+    <button id="btnPrint"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-printer"/></svg>Print record</button>
+    <button class="primary" id="btnResult"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clipboard"/></svg>Check result</button>
+  </div>
+</header>
+<main>
+  <!-- ===== LEFT: experiments and apparatus ===== -->
+  <aside class="panel" id="shelfPanel" aria-label="Experiments and apparatus">
+    <div class="panel-h"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-list"/></svg>Practical list
+      <button id="btnReset" type="button" style="margin-left:auto;padding:3px 9px;font-size:11px;border-radius:8px;text-transform:none;letter-spacing:0"
+        title="Clear every table, every specimen and every saved setting">Reset all</button></div>
+    <div class="tabs" id="shelfTabs" role="tablist" aria-label="Left panel">
+      <button data-cat="exp" class="active" role="tab" aria-selected="true">Experiments</button>
+      <button data-cat="app" role="tab" aria-selected="false">Apparatus<span class="tw"> &amp; least count</span></button>
+    </div>
+    <div class="explist" id="expList" role="list"></div>
+    <div class="appa" id="appaList" hidden></div>
+  </aside>
+
+  <div class="split" id="splitL" role="separator" aria-orientation="vertical" tabindex="0"
+       aria-label="Width of the practical list — drag, or use the arrow keys; double-click to reset"
+    ><button class="tog" data-fold="L" type="button" aria-expanded="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chevL"/></svg></button></div>
+
+  <!-- ===== BENCH ===== -->
+  <section class="panel bench">
+    <div class="bench-top" id="benchTop"></div>
+    <div class="bench-main" id="benchMain">
+      <div class="instr" id="instr" tabindex="0" role="group" aria-label="The instrument — drag it, or use the arrow keys; Home closes it"></div>
+      <div class="mag" id="mag"></div>
+    </div>
+    <div class="ctrl" id="ctrl"></div>
+  </section>
+
+  <div class="split" id="splitR" role="separator" aria-orientation="vertical" tabindex="0"
+       aria-label="Width of the observations panel — drag, or use the arrow keys; double-click to reset"
+    ><button class="tog" data-fold="R" type="button" aria-expanded="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chevR"/></svg></button></div>
+
+  <!-- ===== RIGHT: procedure, readings, result ===== -->
+  <aside class="panel" id="sidePanel" aria-label="Procedure, observations and result">
+    <div class="obs" id="obs" aria-live="polite">
+      <div class="head"><span class="badge" id="obsTest">Ready</span><span class="badge sec" id="obsSec"></span></div>
+      <div class="row"><b>Step</b><div id="obsExp">Pick an experiment on the left to begin.</div></div>
+      <div class="row"><b>Reading</b><div id="obsObs">&mdash;</div></div>
+      <div class="foot"><span class="hintq" id="obsHint"></span><button id="btnGrip" disabled><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-grip"/></svg>Take a reading</button></div>
+    </div>
+    <div class="prog" id="prog" hidden></div>
+    <div class="side-tabs" role="tablist" aria-label="Side panel">
+      <button class="active" data-side="guide" role="tab" aria-selected="true">Procedure</button
+      ><button data-side="obt" role="tab" aria-selected="false">Readings <span id="obCount" class="badge nbc" hidden>0</span></button
+      ><button data-side="calc" role="tab" aria-selected="false">Result</button
+      ><button data-side="rough" role="tab" aria-selected="false">Rough</button>
+    </div>
+    <div class="side-body">
+      <div class="guide" id="guide"></div>
+      <div class="obt" id="obt" hidden></div>
+      <div class="calc" id="calc" hidden></div>
+      <div class="rough" id="rough" hidden>
+        <label class="sr" for="roughText">Rough work</label>
+        <textarea id="roughText" spellcheck="false" placeholder="Rough work — least count, zero correction, anything you want to keep while you measure."></textarea>
+        <div class="rough-foot"><span id="roughCount"></span><span class="sp"></span><button id="btnRoughClear">Clear</button></div>
+      </div>
+    </div>
+  </aside>
+</main>
+<div class="toast" id="toast"></div>
+
+<div class="modal-bg" id="modeModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modeH">
+  <h2 id="modeH">How do you want to work?</h2><p>Pick one to start. You can swap at any time with the switch in the header.</p>
+  <div class="pickgrid">
+    <button class="pick" data-pick="learn">
+      <span class="pi"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-book"/></svg></span>
+      <b>Learning</b>
+      <small>Every reading you write is checked against the instrument the moment you type it, and the working is laid out line by line. The <b>why it works</b> notes and the viva answers are shown.</small>
+      <span class="for">For learning to read the scale in the first place.</span>
+    </button>
+    <button class="pick" data-pick="test">
+      <span class="pi"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-target"/></svg></span>
+      <b>Test</b>
+      <small>The instrument and the procedure stay. Nothing is checked as you go &mdash; your readings, your mean, your result. <b>Check result</b> marks it at the end against the true value and tells you your percentage error.</small>
+      <span class="for">For checking whether you can actually do it.</span>
+    </button>
+  </div>
+  <div class="hint" id="modeRemembered"></div>
+</div></div>
+
+<div class="modal-bg" id="resultModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="repH">
+  <h2 id="repH">Check your result</h2><p id="repLead">Your result is taken from the readings you entered and the calculation in the Result tab.</p>
+  <div id="repBody"></div>
+  <div class="verdict" id="verdict"></div>
+  <div class="foot"><button id="btnReveal" class="ghostbtn">Reveal true value</button><button id="btnCloseResult">Close</button><button class="primary" id="btnCheck"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>Check</button></div>
+</div></div>
+
+<div id="printArea"></div>
+
+<script>
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const ICON=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+// Fixed decimals without the float noise: 0.1+0.2 must print as 0.30, not 0.30000000000000004.
+const fx=(v,n)=>(Math.round(v*Math.pow(10,n))/Math.pow(10,n)).toFixed(n);
+const sig=(v,n)=>Number(v.toPrecision(n));
+const signed=v=>(v>0?'+':'')+v;
+function mulberry(seed){ let a=seed>>>0; return ()=>{ a=(a+0x6D2B79F5)|0; let t=Math.imul(a^(a>>>15),1|a); t=(t+Math.imul(t^(t>>>7),61|t))^t; return ((t^(t>>>14))>>>0)/4294967296; }; }
+const randInt=(rng,lo,hi)=>lo+Math.floor(rng()*(hi-lo+1));
+let toastT;
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2800); }
+
+/* =========================================================
+   THE TWO INSTRUMENTS
+   Position is held as a whole number of least-count ticks, never as a float, so
+   a reading is exact by construction: one tick is one vernier (or circular)
+   division, and the coincidence a student hunts for is real geometry, not a
+   number we decided in advance. Ticks may be negative -- that is a jaw sitting
+   left of the main-scale zero, which is exactly what a negative zero error is.
+   ========================================================= */
+const VERNIER={
+  id:'vernier', name:'Vernier calliper',
+  msdMM:1,            // one main scale division = 1 mm
+  vsd:10,             // 10 vernier divisions ...
+  span:9,             // ... spread over 9 main scale divisions
+  lcMM:0.1,           // so the least count is 1/10 mm
+  maxMM:150,
+  // msr is the main-scale mark just before the vernier zero; vsr is the vernier
+  // division that lines up with a main-scale mark.
+  read(t){ const msrT=Math.floor(t/10)*10; return {ticks:t,msrMM:msrT/10,vsr:t-msrT,totalMM:t/10}; }
+};
+const SCREW={
+  id:'screw', name:'Screw gauge',
+  pitchMM:1,          // the spindle advances 1 mm per turn ...
+  csd:100,            // ... and the thimble is divided into 100 ...
+  lcMM:0.01,          // ... so the least count is 1/100 mm
+  maxMM:25,
+  read(t){ const psr=Math.floor(t/100); return {ticks:t,psrMM:psr,csr:t-psr*100,totalMM:t/100}; }
+};
+const INSTR={vernier:VERNIER,screw:SCREW};
+
+/* =========================================================
+   THE PRACTICALS
+   Aim, apparatus, formula, procedure, precautions, sources of error and viva are
+   the class record's own, kept in its order so the notebook you fill here is the
+   notebook you hand in. What the app adds is the unknown: make() draws a fresh
+   specimen and a fresh zero error every time, in ticks of the least count.
+   ========================================================= */
+const LC_NOTE='Least count = value of one main scale division / total number of divisions on the vernier scale';
+const VERNIER_PREC=[
+  'Avoid excessive pressure on the jaws of the calliper.',
+  'Do not tilt the calliper while taking a reading.',
+  'Zero error for the measurement of height is different from the usual zero error of a vernier calliper, so it should be determined separately and carefully.'
+];
+const VERNIER_ERR=[
+  'The vernier scale may be loose.',
+  'The graduations on the scale may not be evenly marked.',
+  'None of the vernier divisions may be exactly coincident.',
+  'Parallax may be there in taking observations.'
+];
+const VERNIER_VIVA=[
+  ['What is a vernier calliper? Why is it so called?','An instrument used to measure small lengths, accurate to a fraction of a millimetre. It was invented by the French mathematician Pierre Vernier, and is named after him.'],
+  ['What is meant by the least count of a measuring instrument?','The smallest value of the physical quantity that the instrument can measure.'],
+  ['What is meant by zero error?','On bringing the jaws into contact, the zero of the vernier scale does not coincide with the zero of the main scale. Such an instrument is said to possess a zero error.'],
+  ['When is zero error positive and when is it negative?','When the vernier zero is to the right of the main scale zero it is positive; when it is to the left, the error is negative.'],
+  ['Why is a vernier scale used?','To increase the accuracy of the measurement.'],
+  ['What is the vernier constant?','The difference between one main scale division and one vernier scale division.'],
+  ['What is the principle of the vernier scale?','Ten vernier divisions are exactly equal to nine main scale divisions: 10 V.S.D. = 9 M.S.D.'],
+  ['What is zero correction?','Zero correction is the negative of the zero error.']
+];
+const EXPERIMENTS=[
+{
+  id:'v1', no:1, title:'Vernier calliper — 1', short:'Volume of a block',
+  sub:'Length, breadth and height of a block; hence its volume',
+  instrument:'vernier', icon:'i-ruler',
+  aim:'To find out the length, breadth and height of the given object using a vernier calliper and calculate its volume.',
+  apparatus:['Vernier calliper','The given rectangular block'],
+  formula:[{b:'Least count',eq:LC_NOTE},{b:'Volume',eq:'V = length × breadth × height'}],
+  procedure:[
+    'Find out the least count of the vernier calliper, and the zero error, by closing the jaws completely.',
+    'Measure the length of the block. Take five readings and tabulate them.',
+    'Measure the breadth of the block in the same way.',
+    'Measure the height of the block in the same way.',
+    'Take the mean of each dimension, apply the zero correction, and calculate the volume.'
+  ],
+  precautions:VERNIER_PREC, errors:VERNIER_ERR, viva:VERNIER_VIVA,
+  targets:[{key:'l',label:'length',sym:'l'},{key:'b',label:'breadth',sym:'b'},{key:'h',label:'height',sym:'h'}],
+  // A block a school lab would actually hand you: a few cm each way, each
+  // dimension a whole number of least counts.
+  make(rng){ return {
+    zeroTicks:randInt(rng,-3,3),
+    dims:{l:randInt(rng,300,560),b:randInt(rng,190,299),h:randInt(rng,95,189)},
+    label:'Rectangular metal block'
+  };},
+  sizeOf(sp,k){ return sp.dims[k]; },
+  result(sp,m){                       // m: corrected mean of each target, in cm
+    const V=m.l*m.b*m.h;
+    return {
+      lines:[['Mean length, l',fx(m.l,3)+' cm'],['Mean breadth, b',fx(m.b,3)+' cm'],['Mean height, h',fx(m.h,3)+' cm']],
+      work:'V = l × b × h\n  = '+fx(m.l,3)+' × '+fx(m.b,3)+' × '+fx(m.h,3)+' cm³\n  = '+fx(V,4)+' cm³\n  = '+(V*1e-6).toExponential(3)+' m³',
+      value:V, unit:'cm³',
+      final:'Volume of the given object = '+fx(V,3)+' cm³ = '+(V*1e-6).toExponential(3)+' m³',
+      extra:[['Length',fx(m.l/100,5)+' m'],['Breadth',fx(m.b/100,5)+' m'],['Height',fx(m.h/100,5)+' m']]
+    };
+  },
+  trueResult(sp){ const l=sp.dims.l/100,b=sp.dims.b/100,h=sp.dims.h/100; return {value:l*b*h,unit:'cm³',
+    parts:[['Length',fx(l,3)+' cm'],['Breadth',fx(b,3)+' cm'],['Height',fx(h,3)+' cm']]}; }
+},
+{
+  id:'v2', no:2, title:'Vernier calliper — 2', short:'Volume of a sphere',
+  sub:'Diameter of a spherical body; hence its volume',
+  instrument:'vernier', icon:'i-ruler',
+  aim:'To measure the diameter of the given object using a vernier calliper and hence calculate its volume.',
+  apparatus:['Vernier calliper','The given spherical body'],
+  formula:[{b:'Least count',eq:LC_NOTE},{b:'Volume of a sphere',eq:'V = (4/3) π r³,  where r = d / 2'}],
+  procedure:[
+    'Find out the least count of the vernier calliper, and the zero error, by closing the jaws completely.',
+    'Grip the sphere between the jaws and note the reading for the diameter.',
+    'Repeat five times, turning the sphere between readings, and find the mean value.',
+    'Apply the zero correction, halve the diameter to get the radius, and calculate the volume.'
+  ],
+  precautions:VERNIER_PREC, errors:VERNIER_ERR, viva:VERNIER_VIVA,
+  targets:[{key:'d',label:'diameter',sym:'d'}],
+  make(rng){ return { zeroTicks:randInt(rng,-3,3), dims:{d:randInt(rng,180,300)}, label:'Steel sphere' };},
+  sizeOf(sp,k){ return sp.dims[k]; },
+  result(sp,m){
+    const r=m.d/2, V=4/3*Math.PI*r*r*r;
+    return {
+      lines:[['Mean diameter, d',fx(m.d,3)+' cm'],['Radius, r = d/2',fx(r,3)+' cm']],
+      work:'r = d / 2 = '+fx(m.d,3)+' / 2 = '+fx(r,4)+' cm\nV = (4/3) π r³\n  = (4/3) × 3.1416 × ('+fx(r,4)+')³\n  = '+fx(V,4)+' cm³\n  = '+(V*1e-6).toExponential(3)+' m³',
+      value:V, unit:'cm³',
+      final:'Volume of the object = '+fx(V,3)+' cm³ = '+(V*1e-6).toExponential(3)+' m³',
+      extra:[['Diameter',fx(m.d/100,5)+' m'],['Radius',fx(r/100,5)+' m']]
+    };
+  },
+  trueResult(sp){ const d=sp.dims.d/100,r=d/2; return {value:4/3*Math.PI*r*r*r,unit:'cm³',
+    parts:[['Diameter',fx(d,3)+' cm'],['Radius',fx(r,4)+' cm']]}; }
+},
+{
+  id:'s1', no:3, title:'Screw gauge — 1', short:'Volume of a wire',
+  sub:'Diameter of a wire; hence its volume',
+  instrument:'screw', icon:'i-gauge',
+  aim:'To measure the diameter of the given wire and hence calculate its volume.',
+  apparatus:['Screw gauge','The given wire','Metre scale'],
+  formula:[{b:'Least count',eq:'Least count = pitch / number of divisions on the circular scale'},
+           {b:'Volume of a wire',eq:'V = π r² l,  where r = d / 2'}],
+  procedure:[
+    'Calculate the least count by dividing the pitch of the screw by the number of divisions on the circular scale.',
+    'To find the zero error, close the studs completely and note the reading. If the circular scale zero is above the reference line the zero error is negative and is added to the observed reading; if below, it is subtracted.',
+    'Place the wire between the studs and find the pitch scale reading and the circular scale reading.',
+    'Multiply the corrected C.S.R. by the least count and add it to the P.S.R. to get the total reading.',
+    'Repeat five times along the wire, take the mean diameter, and calculate the volume.'
+  ],
+  precautions:[
+    'While taking an observation the screw must always be turned in one direction only, to avoid backlash error.',
+    'The wire must be straight and free from kinks.',
+    'Always rotate the screw by the ratchet, and stop as soon as it gives one tick.'
+  ],
+  errors:['Backlash error affects the result considerably.','The graduations on the scale may not be evenly marked.','The circular scale may not be evenly marked.','The wire may not be uniform.','The screw may have friction.'],
+  viva:[
+    ['What do you mean by a screw gauge? Why is it so called?','An instrument used to measure very short lengths accurately — the thickness of paper, of hair, and so on. It is called a screw gauge because it works on the principle of a micrometer screw and it gauges thin sheets.'],
+    ['Which is more accurate, a vernier calliper or a screw gauge, and why?','The screw gauge. A vernier calliper measures to 0.01 cm; a screw gauge measures to 0.001 cm.'],
+    ['What is the relation between pitch and least count?','Least count = pitch / number of divisions on the circular scale.'],
+    ['How do we decide the sign of the zero error?','With the studs closed: if the circular scale zero lies below the reference line the error is positive; if it lies above, the error is negative.'],
+    ['What is backlash error?','Because the screw and nut are loose, the screw does not move when the cap is first turned in the opposite direction. That causes an error in the reading, called backlash error.'],
+    ['How can backlash error be avoided?','By turning the screw in one direction only while taking observations.'],
+    ['What is the principle of the screw gauge?','The linear motion of the screw is directly proportional to the rotation given to the head.'],
+    ['What is pitch?','The distance moved by the screw when the head is given one complete rotation.'],
+    ['What is zero correction?','Zero correction is the negative of the zero error.']
+  ],
+  targets:[{key:'d',label:'diameter',sym:'d'}],
+  // 0.60-1.68 mm: thick enough that one least count is under 2% of the diameter,
+  // so a careful reading is never dragged out of the good band by honest scatter.
+  make(rng){ return { zeroTicks:randInt(rng,-5,5), dims:{d:randInt(rng,60,168)},
+    lengthCM:randInt(rng,80,220)/10, label:'Copper wire' };},
+  sizeOf(sp,k){ return sp.dims[k]; },
+  result(sp,m){
+    const dCM=m.d/10, r=dCM/2, l=sp.lengthCM, V=Math.PI*r*r*l;
+    return {
+      lines:[['Mean diameter, d',fx(m.d,3)+' mm = '+fx(dCM,4)+' cm'],['Radius, r = d/2',fx(r,4)+' cm'],['Length of the wire, l',fx(l,1)+' cm']],
+      work:'r = d / 2 = '+fx(dCM,4)+' / 2 = '+fx(r,4)+' cm\nV = π r² l\n  = 3.1416 × ('+fx(r,4)+')² × '+fx(l,1)+'\n  = '+fx(V,4)+' cm³\n  = '+(V*1e-6).toExponential(3)+' m³',
+      value:V, unit:'cm³',
+      final:'Diameter of the wire = '+fx(dCM/100,6)+' m · Volume of the wire = '+fx(V,4)+' cm³ = '+(V*1e-6).toExponential(3)+' m³',
+      extra:[['Diameter',fx(dCM/100,6)+' m'],['Radius',fx(r/100,6)+' m']]
+    };
+  },
+  trueResult(sp){ const dCM=sp.dims.d/1000,r=dCM/2; return {value:Math.PI*r*r*sp.lengthCM,unit:'cm³',
+    parts:[['Diameter',fx(sp.dims.d/100,3)+' mm'],['Radius',fx(r,4)+' cm'],['Length',fx(sp.lengthCM,1)+' cm']]}; }
+},
+{
+  id:'s2', no:4, title:'Screw gauge — 2', short:'Thickness of a sheet',
+  sub:'Thickness of a sheet of paper, by measuring a stack',
+  instrument:'screw', icon:'i-gauge',
+  aim:'To measure the thickness of a given sheet using a screw gauge.',
+  apparatus:['Screw gauge','Paper sheets'],
+  formula:[{b:'Least count',eq:'Least count = pitch / number of divisions on the circular scale'},
+           {b:'Thickness',eq:'Thickness of one sheet = thickness of n sheets / n'}],
+  procedure:[
+    'Calculate the least count by dividing the pitch of the screw by the number of divisions on the circular scale.',
+    'To find the zero error, close the studs completely and note the reading. If the circular scale zero is above the reference line the zero error is negative and is added to the observed reading; if below, it is subtracted.',
+    'Place the whole stack of sheets between the studs and find the pitch scale reading and the circular scale reading.',
+    'Multiply the corrected C.S.R. by the least count and add it to the P.S.R. to get the total reading.',
+    'Repeat five times at different places on the stack, take the mean, and divide by the number of sheets.'
+  ],
+  precautions:[
+    'While taking an observation the screw must always be turned in one direction only, to avoid backlash error.',
+    'The paper must be flat and free from kinks.',
+    'Always rotate the screw by the ratchet, and stop as soon as it gives one tick.'
+  ],
+  errors:['Backlash error affects the result considerably.','The graduations on the scale may not be evenly marked.','The circular scale may not be evenly marked.','The sheets may not be of uniform thickness.','The screw may have friction.'],
+  viva:null,                                   // shares the screw gauge viva
+  vivaFrom:'s1',
+  targets:[{key:'t',label:'thickness of the stack',sym:'t'}],
+  // The stack is drawn, not the sheet: real paper is 0.07-0.13 mm and a stack of
+  // n sheets need not come to a round number of hundredths, which is exactly why
+  // the record measures the stack and divides.
+  make(rng){ const n=[10,12,15,20][randInt(rng,0,3)];
+    return { zeroTicks:randInt(rng,-5,5), sheets:n, dims:{t:randInt(rng,7*n,13*n)}, label:n+' sheets of paper' };},
+  sizeOf(sp,k){ return sp.dims[k]; },
+  result(sp,m){
+    const one=m.t/sp.sheets;
+    return {
+      lines:[['Number of sheets, n',String(sp.sheets)],['Mean thickness of the stack',fx(m.t,3)+' mm']],
+      work:'thickness of one sheet = thickness of n sheets / n\n  = '+fx(m.t,3)+' / '+sp.sheets+'\n  = '+fx(one,4)+' mm\n  = '+fx(one/1000,7)+' m',
+      value:one, unit:'mm',
+      final:'Thickness of the given sheet = '+fx(one,4)+' mm = '+(one/1000).toExponential(3)+' m',
+      extra:[['Stack thickness',fx(m.t/1000,6)+' m']]
+    };
+  },
+  trueResult(sp){ return {value:sp.dims.t/100/sp.sheets,unit:'mm',
+    parts:[['Number of sheets',String(sp.sheets)],['Thickness of the stack',fx(sp.dims.t/100,3)+' mm']]}; }
+},
+{
+  id:'pg', no:5, title:'Parallelogram of vectors', short:'Weight of a body',
+  sub:'Unknown weight from the parallelogram law, on Gravesand’s apparatus',
+  instrument:'gravesand', icon:'i-vec',
+  aim:'To find the weight of a given body using the parallelogram law of vectors.',
+  apparatus:['Gravesand’s apparatus','Two slotted weights','A spherical bob','Thread','Drawing paper and pins','Mirror strip'],
+  formula:[{b:'Parallelogram law',eq:'R = √(P² + Q² + 2PQ cos θ)'},
+           {b:'From the drawing',eq:'R (g wt) = OC (cm) × the scale you chose'}],
+  procedure:[
+    'Set up Gravesand’s apparatus and fix the drawing paper on the board with drawing pins.',
+    'Pass threads carrying weights P and Q over the pulleys, and a third thread carrying the unknown weight vertically in the middle of the board.',
+    'Adjust the weights until the junction stays in equilibrium near the middle of the paper.',
+    'Keeping the mirror strip lengthwise under each thread, mark the image of the thread on both sides and mark the junction.',
+    'Remove the paper. Taking a suitable scale, mark OA and OB along P and Q, complete the parallelogram and measure the diagonal OC.',
+    'Repeat the experiment twice more, changing the weights on both sides.'
+  ],
+  precautions:['The board should be vertical and stable.','The pulleys should be frictionless.','The weights should not touch the board, but hang freely.','The junction should be at the middle of the paper.','Read the thread through the mirror strip, with the image hidden behind the thread, to remove parallax.'],
+  errors:['The pulleys may have friction.','The weights may not be accurate.','The points may not be marked correctly.'],
+  viva:[
+    ['State the parallelogram law of vector addition.','If two vectors acting at a point are represented in magnitude and direction by the two adjacent sides of a parallelogram, their resultant is represented by the diagonal drawn from that point.'],
+    ['Why is a mirror strip used?','To remove parallax. The thread is marked when its image in the mirror is hidden exactly behind the thread, so the eye is square to the board.'],
+    ['Why must the pulleys be frictionless?','Friction at a pulley makes the tension in the thread differ from the weight hanging on it, so the force you think you applied is not the force acting at the junction.'],
+    ['Why should the junction be near the middle of the paper?','So that all three directions can be marked on the paper, and so that no thread touches the edge of the board.'],
+    ['What is the direction of the resultant of P and Q here?','Vertically upwards — it balances the unknown weight, which hangs vertically downwards.']
+  ],
+  scale:10,                 // 1 cm on the paper = 10 g wt
+  rows:3,
+  targets:[{key:'main',label:'unknown weight',sym:'R'}],
+  make(rng){ return { R:randInt(rng,7,17)*10+randInt(rng,0,9), label:'Unknown weight' };},
+  result(sp,m){ const R=m.main;
+    return {
+      lines:[['Mean of the three trials',fx(R,1)+' g wt']],
+      work:'each trial:  R = OC (cm) × the scale it was drawn to\nmean R = '+fx(R,1)+' g wt\n       = '+fx(R/1000,4)+' kg wt',
+      value:R, unit:'g wt',
+      final:'The unknown weight of the given body = '+fx(R,1)+' g = '+fx(R/1000,4)+' kg',
+      extra:[]
+    };
+  },
+  trueResult(sp){ return {value:sp.R,unit:'g wt',parts:[['Unknown weight',sp.R+' g wt = '+fx(sp.R/1000,4)+' kg wt']]}; }
+}
+];
+const EXP=Object.fromEntries(EXPERIMENTS.map(e=>[e.id,e]));
+
+/* =========================================================
+   RUNTIME STATE
+   One slot per experiment, so switching between them never loses a table.
+   ========================================================= */
+let mode='learn', theme='light', expId='v1';
+const S={};
+function freshState(e,seed){
+  const rng=mulberry(seed>>>0);
+  const st={seed:seed>>>0, sp:e.make(rng), zeroTyped:'', rows:{}, ticks:0, held:null,
+            jit:[-1,0,0,0,1][Math.floor(rng()*5)], tries:0, checked:null, logged:false};
+  (e.targets||[{key:'main'}]).forEach(t=>st.rows[t.key]=[]);
+  st.active=(e.targets?e.targets[0].key:'main');
+  if(e.instrument==='gravesand'){
+    st.wP=[50,50]; st.wQ=[50,50]; st.P=100; st.Q=100;
+    st.view='board'; st.tool='line'; st.scale=10;
+    st.paper={strokes:[],live:null,ruler:{on:false,x:3,y:4,ang:0}};
+  }
+  st.ticks=(e.instrument==='gravesand')?0:st.sp.zeroTicks;   // the jaws start closed
+  return st;
+}
+function ensure(id){ if(!S[id]) S[id]=freshState(EXP[id],(Math.random()*4294967296)>>>0); return S[id]; }
+const cur=()=>EXP[expId], st=()=>ensure(expId);
+const lcMM=e=>INSTR[e.instrument]?INSTR[e.instrument].lcMM:0;
+
+// Where the jaws come to rest: on the object if something is between them, on the
+// zero error if they are empty. Everything downstream reads this one function.
+function stopTicks(){
+  const e=cur(),s=st();
+  if(e.instrument==='gravesand') return 0;
+  if(s.held==null) return s.sp.zeroTicks;
+  return e.sizeOf(s.sp,s.held)+s.sp.zeroTicks+s.jit;
+}
+const gripped=()=>cur().instrument!=='gravesand'&&st().ticks===stopTicks();
+const maxTicks=()=>Math.round(INSTR[cur().instrument].maxMM/INSTR[cur().instrument].lcMM);
+// A fresh grip is never quite the last one: pressure and tilt move it by up to one
+// least count either way, which is exactly why the record asks for five readings.
+function reJitter(){ const s=st(); s.jit=[-1,0,0,0,1][Math.floor(Math.random()*5)]; }
+// The jitter has to be redrawn BEFORE the jaw is clamped, or the clamp would use
+// the old stop and the jaws would end up a hair off the object.
+function setTicks(t){
+  const s=st(),hi=maxTicks(),lo0=stopTicks();
+  t=Math.round(t);
+  if(t<=lo0&&s.ticks>lo0) reJitter();          // closing on to the object: a fresh grip
+  const lo=stopTicks();
+  s.ticks=Math.max(lo,Math.min(hi,t));
+  if(s.ticks>lo) s.logged=false;               // opened again, so the next grip is a new trial
+}
+function closeJaws(){ const s=st(); reJitter(); s.ticks=stopTicks(); s.logged=false; }
+function setHeld(k){ const s=st(); s.held=k; reJitter(); s.ticks=stopTicks(); s.logged=false; }
+
+
+/* ---- the magnifying glass ----
+   A real loupe over the real drawing: the scene is rendered a second time,
+   scaled about the lens centre and clipped to the circle, so whatever is under
+   the glass is the same thing magnified -- not a separate picture that could
+   drift out of step with it. Drag the rim to move it. */
+let lens={on:false,x:600,y:180,r:150,k:4.2};
+function lensLayer(scene){
+  if(!lens.on) return '';
+  const L=lens,x=L.x.toFixed(1),y=L.y.toFixed(1);
+  return '<defs><clipPath id="lensClip"><circle cx="'+x+'" cy="'+y+'" r="'+L.r+'"/></clipPath></defs>'
+   +'<g clip-path="url(#lensClip)" pointer-events="none">'
+   +'<circle cx="'+x+'" cy="'+y+'" r="'+L.r+'" fill="var(--scale-face)"/>'
+   +'<g transform="translate('+x+' '+y+') scale('+L.k+') translate(-'+x+' -'+y+')">'+scene+'</g>'
+   +'<circle cx="'+x+'" cy="'+y+'" r="'+L.r+'" fill="var(--lens)"/></g>'
+   +'<circle data-drag="lens" class="grab" cx="'+x+'" cy="'+y+'" r="'+L.r+'" fill="none" stroke="transparent" stroke-width="40" pointer-events="stroke"/>'
+   +'<circle cx="'+x+'" cy="'+y+'" r="'+L.r+'" fill="none" stroke="var(--steel-dark)" stroke-width="10" pointer-events="none"/>'
+   +'<circle cx="'+x+'" cy="'+y+'" r="'+(L.r-6)+'" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2.5" pointer-events="none"/>'
+   +'<path d="M'+(L.x+L.r*0.71).toFixed(1)+' '+(L.y+L.r*0.71).toFixed(1)+'l58 58" stroke="var(--steel-dark)" stroke-width="18" stroke-linecap="round" pointer-events="none"/>';
+}
+// The glass starts where the reading is: over the vernier plate, over the
+// thimble edge, or over the marked junction on the paper.
+function lensHome(){
+  const e=cur(),s=st();
+  if(e.instrument==='vernier'){ lens.x=Math.min(1050,vpx(s.ticks/10)+90); lens.y=176; }
+  else if(e.instrument==='screw'){ lens.x=Math.min(1080,530+s.ticks/100*S_U+40); lens.y=S_AX; }
+  else if(s.view==='paper'){ lens.x=pcx(P_O[0]); lens.y=pcy(P_O[1])-120; }
+  else { lens.x=600; lens.y=300; }
+}
+
+/* =========================================================
+   THE VERNIER CALLIPER
+   Main scale ticks rise from the underside of the beam, vernier ticks fall from
+   the top of the sliding plate, and the two meet on one line -- the same
+   arrangement as the instrument, so the coincidence you hunt for on the bench is
+   the coincidence you hunt for here. The ticks are where they are because of
+   where the jaw is; nothing about the reading is decided in advance.
+   ========================================================= */
+const V_X0=180, V_U=5.4;                        // svg x of the main-scale zero, and units per mm
+const vpx=mm=>V_X0+mm*V_U;
+function drawVernier(){
+  const s=st(),e=cur(),x=s.ticks/10,px=vpx(x);
+  let ticks='',nums='';
+  for(let i=0;i<=150;i++){
+    const t=vpx(i).toFixed(1), big=(i%10===0), mid=(i%5===0);
+    ticks+='M'+t+' 170V'+(big?132:mid?147:156);
+    if(big) nums+='<text x="'+t+'" y="124" text-anchor="middle">'+(i/10)+'</text>';
+  }
+  let vt='',vn='';
+  for(let k=0;k<=10;k++){ const t=(px+k*0.9*V_U).toFixed(1);
+    vt+='M'+t+' 170V'+(k%5===0?200:190);
+    if(k%5===0) vn+='<text x="'+t+'" y="218" text-anchor="middle">'+k+'</text>'; }
+  const w=(s.held!=null?e.sizeOf(s.sp,s.held)/10:0);
+  const ow=(w*V_U);
+  const obj=w>0
+   ?'<rect x="'+V_X0+'" y="226" width="'+ow.toFixed(1)+'" height="40" rx="3" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/>'
+    +'<text x="'+(V_X0+ow/2).toFixed(1)+'" y="292" text-anchor="middle" font-size="19" fill="var(--ink)">'+esc(tLabel(s.held))+' of the block</text>'
+   :'<text x="300" y="292" text-anchor="middle" font-size="19" fill="var(--muted)">nothing between the jaws</text>';
+  const scene=
+     '<g stroke="var(--steel-line)" stroke-width="2">'
+    +'<rect x="180" y="96" width="1000" height="74" fill="var(--scale-face)"/>'
+    +'<path d="M180 44 H140 V96 H96 V170 H140 V268 H180 Z" fill="var(--steel)"/>'
+    +'<rect x="'+px.toFixed(1)+'" y="44" width="40" height="52" fill="var(--steel)"/>'
+    +'<rect x="'+px.toFixed(1)+'" y="96" width="5" height="74" fill="var(--steel-dark)" stroke="none"/>'
+    +'<rect x="'+px.toFixed(1)+'" y="170" width="180" height="56" rx="3" fill="var(--vern-face)"/>'
+    +'<rect x="'+px.toFixed(1)+'" y="224" width="40" height="44" fill="var(--steel)"/>'
+    +'<rect x="'+(px+126).toFixed(1)+'" y="130" width="48" height="96" rx="7" fill="var(--steel2)"/>'
+    +'</g>'
+    +'<path d="M'+(px+134).toFixed(1)+' 146v64M'+(px+146).toFixed(1)+' 146v64M'+(px+158).toFixed(1)+' 146v64" stroke="var(--steel-line)" stroke-width="1.6"/>'
+    +obj
+    +'<g stroke="var(--scale-tick)" stroke-width="1.7" fill="none"><path d="'+ticks+'"/></g>'
+    +'<g font-size="19" fill="var(--scale-ink)">'+nums+'</g>'
+    +'<g stroke="var(--vern-ink)" stroke-width="1.9" fill="none"><path d="'+vt+'"/></g>'
+    +'<g font-size="17" fill="var(--vern-ink)" font-weight="700">'+vn+'</g>';
+  return '<svg viewBox="0 0 1200 340" role="img" aria-label="Vernier calliper. Drag the sliding jaw; read the magnified scale below.">'
+   +'<g class="grab" data-drag="jaw">'+scene+'</g>'+lensLayer(scene)
+   +'<text x="600" y="330" text-anchor="middle" font-size="18" fill="var(--muted)">drag the sliding jaw \u2014 it stops when it grips</text>'
+   +'</svg>';
+}
+// The magnified window: 12 mm of main scale, which always contains at least one
+// centimetre mark, and the whole 9 mm vernier inside it. Main ticks rise from the
+// shared line, vernier ticks fall from it, so a coincidence reads as one
+// unbroken stroke -- which is exactly what you look for on the bench.
+const M_X=34, M_U=94;
+function magVernier(){
+  const s=st(),x=s.ticks/10,w0=x-1.5;
+  const mx=mm=>(M_X+(mm-w0)*M_U);
+  let ms='',nums='';
+  for(let i=Math.max(0,Math.ceil(w0));i<=Math.floor(w0+12);i++){
+    const t=mx(i).toFixed(1), big=(i%10===0), mid=(i%5===0);
+    ms+='M'+t+' 108V'+(big?34:mid?56:72);
+    if(big) nums+='<text x="'+t+'" y="26" text-anchor="middle">'+(i/10)+' cm</text>';
+  }
+  let vs='';
+  for(let k=0;k<=10;k++) vs+='M'+mx(x+k*0.9).toFixed(1)+' 108V174';
+  const vnum=[];
+  for(let k=0;k<=10;k++) vnum.push('<text x="'+mx(x+k*0.9).toFixed(1)+'" y="198">'+k+'</text>');
+  return '<svg viewBox="0 0 1200 212" role="img" aria-label="Magnified view of the vernier scale against the main scale">'
+   +'<rect x="0" y="30" width="1200" height="78" fill="var(--scale-face)"/>'
+   +'<rect x="'+mx(x).toFixed(1)+'" y="108" width="'+(9*M_U).toFixed(1)+'" height="76" rx="6" fill="var(--vern-face)"'
+   +' stroke="var(--vern-ink)" stroke-width="1.5" opacity=".92"/>'
+   +'<path d="M0 108H1200" stroke="var(--scale-tick)" stroke-width="2.5"/>'
+   +'<g stroke="var(--scale-tick)" stroke-width="3" stroke-linecap="butt" fill="none"><path d="'+ms+'"/></g>'
+   +'<g font-size="22" font-weight="700" fill="var(--scale-ink)">'+nums+'</g>'
+   +'<g stroke="var(--vern-ink)" stroke-width="3" stroke-linecap="butt" fill="none"><path d="'+vs+'"/></g>'
+   +'<g font-size="21" font-weight="700" fill="var(--vern-ink)" text-anchor="middle">'+vnum.join('')+'</g>'
+   +'<path d="M'+mx(x).toFixed(1)+' 100l-11 -17h22z" fill="var(--accent)"/>'
+   +'<text x="'+mx(x).toFixed(1)+'" y="76" text-anchor="middle" font-size="17" font-weight="700" fill="var(--accent)">index</text>'
+   +'</svg>';
+}
+
+/* =========================================================
+   THE SCREW GAUGE
+   The thimble advances one pitch per turn, so its position along the sleeve and
+   its rotation are the same number seen two ways: the sleeve carries the whole
+   millimetres, the thimble the hundredths. Both are drawn from the one spindle
+   position, so they can never disagree.
+   ========================================================= */
+const S_X0=530, S_U=8, S_ANV=300, S_AX=145;     // sleeve zero, units per mm, anvil face, axis
+function drawScrew(){
+  const s=st(),e=cur(),g=s.ticks/100,adv=g*S_U;
+  let ms='',nums='';
+  for(let i=0;i<=25;i++){
+    const t=(S_X0+i*S_U).toFixed(1);
+    ms+='M'+t+' '+S_AX+'V'+(i%5===0?118:128);
+    if(i%5===0) nums+='<text x="'+t+'" y="110" text-anchor="middle">'+i+'</text>';
+  }
+  const csr=INSTR.screw.read(s.ticks).csr;
+  let drum='';
+  for(let d=-5;d<=5;d++){
+    const y=(S_AX+d*11).toFixed(1);
+    drum+='M'+(536+adv).toFixed(1)+' '+y+'h'+(((((csr+d)%5)+5)%5===0)?40:22);
+  }
+  const w=(s.held!=null?e.sizeOf(s.sp,s.held)/100:0), ow=Math.max(3,w*S_U);
+  const obj=w>0?'<rect x="'+S_ANV+'" y="'+(S_AX-17)+'" width="'+ow.toFixed(1)+'" height="34" rx="3" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/>'
+    +'<text x="'+(S_ANV+60)+'" y="'+(S_AX+66)+'" text-anchor="middle" font-size="19" fill="var(--ink)">'+esc(s.sp.label)+'</text>':
+    '<text x="'+(S_ANV+60)+'" y="'+(S_AX+66)+'" text-anchor="middle" font-size="19" fill="var(--muted)">studs empty</text>';
+  const scene=
+     '<g stroke="var(--steel-line)" stroke-width="2">'
+    +'<path d="M300 108 h-60 a96 96 0 0 0 0 192 h340 v-54 H272 a42 42 0 0 1 0-84 h28 z" fill="var(--steel)"/>'
+    +'<rect x="258" y="108" width="42" height="74" rx="3" fill="var(--steel2)"/>'
+    +'</g>'+obj
+    +'<rect x="'+(S_ANV+adv).toFixed(1)+'" y="'+(S_AX-13)+'" width="'+Math.max(8,520-S_ANV-adv).toFixed(1)+'" height="26" rx="4" fill="var(--steel2)" stroke="var(--steel-line)" stroke-width="2"/>'
+    +'<rect x="520" y="104" width="440" height="82" rx="8" fill="var(--scale-face)" stroke="var(--steel-line)" stroke-width="2"/>'
+    +'<path d="M'+S_X0+' '+S_AX+'H950" stroke="var(--accent)" stroke-width="2.4"/>'
+    +'<g stroke="var(--scale-tick)" stroke-width="1.7" fill="none"><path d="'+ms+'"/></g>'
+    +'<g font-size="17" fill="var(--scale-ink)">'+nums+'</g>'
+    +'<g stroke="var(--steel-line)" stroke-width="2">'
+    +'<rect x="'+(530+adv).toFixed(1)+'" y="96" width="200" height="98" rx="12" fill="var(--brass)"/>'
+    +'<rect x="'+(530+adv).toFixed(1)+'" y="96" width="46" height="98" rx="5" fill="var(--brass2)" opacity=".4" stroke="none"/>'
+    +'<rect x="'+(730+adv).toFixed(1)+'" y="112" width="58" height="66" rx="12" fill="var(--steel2)"/>'
+    +'</g>'
+    +'<g stroke="var(--scale-ink)" stroke-width="1.8" fill="none" opacity=".85"><path d="'+drum+'"/></g>'
+    +'<path d="M'+(744+adv).toFixed(1)+' 126v38M'+(758+adv).toFixed(1)+' 126v38M'+(772+adv).toFixed(1)+' 126v38" stroke="var(--steel-line)" stroke-width="1.7"/>';
+  return '<svg viewBox="0 0 1200 340" role="img" aria-label="Screw gauge. Drag the thimble; read the magnified sleeve and thimble below.">'
+   +'<g class="grab" data-drag="thimble">'+scene+'</g>'+lensLayer(scene)
+   +'<text x="600" y="330" text-anchor="middle" font-size="18" fill="var(--muted)">drag the thimble \u2014 turning it one way only avoids backlash</text>'
+   +'</svg>';
+}
+// Magnified: the sleeve on the left, where you count the whole millimetres the
+// thimble has uncovered, and the thimble's own divisions on the right, where you
+// read the one standing on the reference line.
+function magScrew(){
+  const s=st(),g=s.ticks/100,r=INSTR.screw.read(s.ticks);
+  const w0=Math.max(0,Math.floor(g)-2), mx=mm=>(50+(mm-w0)*100);
+  const edge=Math.min(664,mx(g));
+  // Only the marks the thimble has actually uncovered are drawn. Relying on one
+  // rectangle to hide the rest is fragile -- a digit is taller than its baseline.
+  let ms='',nums='',seen=0;
+  // A mark the edge sits exactly on has been uncovered: that is P.S.R. = that mark
+  // with the circular scale reading 00.
+  for(let i=w0;i<=w0+6;i++){ const t=mx(i); if(t>edge+0.5||t>664) break;
+    ms+='M'+t.toFixed(1)+' 150V104';
+    nums+='<text x="'+t.toFixed(1)+'" y="92" text-anchor="middle">'+i+'</text>'; seen++; }
+  let drum='',dn='';
+  for(let d=r.csr-4;d<=r.csr+4;d++){
+    const y=(150+(d-r.csr)*30).toFixed(1), five=(((d%5)+5)%5===0);
+    drum+='M724 '+y+'h'+(five?96:56);
+    if(five) dn+='<text x="836" y="'+(+y+7)+'">'+String(((d%100)+100)%100).padStart(2,'0')+'</text>';
+  }
+  return '<svg viewBox="0 0 1200 300" role="img" aria-label="Magnified view of the sleeve and the thimble against the reference line">'
+   +'<rect x="40" y="104" width="624" height="92" rx="6" fill="var(--scale-face)" stroke="var(--line)"/>'
+   +'<g stroke="var(--scale-tick)" stroke-width="2.6" fill="none"><path d="'+ms+'"/></g>'
+   +'<g font-size="22" fill="var(--scale-ink)">'+nums+'</g>'
+   +(seen?'':'<text x="'+((40+edge)/2).toFixed(1)+'" y="152" text-anchor="middle" font-size="19" fill="var(--muted)">no mark uncovered</text>')
+   +'<rect x="'+edge.toFixed(1)+'" y="64" width="'+(670-edge).toFixed(1)+'" height="152" rx="6" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/>'
+   +'<rect x="700" y="24" width="470" height="252" rx="10" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/>'
+   +'<g stroke="var(--scale-ink)" stroke-width="2.6" fill="none" opacity=".85"><path d="'+drum+'"/></g>'
+   +'<g font-size="24" fill="var(--scale-ink)" font-weight="700">'+dn+'</g>'
+   +'<path d="M40 150H1170" stroke="var(--accent)" stroke-width="2.5"/>'
+   +'<path d="M1170 150l-16-8v16z" fill="var(--accent)"/>'
+   +'<text x="352" y="234" text-anchor="middle" font-size="19" fill="var(--muted)">sleeve — whole millimetres</text>'
+   +'<text x="935" y="296" text-anchor="middle" font-size="19" fill="var(--muted)">thimble — hundredths</text>'
+   +'</svg>';
+}
+
+/* =========================================================
+   GRAVESAND'S APPARATUS
+   Two halves, as on the bench: the board, where you hang the weights and let the
+   junction settle, and the paper, which you take off the board and draw on.
+   The junction is not placed, it is solved for -- given P, Q and the unknown R
+   the force triangle fixes both thread angles, and the point where those two
+   directions meet, coming down from the two pulleys, is where the knot hangs.
+   ========================================================= */
+const G_P1={x:180,y:84}, G_P2={x:1020,y:84};
+const WEIGHTS=[1,2,5,10,20,50];                 // the slotted weight box, in g wt
+const sumW=a=>a.reduce((x,y)=>x+y,0);
+function syncWeights(){ const s=st(); s.P=sumW(s.wP); s.Q=sumW(s.wQ); }
+function gravSolve(P,Q,R){
+  if(P<=0||Q<=0) return {err:'Hang some weight on both hangers before the junction can settle.'};
+  const ca=(P*P+R*R-Q*Q)/(2*P*R), cb=(Q*Q+R*R-P*P)/(2*Q*R);
+  if(!(ca>-1&&ca<1&&cb>-1&&cb<1)) return {err:'These three forces cannot close a triangle — the junction is dragged straight up to one pulley.'};
+  const a=Math.acos(ca),b=Math.acos(cb),D=180/Math.PI;
+  if(a*D<13||a*D>76||b*D<13||b*D>76) return {err:'One thread runs almost along the other. Change the weights until both hang well clear of the pulleys.'};
+  const t=(G_P2.x-G_P1.x)/(Math.sin(a)+Math.cos(a)*Math.tan(b));
+  const O={x:G_P1.x+t*Math.sin(a),y:G_P1.y+t*Math.cos(a)};
+  if(O.y<170) return {err:'The junction is pulled up almost to the pulleys. Take some weight off P and Q.'};
+  if(O.y>470) return {err:'The junction hangs below the board. Add more weight to P and Q until it sits near the middle.'};
+  return {a,b,theta:a+b,O};
+}
+// A hanger: the hook, then the pieces actually on it, each one clickable to take
+// it off again. Nothing about the stack is decorative -- it is the weight.
+function hanger(x,y,side,pieces){
+  const H=21, bot=y+16+Math.max(1,pieces.length)*H;
+  let d='<g data-drop="'+side+'">'
+   +'<rect x="'+(x-86)+'" y="'+(y-20)+'" width="172" height="'+(bot-y+72)+'" rx="12" fill="var(--accent-bg)" opacity=".5"'
+   +' stroke="var(--accent-line)" stroke-width="2" stroke-dasharray="8 7"/>'
+   +'<path d="M'+x+' '+(y-18)+'v26" stroke="var(--thread)" stroke-width="2.5"/>'
+   +'<path d="M'+(x-32)+' '+(y+8)+'h64" stroke="var(--steel-line)" stroke-width="3.5"/>';
+  pieces.forEach((g,i)=>{
+    const w=40+g*0.62;
+    d+='<g class="grab" data-wt="'+side+'-'+i+'"><rect x="'+(x-w/2).toFixed(1)+'" y="'+(y+12+i*H)+'" width="'+w.toFixed(1)+'" height="'+(H-4)+'" rx="4"'
+      +' fill="var(--steel2)" stroke="var(--steel-line)" stroke-width="1.6"/>'
+      +'<text x="'+x+'" y="'+(y+27+i*H)+'" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">'+g+'</text></g>';
+  });
+  d+='<text x="'+x+'" y="'+(bot+28)+'" text-anchor="middle" font-size="21" font-weight="700" fill="var(--ink)">'
+    +side+' = '+sumW(pieces)+' g wt</text>';
+  if(!pieces.length) d+='<text x="'+x+'" y="'+(y+36)+'" text-anchor="middle" font-size="16" fill="var(--muted)">drop weights here</text>';
+  return d+'</g>';
+}
+function drawBoard(){
+  const s=st(),sol=gravSolve(s.P,s.Q,s.sp.R);
+  let grid='';
+  for(let x=72;x<=1128;x+=24) grid+='M'+x+' 44V536';
+  for(let y=68;y<=536;y+=24) grid+='M48 '+y+'H1152';
+  let d='<svg viewBox="0 0 1200 590" role="img" aria-label="Gravesand\u2019s apparatus: a vertical board with two pulleys">'
+   +'<rect x="26" y="22" width="1148" height="532" rx="9" fill="var(--steel)" stroke="var(--steel-line)" stroke-width="3"/>'
+   +'<rect x="48" y="44" width="1104" height="492" rx="3" fill="var(--board)" stroke="var(--board-line)" stroke-width="1.5"/>'
+   +'<g stroke="var(--board-line)" stroke-width=".8" opacity=".5" fill="none"><path d="'+grid+'"/></g>';
+  [[G_P1,'P',s.wP],[G_P2,'Q',s.wQ]].forEach(([p,side,pieces])=>{
+    d+='<circle cx="'+p.x+'" cy="'+p.y+'" r="23" fill="var(--steel2)" stroke="var(--steel-line)" stroke-width="3"/>'
+      +'<circle cx="'+p.x+'" cy="'+p.y+'" r="5" fill="var(--steel-line)"/>'
+      +hanger(p.x+(side==='P'?-23:23),p.y+18,side,pieces);
+  });
+  if(sol.err) return d
+   +'<rect x="300" y="250" width="600" height="96" rx="14" fill="var(--warn-soft)" stroke="var(--warn)" stroke-width="2"/>'
+   +'<foreignObject x="318" y="264" width="564" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="font:600 18px system-ui,sans-serif;color:#92400e;line-height:1.4;text-align:center">'+esc(sol.err)+'</div></foreignObject>'
+   +'</svg>';
+  const O=sol.O;
+  return d
+   +'<g stroke="var(--thread)" stroke-width="2.5" fill="none">'
+   +'<path d="M'+O.x.toFixed(1)+' '+O.y.toFixed(1)+'L'+G_P1.x+' '+G_P1.y+'"/>'
+   +'<path d="M'+O.x.toFixed(1)+' '+O.y.toFixed(1)+'L'+G_P2.x+' '+G_P2.y+'"/>'
+   +'<path d="M'+O.x.toFixed(1)+' '+O.y.toFixed(1)+'V'+(O.y+52).toFixed(1)+'"/></g>'
+   +'<circle cx="'+O.x.toFixed(1)+'" cy="'+O.y.toFixed(1)+'" r="6" fill="var(--accent)"/>'
+   +'<text x="'+(O.x-18).toFixed(1)+'" y="'+(O.y-12).toFixed(1)+'" font-size="20" font-weight="700" fill="var(--accent-ink)">O</text>'
+   +'<g transform="translate('+O.x.toFixed(1)+' '+(O.y+52).toFixed(1)+')">'
+   +'<path d="M-24 0h48" stroke="var(--steel-line)" stroke-width="2.5"/>'
+   +'<circle cx="0" cy="26" r="21" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/>'
+   +'<text x="0" y="68" text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)">unknown</text></g>'
+   +'<text x="600" y="578" text-anchor="middle" font-size="18" fill="var(--muted)">the junction hangs in equilibrium \u2014 mark it, then take the paper off the board</text>'
+   +'</svg>';
+}
+
+/* ---------------------------------------------------------
+   THE PAPER
+   Squared paper, the three thread directions already marked on it as they would
+   be on the board, and a set of drawing tools. Everything the student draws is
+   kept in centimetres on the paper, so the scale can be changed without the
+   construction moving. Lengths snap to the millimetre and directions snap to
+   the marked threads and to lines already drawn, which is what makes completing
+   a parallelogram by hand possible with a mouse.
+   --------------------------------------------------------- */
+const PU=38, PW=30, PH=20, PMX=30, PMY=24;      // units per cm, paper cm, margins
+const P_O=[15,17.4];                            // where the junction was marked, in paper cm
+const pcx=c=>PMX+c*PU, pcy=c=>PMY+c*PU;
+const SCALES=[10,20,25,50];                     // g wt per cm the student may choose
+function paperDirs(){
+  const s=st(),sol=gravSolve(s.P,s.Q,s.sp.R);
+  if(sol.err) return null;
+  return { P:[-Math.sin(sol.a),-Math.cos(sol.a)], Q:[Math.sin(sol.b),-Math.cos(sol.b)], R:[0,1], sol };
+}
+const strokes=()=>st().paper.strokes;
+// Every point worth landing on: the marked junction, the end of any line already
+// drawn, and -- the one that makes a parallelogram close exactly -- the point
+// where two drawn lines cross. C is not given to the student; it is where their
+// own two parallels meet.
+function segX(k,m){
+  const r=[k.b[0]-k.a[0],k.b[1]-k.a[1]], sv=[m.b[0]-m.a[0],m.b[1]-m.a[1]];
+  const den=r[0]*sv[1]-r[1]*sv[0];
+  if(Math.abs(den)<1e-9) return null;
+  const t=((m.a[0]-k.a[0])*sv[1]-(m.a[1]-k.a[1])*sv[0])/den;
+  const u=((m.a[0]-k.a[0])*r[1]-(m.a[1]-k.a[1])*r[0])/den;
+  if(t<-0.02||t>1.02||u<-0.02||u>1.02) return null;
+  return [k.a[0]+t*r[0],k.a[1]+t*r[1]];
+}
+function knownPoints(){
+  const pts=[P_O.slice()], ls=strokes().filter(k=>k.t==='l');
+  ls.forEach(k=>{ pts.push(k.a.slice()); pts.push(k.b.slice()); });
+  for(let i=0;i<ls.length;i++) for(let j=i+1;j<ls.length;j++){
+    const x=segX(ls[i],ls[j]); if(x) pts.push(x);
+  }
+  return pts;
+}
+const SNAP=0.6;                                 // centimetres on the paper: about a pencil width on screen
+function nearestPoint(p,skip){
+  let best=null,bd=SNAP;
+  knownPoints().forEach(q=>{
+    if(skip&&Math.abs(q[0]-skip[0])<1e-6&&Math.abs(q[1]-skip[1])<1e-6) return;
+    const d=Math.hypot(q[0]-p[0],q[1]-p[1]); if(d<bd){ bd=d; best=q; }
+  });
+  return best?best.slice():null;
+}
+function snapPoint(p){
+  return nearestPoint(p,null)||[Math.round(p[0]*10)/10,Math.round(p[1]*10)/10];
+}
+function candidateDirs(){
+  const out=[[1,0],[0,1]], d=paperDirs();
+  if(d) [d.P,d.Q,d.R].forEach(u=>out.push(u));
+  strokes().forEach(k=>{ if(k.t!=='l') return;
+    const v=[k.b[0]-k.a[0],k.b[1]-k.a[1]],L=Math.hypot(v[0],v[1]);
+    if(L>0.2) out.push([v[0]/L,v[1]/L]); });
+  return out.concat(out.map(u=>[-u[0],-u[1]]));
+}
+function snapEnd(a,b){
+  const land=nearestPoint(b,a);        // landing on a marked point wins outright
+  if(land) return land;
+  let v=[b[0]-a[0],b[1]-a[1]],L=Math.hypot(v[0],v[1]);
+  if(L<0.05) return b;
+  let pick=null,bd=4.5*Math.PI/180;
+  candidateDirs().forEach(u=>{
+    const ang=Math.abs(Math.atan2(v[0]*u[1]-v[1]*u[0], v[0]*u[0]+v[1]*u[1]));
+    if(ang<bd){ bd=ang; pick=u; }
+  });
+  if(pick) v=[pick[0]*L,pick[1]*L];
+  const Ls=Math.round(L*10)/10;                 // lengths land on whole millimetres
+  return [a[0]+v[0]/L*Ls, a[1]+v[1]/L*Ls];
+}
+function nearStroke(p){
+  let hit=-1,bd=0.34;
+  strokes().forEach((k,i)=>{
+    let d=Infinity;
+    if(k.t==='l'){
+      const vx=k.b[0]-k.a[0],vy=k.b[1]-k.a[1],L2=vx*vx+vy*vy;
+      const t=L2?Math.max(0,Math.min(1,((p[0]-k.a[0])*vx+(p[1]-k.a[1])*vy)/L2)):0;
+      d=Math.hypot(k.a[0]+t*vx-p[0],k.a[1]+t*vy-p[1]);
+    } else k.p.forEach(q=>{ d=Math.min(d,Math.hypot(q[0]-p[0],q[1]-p[1])); });
+    if(d<bd){ bd=d; hit=i; }
+  });
+  return hit;
+}
+
+function drawPaper(){
+  const s=st(),d=paperDirs(),sc=s.scale;
+  // millimetre, centimetre and 5 cm rules, each collected into its own path so
+  // the three weights of line can be drawn in one pass apiece
+  const G={mm:'',cm:'',dm:''}, band=i=>i%50===0?'dm':i%10===0?'cm':'mm';
+  for(let i=0;i<=PW*10;i++){ const x=pcx(i/10).toFixed(1);
+    G[band(i)]+='M'+x+' '+PMY+'V'+(PMY+PH*PU); }
+  for(let i=0;i<=PH*10;i++){ const y=pcy(i/10).toFixed(1);
+    G[band(i)]+='M'+PMX+' '+y+'H'+(PMX+PW*PU); }
+  const O=P_O;
+  let marks='';
+  if(d){
+    const ray=(u,lab,len,col)=>{
+      const e=[O[0]+u[0]*len,O[1]+u[1]*len];
+      return '<path d="M'+pcx(O[0]).toFixed(1)+' '+pcy(O[1]).toFixed(1)+'L'+pcx(e[0]).toFixed(1)+' '+pcy(e[1]).toFixed(1)+'"'
+        +' stroke="'+col+'" stroke-width="2" stroke-dasharray="9 7" opacity=".85"/>'
+        +'<text x="'+pcx(e[0]).toFixed(1)+'" y="'+(pcy(e[1])-8).toFixed(1)+'" text-anchor="middle" font-size="19" font-weight="700" fill="'+col+'">'+lab+'</text>';
+    };
+    marks=ray(d.P,'P direction',3.4,'var(--muted)')+ray(d.Q,'Q direction',3.4,'var(--muted)')+ray(d.R,'unknown',2.2,'var(--muted)');
+  }
+  let ink='';
+  strokes().forEach((k,i)=>{
+    if(k.t==='l') ink+='<path d="M'+pcx(k.a[0]).toFixed(1)+' '+pcy(k.a[1]).toFixed(1)+'L'+pcx(k.b[0]).toFixed(1)+' '+pcy(k.b[1]).toFixed(1)
+      +'" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" fill="none"/>';
+    else ink+='<path d="M'+k.p.map(q=>pcx(q[0]).toFixed(1)+' '+pcy(q[1]).toFixed(1)).join('L')
+      +'" stroke="var(--ink)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>';
+  });
+  if(s.paper.live){
+    const L=s.paper.live, len=Math.hypot(L.b[0]-L.a[0],L.b[1]-L.a[1]);
+    [L.a,L.b].forEach(q=>{ if(nearestPoint(q,null)) ink+='<circle cx="'+pcx(q[0]).toFixed(1)+'" cy="'+pcy(q[1]).toFixed(1)
+      +'" r="9" fill="none" stroke="var(--accent)" stroke-width="2.5" opacity=".9"/>'; });
+    ink+='<path d="M'+pcx(L.a[0]).toFixed(1)+' '+pcy(L.a[1]).toFixed(1)+'L'+pcx(L.b[0]).toFixed(1)+' '+pcy(L.b[1]).toFixed(1)
+      +'" stroke="var(--accent)" stroke-width="2.6" stroke-dasharray="8 6" fill="none"/>'
+      +'<rect x="'+(pcx(L.b[0])+12).toFixed(1)+'" y="'+(pcy(L.b[1])-38).toFixed(1)+'" width="148" height="30" rx="7" fill="var(--surface)" stroke="var(--accent-line)"/>'
+      +'<text x="'+(pcx(L.b[0])+20).toFixed(1)+'" y="'+(pcy(L.b[1])-17).toFixed(1)+'" font-size="18" font-weight="700" fill="var(--accent-ink)">'
+      +fx(len,2)+' cm = '+fx(len*sc,0)+' g</text>';
+  }
+  let rule='';
+  if(s.paper.ruler.on){
+    const R=s.paper.ruler, A=R.ang*Math.PI/180;
+    let t='';
+    for(let i=0;i<=200;i++) t+='M'+(i*PU/10).toFixed(1)+' 0V'+(i%10===0?26:i%5===0?18:11);
+    let tn='';
+    for(let i=0;i<=20;i++) tn+='<text x="'+(i*PU).toFixed(1)+'" y="48" text-anchor="middle" font-size="17" fill="var(--scale-ink)">'+i+'</text>';
+    rule='<g transform="translate('+pcx(R.x).toFixed(1)+' '+pcy(R.y).toFixed(1)+') rotate('+R.ang.toFixed(1)+')">'
+      +'<rect data-drag="ruler" class="grab" x="-14" y="-6" width="'+(20*PU+34)+'" height="74" rx="7" fill="var(--scale-face)" stroke="var(--steel-line)" stroke-width="2" opacity=".93"/>'
+      +'<g stroke="var(--scale-tick)" stroke-width="1.8" fill="none"><path d="'+t+'"/></g>'+tn
+      +'<circle data-drag="rulerot" class="grab" cx="'+(20*PU+12)+'" cy="32" r="15" fill="var(--accent)" stroke="var(--surface)" stroke-width="2.5"/>'
+      +'</g>';
+  }
+  const scene='<rect x="'+PMX+'" y="'+PMY+'" width="'+(PW*PU)+'" height="'+(PH*PU)+'" fill="var(--board)"/>'
+   +'<g stroke="var(--board-line)" stroke-width=".7" opacity=".45" fill="none"><path d="'+G.mm+'"/></g>'
+   +'<g stroke="var(--board-line)" stroke-width="1.3" opacity=".9" fill="none"><path d="'+G.cm+'"/></g>'
+   +'<g stroke="var(--board-line)" stroke-width="2" fill="none"><path d="'+G.dm+'"/></g>'
+   +marks+ink
+   +'<circle cx="'+pcx(O[0]).toFixed(1)+'" cy="'+pcy(O[1]).toFixed(1)+'" r="5.5" fill="var(--accent)"/>'
+   +'<text x="'+(pcx(O[0])-24).toFixed(1)+'" y="'+(pcy(O[1])+24).toFixed(1)+'" font-size="21" font-weight="700" fill="var(--accent-ink)">O</text>';
+  return '<svg viewBox="0 0 1200 808" role="img" aria-label="Squared drawing paper with the three thread directions marked" style="touch-action:none">'
+   +'<g data-paper="1">'+scene+'</g>'+rule+lensLayer(scene)
+   +'</svg>';
+}
+
+// OC is the diagonal, so it measures the unknown whatever P and Q are -- which is
+// the whole point of repeating the trial with different weights. The drawing
+// jitter of one millimetre is what a pencil and a scale actually give you.
+const gOC=()=>st().sp.R/st().scale+st().jit*0.1;
+function paperPt(ev){
+  const svg=$('#instr svg'); if(!svg) return null;
+  const rc=svg.getBoundingClientRect(), u=1200/Math.max(1,rc.width);
+  return [((ev.clientX-rc.left)*u-PMX)/PU, ((ev.clientY-rc.top)*u-PMY)/PU];
+}
+function paperDown(ev){
+  const s=st(); if(s.view!=='paper') return false;
+  if(ev.target.closest('[data-drag]')) return false;
+  const p=paperPt(ev); if(!p) return false;
+  if(s.tool==='erase'){
+    const i=nearStroke(p);
+    if(i>=0){ s.paper.strokes.splice(i,1); renderInstr(); save(); toast('Rubbed out.'); }
+    return true;
+  }
+  if(s.tool==='free'){ drag={kind:'free',pts:[p]}; s.paper.strokes.push({t:'f',p:drag.pts}); }
+  else { const a=snapPoint(p); drag={kind:'line',a}; s.paper.live={a,b:a.slice()}; }
+  return true;
+}
+function paperMove(ev){
+  const s=st(),p=paperPt(ev); if(!p) return;
+  if(drag.kind==='free'){ const q=drag.pts[drag.pts.length-1];
+    if(Math.hypot(q[0]-p[0],q[1]-p[1])>0.06) drag.pts.push(p); }
+  else s.paper.live={a:drag.a,b:snapEnd(drag.a,p)};
+}
+function paperUp(){
+  const s=st();
+  if(drag.kind==='line'){
+    const L=s.paper.live;
+    if(L&&Math.hypot(L.b[0]-L.a[0],L.b[1]-L.a[1])>0.2) s.paper.strokes.push({t:'l',a:L.a,b:L.b});
+    s.paper.live=null;
+  } else if(drag.kind==='free'&&drag.pts.length<3) s.paper.strokes.pop();
+  save();
+}
+/* ---- the two views, the weight box and the drawing tools ---- */
+function pgBenchTop(){
+  const s=st();
+  const seg='<div class="segs" id="pgView" role="group" aria-label="What you are looking at">'
+    +'<button data-view="board"'+(s.view==='board'?' class="on"':'')+' type="button">The board</button>'
+    +'<button data-view="paper"'+(s.view==='paper'?' class="on"':'')+' type="button">The paper</button></div>';
+  if(s.view!=='board') return '<div class="spec-card" style="flex:1"><div style="min-width:0">'+seg
+    +'<small style="margin-top:6px">Mark OA and OB to scale along the two directions, complete the parallelogram, then measure the diagonal OC.</small></div></div>';
+  return '<div class="spec-card" style="flex:1;align-items:flex-start"><div style="min-width:0;width:100%">'+seg
+    +'<div class="wbox" style="margin-top:8px"><span style="font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-weight:700">Weight box</span>'
+    +WEIGHTS.map(g=>'<span class="wt" data-wt-new="'+g+'" title="Drag on to a hanger">'+g+' g</span>').join('')
+    +'</div><small style="margin-top:6px">Drag a weight on to either hanger. Click a weight already on a hanger to take it off again.</small></div></div>';
+}
+function pgCtrl(){
+  const s=st(),c=$('#ctrl');
+  if(s.view==='board'){
+    const sol=gravSolve(s.P,s.Q,s.sp.R);
+    c.innerHTML=lensBtn()
+      +'<span class="ctag">P = '+s.P+' g wt</span><span class="ctag">Q = '+s.Q+' g wt</span>'
+      +'<span class="sp"></span>'
+      +(sol.err?'<span class="ctag warn">not in equilibrium</span>'
+               :'<span class="ctag ok">in equilibrium \u00b7 \u03b8 = '+fx(sol.theta*180/Math.PI,1)+'\u00b0</span>');
+    return;
+  }
+  const d=paperDirs();
+  const tool=(k,lab,t)=>'<button data-tool="'+k+'"'+(s.tool===k?' class="on"':'')+' type="button" title="'+t+'">'+lab+'</button>';
+  c.innerHTML='<div class="toolbar">'+lensBtn()
+    +tool('line','Line','Straight lines. Ends snap to marked points, directions snap to the marked threads and to lines already drawn.')
+    +tool('free','Freehand','Draw anything, freely.')
+    +tool('erase','Rubber','Click a line to rub it out.')
+    +'<button id="pgRuler"'+(s.paper.ruler.on?' class="on"':'')+' type="button" title="A centimetre scale you can lay anywhere on the paper">Scale</button>'
+    +'<button id="pgUndo" type="button" title="Take back the last thing drawn">Undo</button>'
+    +'<button id="pgClear" type="button">Clear paper</button>'
+    +'<span style="font-size:12px;color:var(--muted);margin-left:4px">1 cm =</span>'
+    +'<select id="pgScale" style="width:auto;padding:4px 6px;font-size:12px">'
+    +SCALES.map(v=>'<option value="'+v+'"'+(v===s.scale?' selected':'')+'>'+v+' g wt</option>').join('')+'</select>'
+    +'</div><span class="sp"></span>'
+    +(d&&mode==='learn'
+      ?'<span class="ctag">OA = '+fx(s.P/s.scale,2)+' cm \u00b7 OB = '+fx(s.Q/s.scale,2)+' cm</span>'
+      :'<span class="ctag dim">draw OA and OB to scale, then complete the parallelogram</span>');
+}
+
+/* =========================================================
+   THE BENCH
+   ========================================================= */
+const tLabel=k=>{ const t=(cur().targets||[]).find(x=>x.key===k); return t?t.label:k; };
+const SPEC_ICON={
+  v1:'<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="15" width="34" height="21" rx="2" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/><path d="M7 15l6-6h34l-6 6M41 15l6-6v21l-6 6" fill="var(--brass2)" opacity=".5"/></svg>',
+  v2:'<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="25" r="15" fill="var(--steel)" stroke="var(--steel-line)" stroke-width="2"/><ellipse cx="19" cy="19" rx="4.5" ry="3" fill="#fff" opacity=".55"/></svg>',
+  s1:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M5 33c8-14 14 6 21-6s10 4 17-5" fill="none" stroke="var(--brass)" stroke-width="4" stroke-linecap="round"/></svg>',
+  s2:'<svg viewBox="0 0 48 48" aria-hidden="true"><g fill="var(--scale-face)" stroke="var(--steel-line)" stroke-width="1.6"><rect x="9" y="12" width="30" height="20" rx="2"/><rect x="9" y="17" width="30" height="20" rx="2"/><rect x="9" y="22" width="30" height="20" rx="2"/></g></svg>',
+  pg:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40V14" stroke="var(--accent)" stroke-width="3"/><path d="M24 14l-5 6M24 14l5 6" stroke="var(--accent)" stroke-width="3" fill="none"/><path d="M24 40L10 22M24 40l14-18" stroke="var(--ink)" stroke-width="2" fill="none"/><path d="M10 22l14 -8 14 8" stroke="var(--muted)" stroke-width="1.6" fill="none" stroke-dasharray="4 3"/></svg>'
+};
+function renderBenchTop(){
+  const e=cur(),s=st(),el=$('#benchTop');
+  if(e.instrument==='gravesand'){ el.innerHTML=pgBenchTop(); return; }
+  const card=(key,name,note)=>'<button class="spec-card pick'+(s.held===key?' on':'')+'" data-held="'+(key===null?'':key)+'" type="button">'
+    +(key===null?'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 10v28M33 10v28" stroke="var(--steel-line)" stroke-width="4" stroke-linecap="round"/></svg>':SPEC_ICON[e.id])
+    +'<div><b>'+esc(name)+'</b><small>'+esc(note)+'</small></div></button>';
+  el.innerHTML=card(null,'Jaws closed','find the zero error')
+    +(e.targets||[]).map(t=>card(t.key,t.label.charAt(0).toUpperCase()+t.label.slice(1),s.sp.label)).join('');
+}
+function renderInstr(){
+  const e=cur(),s=st();
+  $('#instr').innerHTML=e.instrument==='vernier'?drawVernier()
+    :e.instrument==='screw'?drawScrew()
+    :(s.view==='paper'?drawPaper():drawBoard());
+}
+function renderMag(){
+  const e=cur(),s=st(),m=$('#mag');
+  m.hidden=(e.instrument==='gravesand');        // the paper is its own full-size surface
+  if(m.hidden) return;
+  const I=INSTR[e.instrument],ok=gripped();
+  m.innerHTML='<h5>'+(e.instrument==='vernier'?'Main scale and vernier scale':'Sleeve and thimble')
+    +'<span class="sp"></span>'+(ok?'<em>reading is steady</em>':'<em style="color:var(--warn)">not gripping — this is not a reading</em>')+'</h5>'
+    +(e.instrument==='vernier'?magVernier():magScrew());
+}
+const lensBtn=()=>'<button id="btnLens" type="button"'+(lens.on?' class="primary"':'')
+  +' aria-pressed="'+lens.on+'" title="A magnifying glass you can drag over the drawing">'+ICON('lens')+'Magnifier</button>';
+function renderCtrl(){
+  const e=cur(),s=st(),c=$('#ctrl');
+  if(e.instrument==='gravesand'){ pgCtrl(); return; }
+  const ok=gripped();
+  c.innerHTML=lensBtn()+'<button id="btnClose" type="button">'+ICON('grip')+(e.instrument==='vernier'?'Close the jaws':'Turn the ratchet home')+'</button>'
+    +'<button id="btnOpen" type="button">Open it again</button>'
+    +'<span class="sp"></span>'
+    +'<span class="ctag '+(ok?'ok':'warn')+'">'+(ok?(s.held==null?'jaws closed — read the zero error':'gripping the '+esc(tLabel(s.held))):'not gripping')+'</span>';
+}
+// Whether a reading may be taken at all: the instrument has to be gripping
+// something, or the junction has to be hanging in equilibrium.
+function canTake(){
+  const e=cur(),s=st();
+  if(e.instrument==='gravesand') return !gravSolve(s.P,s.Q,s.sp.R).err;
+  return gripped()&&s.held!=null&&!s.logged;
+}
+// What the panel says about the instrument -- its state, never its reading.
+// Handing over the number here would leave nothing to read off the scale.
+function renderObsPanel(){
+  const e=cur(),s=st(),box=$('#obsObs');
+  if(e.instrument==='gravesand'){
+    const sol=gravSolve(s.P,s.Q,s.sp.R);
+    box.innerHTML=sol.err
+      ?'<span style="color:var(--warn)">'+esc(sol.err)+'</span>'
+      :'<ul class="oblist"><li>P = '+s.P+' g wt and Q = '+s.Q+' g wt, junction steady.</li>'
+        +'<li>The three directions are marked on the paper.</li>'
+        +'<li>Draw OA and OB to scale, complete the parallelogram, then measure OC.</li></ul>';
+  } else if(!gripped()){
+    box.innerHTML='<span style="color:var(--warn)">Not gripping — close the instrument before reading it.</span>';
+  } else if(s.held==null){
+    box.innerHTML='<ul class="oblist"><li>Closed on nothing.</li><li>Find the division that coincides: that is the zero error.</li>'
+      +'<li>Write it in the Readings tab.</li></ul>';
+  } else if(s.logged){
+    box.innerHTML='<ul class="oblist"><li>This reading is already in the table.</li>'
+      +'<li>The instrument is still holding it — read the scale and write the figures in.</li>'
+      +'<li>Close it on the object again for the next trial.</li></ul>';
+  } else {
+    box.innerHTML='<ul class="oblist"><li>Gripping the '+esc(tLabel(s.held))+'.</li>'
+      +'<li>Read the magnified scale and write the figures in the table.</li></ul>';
+  }
+  const can=canTake();
+  $('#btnGrip').disabled=!can;
+  $('#obsHint').textContent=can?'':(e.instrument==='gravesand'
+    ?'Change P or Q until the junction settles on the paper.'
+    :s.logged?'Written down? Close the instrument again for the next trial.'
+    :(s.held==null?'Pick a dimension above, then close on it.':'Close the instrument on it first.'));
+}
+function renderBench(){
+  const bench=document.querySelector('.bench');
+  bench.classList.toggle('wide',cur().instrument==='gravesand');
+  bench.classList.toggle('paper',cur().instrument==='gravesand'&&st().view==='paper');
+  renderBenchTop(); renderInstr(); renderMag(); renderCtrl(); renderObsPanel();
+}
+
+/* =========================================================
+   LEFT PANEL
+   ========================================================= */
+const nRows=e=>e.rows||5;
+function rowsDone(e,s){ let n=0,t=0; (e.targets||[{key:'main'}]).forEach(k=>{ t+=nRows(e); n+=s.rows[k.key].length; }); return {n,t}; }
+function renderExpList(){
+  $('#expList').innerHTML=EXPERIMENTS.map(e=>{
+    const s=S[e.id], got=s?Object.values(s.rows).reduce((a,r)=>a+r.length,0):0;
+    return '<button class="exprow'+(e.id===expId?' on':'')+(got?' done':'')+'" data-exp="'+e.id+'" type="button" role="listitem">'
+      +'<span class="n">'+e.no+'</span><span><b>'+esc(e.title)+'</b><small>'+esc(e.sub)+'</small></span></button>';
+  }).join('');
+}
+function renderAppa(){
+  const e=cur(),s=st(),I=INSTR[e.instrument];
+  let h='<h4>Apparatus</h4>'+e.apparatus.map(a=>'<div class="ac">'+ICON(e.icon.replace('i-',''))+'<div><b>'+esc(a)+'</b></div></div>').join('');
+  if(I){
+    h+='<h4>The instrument</h4><div class="lcbox"><b>'+esc(I.name)+'</b>'
+      +(e.instrument==='vernier'
+        ?'<div class="lcrow"><span>Value of one main scale division</span><span>'+I.msdMM+' mm</span></div>'
+         +'<div class="lcrow"><span>Divisions on the vernier scale</span><span>'+I.vsd+'</span></div>'
+         +'<div class="lcrow"><span>'+I.vsd+' V.S.D. equal</span><span>'+I.span+' M.S.D.</span></div>'
+        :'<div class="lcrow"><span>Pitch of the screw</span><span>'+I.pitchMM+' mm</span></div>'
+         +'<div class="lcrow"><span>Divisions on the circular scale</span><span>'+I.csd+'</span></div>')
+      +'<div class="q">Work the least count out from these, and write it in the Readings tab. The zero error you must find yourself, by closing the instrument on nothing.</div></div>';
+  }
+  h+='<h4>The specimen</h4><div class="ac">'+(SPEC_ICON[e.id]||'')+'<div><b>'+esc(s.sp.label||e.short)+'</b>'
+    +'<small>'+(e.instrument==='gravesand'?'Its weight is what you are after.':'Drawn fresh each time. Its true size is hidden until you check your result.')+'</small></div></div>';
+  if(e.id==='s1') h+='<div class="ac"><div><b>Length of the wire</b><small>measured with the metre scale: '+fx(s.sp.lengthCM,1)+' cm</small></div></div>';
+  if(e.id==='s2') h+='<div class="ac"><div><b>Number of sheets in the stack</b><small>'+s.sp.sheets+' sheets</small></div></div>';
+  $('#appaList').innerHTML=h;
+}
+
+/* =========================================================
+   PROCEDURE — the record, section by section
+   ========================================================= */
+let curStep=0;
+function renderGuide(){
+  const e=cur();
+  const sec=(t,body,open)=>'<details'+(open?' open':'')+'><summary>'+esc(t)+'</summary><div class="body">'+body+'</div></details>';
+  const ul=a=>'<ul>'+a.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+  const viva=(e.viva||EXP[e.vivaFrom].viva);
+  $('#guide').innerHTML=
+     sec('Aim','<p>'+esc(e.aim)+'</p>',true)
+    +sec('Apparatus',ul(e.apparatus))
+    +sec('Formula',e.formula.map(f=>'<div class="fml"><b>'+esc(f.b)+'</b><span class="eq">'+esc(f.eq)+'</span></div>').join(''),true)
+    +sec('Procedure','<ol>'+e.procedure.map((p,i)=>'<li class="step'+(i===curStep?' on':'')+'" data-step="'+i+'">'+esc(p)+'</li>').join('')+'</ol>',true)
+    +sec('Precautions',ul(e.precautions))
+    +sec('Sources of error',ul(e.errors))
+    +sec('Viva voce','<dl class="viva">'+viva.map(q=>'<dt>'+esc(q[0])+'</dt>'+(mode==='learn'?'<dd>'+esc(q[1])+'</dd>':'<dd style="color:var(--muted)">Answer shown in learning mode.</dd>')).join('')+'</dl>');
+}
+$('#guide').addEventListener('click',e=>{
+  const li=e.target.closest('.step'); if(!li) return;
+  curStep=+li.dataset.step; renderGuide(); showStep();
+});
+function showStep(){
+  const e=cur();
+  $('#obsTest').textContent='Step '+(curStep+1)+' of '+e.procedure.length;
+  $('#obsSec').textContent=e.title; $('#obsSec').style.display='';
+  $('#obsExp').textContent=e.procedure[curStep];
+}
+
+/* =========================================================
+   THE OBSERVATION TABLE
+   The record's own columns. What the student types is kept exactly as typed;
+   the app keeps the instrument's own reading beside it, so learning mode can
+   say straight away whether the scale was read correctly and test mode can
+   stay quiet until the end.
+   ========================================================= */
+const num=v=>{ const n=parseFloat(v); return isFinite(n)?n:NaN; };
+const COLSPEC={
+  vernier:{
+    cols:[{k:'msr',h:'M.S.R. (cm)',step:'0.1'},{k:'vsr',h:'V.S.R. (div)',step:'1'}],
+    totalH:'Total = M.S.R. + (V.S.R. × L.C.)  (cm)', unit:'cm', dp:2,
+    total:r=>num(r.msr)+num(r.vsr)*0.01,
+    truth:(r,sp)=>{ const v=VERNIER.read(r.t); return {msr:v.msrMM/10,vsr:v.vsr}; }
+  },
+  screw:{
+    cols:[{k:'psr',h:'P.S.R. (mm)',step:'1'},{k:'csrO',h:'C.S.R. observed (div)',step:'1'},{k:'csrC',h:'C.S.R. corrected (div)',step:'1'}],
+    totalH:'Total = P.S.R. + (corrected C.S.R. × L.C.)  (mm)', unit:'mm', dp:2,
+    total:r=>num(r.psr)+num(r.csrC)*0.01,
+    truth:(r,sp)=>{ const v=SCREW.read(r.t); return {psr:v.psrMM,csrO:v.csr,csrC:v.csr-sp.zeroTicks}; }
+  },
+  gravesand:{
+    cols:[{k:'P',h:'P (g wt)',ro:true},{k:'Q',h:'Q (g wt)',ro:true},
+          {k:'oa',h:'OA (cm)',step:'0.1'},{k:'ob',h:'OB (cm)',step:'0.1'},{k:'oc',h:'OC (cm)',step:'0.1'}],
+    totalH:'R = OC × scale  (g wt)', unit:'g wt', dp:1,
+    total:r=>num(r.oc)*(r.sc||10),
+    truth:(r,sp)=>({oa:r.P/10,ob:r.Q/10,oc:r.oc_true})
+  }
+};
+const specOf=()=>COLSPEC[cur().instrument];
+const close=(a,b,tol)=>isFinite(a)&&isFinite(b)&&Math.abs(a-b)<(tol||1e-6);
+function rowTotal(r){ const v=specOf().total(r); return isFinite(v)?v:NaN; }
+function meanOf(key){
+  const rows=st().rows[key].filter(r=>isFinite(rowTotal(r)));
+  if(!rows.length) return NaN;
+  return rows.reduce((a,r)=>a+rowTotal(r),0)/rows.length;
+}
+// How close a typed figure has to be to count as the same reading: whole
+// divisions are exact, lengths are to the last decimal the column carries.
+const tolOf=k=>({oc:0.049,oa:0.049,ob:0.049,msr:0.0049})[k]||0.49;
+function obsHead(){
+  const e=cur(),s=st(),I=INSTR[e.instrument];
+  if(!I) return '<p class="lead"><b>Observations.</b> Scale taken for the drawing: <b>1 cm = '+s.scale+' g wt</b>'
+    +' &middot; OA = P / scale &middot; OB = Q / scale. Hang the weights, let the junction settle, mark the directions,'
+    +' complete the parallelogram on the paper and measure the diagonal OC.</p>';
+  const ze=num(s.zeroTyped), zc=isFinite(ze)?signed(-ze)+' div':'—';
+  const fld=(id,val,step,unit,ph)=>'<span style="display:inline-flex;align-items:center;gap:6px">'
+    +'<input type="number" id="'+id+'" value="'+esc(val)+'" step="'+step+'" placeholder="'+ph+'" style="width:88px;text-align:right">'
+    +'<span>'+unit+'</span></span>';
+  return '<p class="lead"><b>Observations.</b> '
+    +(e.instrument==='vernier'
+      ?'One main scale division = <b>'+I.msdMM+' mm</b> &middot; divisions on the vernier scale = <b>'+I.vsd+'</b>'
+      :'Pitch of the screw = <b>'+I.pitchMM+' mm</b> &middot; divisions on the circular scale = <b>'+I.csd+'</b>')
+    +'. Work out the least count, and close the instrument on nothing to find the zero error.</p>'
+    +'<table style="table-layout:auto;margin-bottom:10px"><tbody>'
+    +'<tr><th style="width:52%">Least count</th><td>'+fld('inLC',s.lcTyped||'','0.01','mm','')+'<span class="mark" id="mkLC"></span></td></tr>'
+    +'<tr><th>Zero error</th><td>'+fld('inZE',s.zeroTyped||'','1','divisions','')+'<span class="mark" id="mkZE"></span></td></tr>'
+    +'<tr><th>Zero correction</th><td><b id="zcVal">'+zc+'</b> <span style="color:var(--muted);font-size:11.5px">(= &minus; zero error)</span></td></tr>'
+    +'</tbody></table>';
+}
+function renderObt(){
+  const e=cur(),s=st(),cs=specOf(),show=(mode==='learn');
+  const keys=(e.targets||[{key:'main',label:e.short,sym:'R'}]);
+  let h=obsHead();
+  keys.forEach(tg=>{
+    const rows=s.rows[tg.key], n=nRows(e), mean=meanOf(tg.key);
+    h+='<h4>Readings for the '+esc(tg.label)+(s.active===tg.key&&e.instrument!=='gravesand'?' &nbsp;<span class="badge">next reading goes here</span>':'')+'</h4>';
+    h+='<table><thead><tr><th class="sn">S.No</th>'
+      +cs.cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')
+      +'<th>'+esc(cs.totalH)+'</th>'+(show?'<th class="mark"></th>':'')+'</tr></thead><tbody>';
+    for(let i=0;i<n;i++){
+      const r=rows[i];
+      if(!r){ h+='<tr><td class="sn">'+(i+1)+'</td><td colspan="'+(cs.cols.length+1+(show?1:0))+'" style="color:var(--muted);font-style:italic">not taken yet</td></tr>'; continue; }
+      const tv=cs.truth(r,s.sp), tot=rowTotal(r);
+      const pend=cs.cols.some(c=>!c.ro&&(r[c.k]===''||r[c.k]===undefined));
+      h+='<tr'+(pend?' class="pending"':'')+'>'+'<td class="sn">'+(i+1)+'</td>';
+      cs.cols.forEach(c=>{
+        if(c.ro){ h+='<td class="tot">'+r[c.k]+'</td>'; return; }
+        const v=r[c.k]===undefined?'':r[c.k];
+        const ok=close(num(v),tv[c.k],tolOf(c.k));
+        const cls=show&&v!==''?(ok?' good':' bad'):'';
+        h+='<td><input type="number" class="cell'+cls+'" step="'+c.step+'" data-k="'+tg.key+'" data-i="'+i+'" data-c="'+c.k+'" value="'+esc(v)+'"></td>';
+      });
+      h+='<td class="tot" data-tot="'+tg.key+'-'+i+'">'+(isFinite(tot)?fx(tot,cs.dp):'—')+'</td>';
+      if(show){ const allOk=cs.cols.filter(c=>!c.ro).every(c=>close(num(r[c.k]),tv[c.k],tolOf(c.k)));
+        const any=cs.cols.filter(c=>!c.ro).some(c=>r[c.k]!==''&&r[c.k]!==undefined);
+        h+='<td class="mark" data-mk="'+tg.key+'-'+i+'">'+(!any?'':allOk?'<span class="y">'+ICON('check')+'</span>':'<span class="n">'+ICON('x')+'</span>')+'</td>'; }
+      h+='</tr>';
+    }
+    h+='</tbody><tfoot><tr><td colspan="'+(cs.cols.length+1)+'" style="text-align:right">Mean '+esc(tg.sym||tg.label)+'</td>'
+      +'<td class="tot" data-mean="'+tg.key+'">'+(isFinite(mean)?fx(mean,cs.dp+1)+' '+cs.unit:'—')+'</td>'+(show?'<td class="mark"></td>':'')+'</tr></tfoot></table>';
+  });
+  h+='<div class="rowtools"><button id="btnClearRows">'+ICON('refresh')+'Clear the table</button></div>';
+  h+='<p class="note">'+(e.instrument==='gravesand'
+      ?'Each trial must use a different pair of weights — that is the point of repeating it.'
+      :'A reading is only taken when the instrument is actually gripping. The five trials differ by about one least count, which is why the record asks for a mean.')+'</p>';
+  $('#obt').innerHTML=h;
+  const c=$('#obCount'); const got=Object.values(s.rows).reduce((a,r)=>a+r.length,0);
+  c.textContent=got; c.hidden=!got;
+}
+// Typing must not redraw the table -- that would throw the caret out of the box
+// mid-number. Only the cells that actually derive from the value are patched.
+function patchRow(key,i){
+  const s=st(),cs=specOf(),r=s.rows[key][i],show=(mode==='learn');
+  if(!r) return;
+  const tv=cs.truth(r,s.sp),tot=rowTotal(r);
+  const tc=$('[data-tot="'+key+'-'+i+'"]'); if(tc) tc.textContent=isFinite(tot)?fx(tot,cs.dp):'—';
+  const mn=$('[data-mean="'+key+'"]'),m=meanOf(key);
+  if(mn) mn.textContent=isFinite(m)?fx(m,cs.dp+1)+' '+cs.unit:'—';
+  cs.cols.filter(c=>!c.ro).forEach(c=>{
+    const el=$('input[data-k="'+key+'"][data-i="'+i+'"][data-c="'+c.k+'"]'); if(!el) return;
+    el.classList.remove('good','bad');
+    if(show&&el.value!=='') el.classList.add(close(num(el.value),tv[c.k],tolOf(c.k))?'good':'bad');
+  });
+  const mk=$('[data-mk="'+key+'-'+i+'"]');
+  if(mk&&show){
+    const fields=cs.cols.filter(c=>!c.ro);
+    const any=fields.some(c=>r[c.k]!==''&&r[c.k]!==undefined);
+    const all=fields.every(c=>close(num(r[c.k]),tv[c.k],tolOf(c.k)));
+    mk.innerHTML=!any?'':all?'<span class="y">'+ICON('check')+'</span>':'<span class="n">'+ICON('x')+'</span>';
+  }
+  const tr=$('input[data-k="'+key+'"][data-i="'+i+'"]'); if(tr&&tr.closest('tr'))
+    tr.closest('tr').classList.toggle('pending',cs.cols.some(c=>!c.ro&&(r[c.k]===''||r[c.k]===undefined)));
+}
+function patchAll(){ const s=st(); Object.keys(s.rows).forEach(k=>s.rows[k].forEach((_,i)=>patchRow(k,i))); }
+function markConst(){
+  const s=st(),e=cur(),I=INSTR[e.instrument]; if(!I) return;
+  const show=(mode==='learn');
+  const set=(id,ok,typed)=>{ const el=$(id); if(!el) return;
+    el.innerHTML=(!show||typed==='')?'':(ok?'<span class="y">'+ICON('check')+'</span>':'<span class="n">'+ICON('x')+'</span>'); };
+  set('#mkLC',close(num(s.lcTyped),I.lcMM,0.0009),s.lcTyped||'');
+  set('#mkZE',close(num(s.zeroTyped),s.sp.zeroTicks,0.49),s.zeroTyped||'');
+}
+
+/* =========================================================
+   CALCULATION AND RESULT
+   The zero correction is applied with the figure the student wrote, not the one
+   the app knows. Getting the zero error wrong should carry through to the
+   answer — that is the whole reason the record asks for it separately.
+   ========================================================= */
+function means(){
+  const e=cur(),s=st(),out={};
+  e.targets.forEach(t=>out[t.key]=meanOf(t.key));
+  if(e.instrument==='vernier'){ const ze=num(s.zeroTyped);
+    Object.keys(out).forEach(k=>out[k]=out[k]-ze*0.01); }   // cm; the screw gauge table corrects in place
+  return out;
+}
+function studentResult(){
+  const e=cur(),s=st();
+  if(e.targets.some(t=>!isFinite(meanOf(t.key)))) return {err:'Fill in at least one complete reading for every table before the result can be worked out.'};
+  if(e.instrument==='vernier'&&!isFinite(num(s.zeroTyped))) return {err:'Write the zero error in the Readings tab first — the mean has to be corrected for it.'};
+  return {R:e.result(s.sp,means())};
+}
+function renderCalc(){
+  const e=cur(),s=st(),r=studentResult(),el=$('#calc');
+  if(r.err){ el.innerHTML='<div class="empty">'+esc(r.err)+'</div>'; return; }
+  const R=r.R;
+  el.innerHTML='<div class="card"><h4>From your table</h4><div class="in">'
+     +R.lines.map(l=>'<div class="line"><span>'+esc(l[0])+'</span><span>'+esc(l[1])+'</span></div>').join('')
+     +(e.instrument==='vernier'?'<div class="line"><span>Zero correction applied</span><span>'+signed(-num(s.zeroTyped))+' div = '+signed(-num(s.zeroTyped)*0.01)+' cm</span></div>':'')
+     +'</div></div>'
+    +'<div class="card"><h4>Calculation</h4><div class="in"><pre class="work">'+esc(R.work)+'</pre></div></div>'
+    +(R.extra&&R.extra.length?'<div class="card"><h4>In SI units</h4><div class="in">'
+       +R.extra.map(l=>'<div class="line"><span>'+esc(l[0])+'</span><span>'+esc(l[1])+'</span></div>').join('')+'</div></div>':'')
+    +'<div class="final">'+esc(R.final)+'<small>Press <b>Check result</b> in the header to have it marked against the true value.</small></div>';
+}
+function checkResult(){
+  const e=cur(),s=st(),r=studentResult(),v=$('#verdict'),body=$('#repBody');
+  if(r.err){ v.className='verdict info'; v.textContent=r.err; body.innerHTML=''; return; }
+  const T=e.trueResult(s.sp), mine=r.R.value, err=Math.abs(mine-T.value)/T.value*100;
+  body.innerHTML='<div class="calc" style="padding:0"><div class="card"><h4>Your result</h4><div class="in">'
+    +'<div class="line"><span>'+esc(e.short)+'</span><span>'+fx(mine,4)+' '+esc(r.R.unit)+'</span></div>'
+    +'<div class="line"><span>from</span><span>'+rowsDone(e,s).n+' readings</span></div>'
+    +'</div></div></div>';
+  s.tries=(s.tries||0)+1; s.checked=err;
+  const band=err<=2?'ok':err<=5?'ok':'bad';
+  v.className='verdict '+band;
+  v.innerHTML='<span class="vh">'+ICON(band==='ok'?'check':'x')+'<b>'
+    +(err<=2?'Well measured — that is within 2%.':err<=5?'Accepted — within 5%, but there is room to be tidier.':'Too far out. Something in the reading or the correction has gone wrong.')
+    +'</b></span><ul><li>Your value: <b>'+fx(mine,4)+' '+esc(r.R.unit)+'</b></li>'
+    +'<li>True value: <b>'+fx(T.value,4)+' '+esc(T.unit)+'</b></li>'
+    +'<li>Percentage error: <b>'+fx(err,2)+'%</b></li>'
+    +(err>5?'<li>Check, in this order: the least count, the zero error and its sign, then whether each M.S.R. was read at the mark <i>before</i> the index and not after it.</li>':'')
+    +'</ul>';
+  save();
+}
+
+/* =========================================================
+   INTERACTION
+   ========================================================= */
+function refreshBench(){ renderInstr(); renderMag(); renderCtrl(); renderObsPanel(); }
+function renderAll(){ renderExpList(); renderAppa(); renderBench(); renderGuide(); showStep(); renderObt(); renderCalc(); renderProg(); $('#expTag').textContent='No. '+cur().no+' — '+cur().title; }
+function renderProg(){
+  const e=cur(),s=st(),p=$('#prog'),d=rowsDone(e,s);
+  p.hidden=false;
+  p.innerHTML='<b>'+d.n+'</b> of '+d.t+' readings taken'+(e.instrument!=='gravesand'?' · least count and zero error '+((s.lcTyped&&s.zeroTyped)?'written':'still blank'):'')
+    +'<div class="bar"><i style="width:'+Math.round(d.n/d.t*100)+'%"></i></div>';
+}
+let drag=null,raf=0;
+// svg units per screen pixel, taken from the element's own viewBox, so the lens
+// tracks the pointer at whatever size the bench happens to be.
+function svgScale(svg){
+  const rc=svg.getBoundingClientRect(), vb=(svg.getAttribute('viewBox')||'0 0 1200 340').split(/\s+/).map(Number);
+  return {u:vb[2]/Math.max(1,rc.width),W:vb[2],H:vb[3]};
+}
+function dragMove(ev){
+  if(!drag) return;
+  let light=false;
+  if(drag.kind==='lens'){
+    lens.x=Math.max(40,Math.min(drag.W-40,drag.lx+(ev.clientX-drag.x0)*drag.u));
+    lens.y=Math.max(30,Math.min(drag.H-30,drag.ly+(ev.clientY-drag.y0)*drag.u));
+    light=(cur().instrument==='gravesand');
+  } else if(drag.kind==='ruler'){
+    const R=st().paper.ruler;
+    R.x=drag.rx+(ev.clientX-drag.x0)*drag.u/PU; R.y=drag.ry+(ev.clientY-drag.y0)*drag.u/PU; light=true;
+  } else if(drag.kind==='rulerot'){
+    const R=st().paper.ruler,q=paperPt(ev);
+    if(q) R.ang=Math.atan2(q[1]-R.y,q[0]-R.x)*180/Math.PI;
+    light=true;
+  } else if(drag.kind==='line'||drag.kind==='free'){ paperMove(ev); light=true; }
+  else setTicks(drag.t0+(ev.clientX-drag.x0)*drag.k);
+  if(!raf) raf=requestAnimationFrame(()=>{ raf=0; light?renderInstr():refreshBench(); });
+}
+function dragEnd(){
+  document.removeEventListener('pointermove',dragMove);
+  document.removeEventListener('pointerup',dragEnd);
+  document.removeEventListener('pointercancel',dragEnd);
+  if(!drag){ return; }
+  if(drag.kind==='line'||drag.kind==='free') paperUp();
+  drag=null; refreshBench(); save();
+}
+function startDrag(ev,host){
+  const g=ev.target.closest('[data-drag]'); if(!g) return;
+  const svg=$(host+' svg'); if(!svg) return;
+  const sc=svgScale(svg);
+  if(g.dataset.drag==='lens'){
+    drag={kind:'lens',x0:ev.clientX,y0:ev.clientY,lx:lens.x,ly:lens.y,u:sc.u,W:sc.W,H:sc.H};
+  } else if(g.dataset.drag==='ruler'){
+    const R=st().paper.ruler; drag={kind:'ruler',x0:ev.clientX,y0:ev.clientY,rx:R.x,ry:R.y,u:sc.u};
+  } else if(g.dataset.drag==='rulerot'){
+    drag={kind:'rulerot'};
+  } else {
+    const e=cur(),I=INSTR[e.instrument]; if(!I) return;
+    const U=(e.instrument==='vernier')?V_U:S_U;
+    drag={kind:'jaw',x0:ev.clientX,t0:st().ticks,k:sc.u/U/I.lcMM};
+  }
+  document.addEventListener('pointermove',dragMove);
+  document.addEventListener('pointerup',dragEnd);
+  document.addEventListener('pointercancel',dragEnd);
+  ev.preventDefault();
+}
+$('#instr').addEventListener('pointerdown',ev=>{
+  if(cur().instrument==='gravesand'&&st().view==='paper'&&!ev.target.closest('[data-drag]')){
+    if(paperDown(ev)){
+      document.addEventListener('pointermove',dragMove);
+      document.addEventListener('pointerup',dragEnd);
+      document.addEventListener('pointercancel',dragEnd);
+      ev.preventDefault();
+    }
+    return;
+  }
+  startDrag(ev,'#instr');
+});
+$('#mag').addEventListener('pointerdown',ev=>startDrag(ev,'#mag'));
+$('#instr').addEventListener('keydown',ev=>{
+  const I=INSTR[cur().instrument]; if(!I) return;
+  const step=ev.shiftKey?10:1;
+  if(ev.key==='ArrowLeft'||ev.key==='ArrowDown') setTicks(st().ticks-step);
+  else if(ev.key==='ArrowRight'||ev.key==='ArrowUp') setTicks(st().ticks+step);
+  else if(ev.key==='Home') closeJaws();
+  else return;
+  ev.preventDefault(); refreshBench(); save();
+});
+$('#benchTop').addEventListener('click',ev=>{
+  const v=ev.target.closest('[data-view]');
+  if(v){ st().view=v.dataset.view; lensHome(); renderBench(); save(); return; }
+  const b=ev.target.closest('[data-held]'); if(!b) return;
+  setHeld(b.dataset.held||null);
+  if(b.dataset.held) st().active=b.dataset.held;
+  renderBench(); renderObt(); save();
+});
+$('#instr').addEventListener('click',ev=>{
+  const w=ev.target.closest('[data-wt]'); if(!w) return;
+  const [side,i]=w.dataset.wt.split('-'); const s=st();
+  const arr=(side==='P')?s.wP:s.wQ;
+  const g=arr.splice(+i,1)[0]; syncWeights(); reJitter(); renderBench(); save();
+  toast(g+' g taken off hanger '+side+'.');
+});
+$('#ctrl').addEventListener('change',ev=>{
+  if(ev.target.id!=='pgScale') return;
+  st().scale=+ev.target.value; reJitter(); renderBench(); renderObt(); renderCalc(); save();
+  toast('Scale set to 1 cm = '+st().scale+' g wt. Readings already taken keep the scale they were taken with.');
+});
+$('#ctrl').addEventListener('click',ev=>{
+  const b=ev.target.closest('button'); if(!b) return;
+  const e=cur(),s=st();
+  if(b.dataset.tool){ s.tool=b.dataset.tool; renderCtrl(); return; }
+  if(b.id==='pgRuler'){ s.paper.ruler.on=!s.paper.ruler.on; renderBench(); save(); return; }
+  if(b.id==='pgUndo'){
+    if(!s.paper.strokes.length){ toast('Nothing to undo.'); return; }
+    s.paper.strokes.pop(); renderInstr(); save(); return;
+  }
+  if(b.id==='pgClear'){
+    if(!s.paper.strokes.length) return;
+    if(!confirm('Rub out everything drawn on the paper?')) return;
+    s.paper.strokes=[]; s.paper.live=null; renderInstr(); save(); toast('Paper cleared.'); return;
+  }
+  if(b.id==='btnLens'){ lens.on=!lens.on; if(lens.on) lensHome(); refreshBench(); save();
+    toast(lens.on?'Magnifier on — drag its rim over any part of the drawing.':'Magnifier put away.'); return; }
+  if(b.dataset.w){ const k=b.dataset.w, d=+b.dataset.d;
+    s[k]=Math.max(20,Math.min(400,s[k]+d)); reJitter(); renderBench(); save(); return; }
+  if(b.id==='btnClose'){ closeJaws(); refreshBench(); save(); return; }
+  if(b.id==='btnOpen'){ setTicks(st().ticks+(e.instrument==='vernier'?40:50)); refreshBench(); save(); }
+});
+let wdrag=null;
+function wGhost(ev){ if(wdrag&&wdrag.el) wdrag.el.style.transform='translate('+(ev.clientX-26)+'px,'+(ev.clientY-16)+'px)'; }
+function wMove(ev){ wGhost(ev); }
+function wUp(ev){
+  document.removeEventListener('pointermove',wMove);
+  document.removeEventListener('pointerup',wUp);
+  document.removeEventListener('pointercancel',wUp);
+  if(!wdrag) return;
+  if(wdrag.el) wdrag.el.remove();
+  const under=document.elementFromPoint(ev.clientX,ev.clientY);
+  const zone=under&&under.closest?under.closest('[data-drop]'):null;
+  const g=wdrag.g; wdrag=null;
+  if(!zone){ toast('Drop it on one of the two hangers.'); return; }
+  const s=st(),side=zone.dataset.drop,arr=(side==='P')?s.wP:s.wQ;
+  if(arr.length>=9){ toast('That hanger is full.'); return; }
+  arr.push(g); arr.sort((x,y)=>y-x); syncWeights(); reJitter();
+  renderBench(); save(); toast(g+' g added to hanger '+side+' — P = '+s.P+', Q = '+s.Q+' g wt.');
+}
+document.addEventListener('pointerdown',ev=>{
+  const w=ev.target.closest('[data-wt-new]'); if(!w) return;
+  const el=document.createElement('div'); el.className='ghost'; el.textContent=w.dataset.wtNew+' g';
+  document.body.appendChild(el);
+  wdrag={g:+w.dataset.wtNew,el}; wGhost(ev);
+  document.addEventListener('pointermove',wMove);
+  document.addEventListener('pointerup',wUp);
+  document.addEventListener('pointercancel',wUp);
+  ev.preventDefault();
+});
+function takeReading(){
+  const e=cur(),s=st(),n=nRows(e);
+  if(e.instrument==='gravesand'){
+    const sol=gravSolve(s.P,s.Q,s.sp.R);
+    if(sol.err){ toast('The junction is not in equilibrium yet.'); return; }
+    const rows=s.rows.main;
+    if(rows.length>=n){ toast('The table already holds its '+n+' trials.'); return; }
+    if(rows.some(r=>r.P===s.P&&r.Q===s.Q)){ toast('That pair of weights has been used. Change P or Q for the next trial.'); return; }
+    rows.push({P:s.P,Q:s.Q,sc:s.scale,oc_true:gOC(),oa:'',ob:'',oc:''});
+    toast('Trial recorded. Measure OC on the paper and write it in.');
+  } else {
+    if(!gripped()){ toast('The instrument is not gripping — close it on the object first.'); return; }
+    if(s.held==null){ toast('Closed on nothing: that is the zero error, not a reading. Write it in the Readings tab.'); return; }
+    const rows=s.rows[s.held];
+    if(rows.length>=n){ toast('The table for the '+tLabel(s.held)+' already holds its '+n+' readings.'); return; }
+    rows.push({t:s.ticks});
+    s.active=s.held; s.logged=true;            // the jaws stay shut: you still have to read them
+    toast('Reading taken — the instrument is still holding it. Write it in, then close on the object again for the next trial.');
+  }
+  renderBench(); renderObt(); renderCalc(); renderProg(); renderExpList(); save();
+  const tab=$('.side-tabs button[data-side="obt"]'); if(tab&&!tab.classList.contains('active')) tab.click();
+}
+$('#btnGrip').onclick=takeReading;
+$('#obt').addEventListener('input',ev=>{
+  const el=ev.target,s=st();
+  if(el.id==='inLC'){ s.lcTyped=el.value; markConst(); renderProg(); save(); return; }
+  if(el.id==='inZE'){ s.zeroTyped=el.value; markConst(); patchAll(); renderProg(); renderCalc(); save();
+    const zc=$('#zcVal'); if(zc) zc.textContent=isFinite(num(el.value))?signed(-num(el.value))+' div':'—';
+    return; }
+  if(!el.classList.contains('cell')) return;
+  const r=s.rows[el.dataset.k][+el.dataset.i]; if(!r) return;
+  r[el.dataset.c]=el.value;
+  patchRow(el.dataset.k,+el.dataset.i); renderCalc(); save();
+});
+$('#obt').addEventListener('click',ev=>{
+  if(ev.target.closest('#btnClearRows')){
+    if(!confirm('Clear every reading in this experiment’s tables?')) return;
+    const s=st(); Object.keys(s.rows).forEach(k=>s.rows[k]=[]);
+    renderObt(); renderCalc(); renderProg(); renderExpList(); save();
+  }
+});
+$('#shelfTabs').addEventListener('click',ev=>{
+  const b=ev.target.closest('button'); if(!b) return;
+  $$('#shelfTabs button').forEach(x=>{ const on=x===b; x.classList.toggle('active',on); x.setAttribute('aria-selected',on); });
+  $('#expList').hidden=b.dataset.cat!=='exp';
+  $('#appaList').hidden=b.dataset.cat!=='app';
+});
+$('.side-tabs').addEventListener('click',ev=>{
+  const b=ev.target.closest('button'); if(!b) return;
+  $$('.side-tabs button').forEach(x=>{ const on=x===b; x.classList.toggle('active',on); x.setAttribute('aria-selected',on); });
+  ['guide','obt','calc','rough'].forEach(k=>{ $('#'+k).hidden=(k!==b.dataset.side); });
+  if(b.dataset.side==='obt') markConst();
+});
+$('#expList').addEventListener('click',ev=>{
+  const b=ev.target.closest('[data-exp]'); if(!b||b.dataset.exp===expId) return;
+  expId=b.dataset.exp; curStep=0; ensure(expId); lensHome(); renderAll(); save();
+  toast('Experiment '+cur().no+' — '+cur().title+'.');
+});
+$('#btnNew').onclick=()=>{
+  if(!confirm('Draw a fresh specimen for this experiment?\n\nThe readings you have taken for it are cleared — they belong to the old one.')) return;
+  S[expId]=freshState(cur(),(Math.random()*4294967296)>>>0); curStep=0; renderAll(); save();
+  toast('A fresh specimen, and a fresh zero error. Start with the least count.');
+};
+$('#btnResult').onclick=()=>{ checkResult(); openModal('#resultModal'); };
+$('#btnCloseResult').onclick=()=>closeModal('#resultModal');
+$('#btnCheck').onclick=checkResult;
+$('#btnReveal').onclick=()=>{
+  const e=cur(),T=e.trueResult(st().sp),v=$('#verdict');
+  v.className='verdict info';
+  v.innerHTML='<span class="vh">'+ICON('target')+'<b>The true figures for this specimen</b></span><ul>'
+    +T.parts.map(p=>'<li>'+esc(p[0])+': <b>'+esc(p[1])+'</b></li>').join('')
+    +'<li>'+esc(e.short)+': <b>'+fx(T.value,4)+' '+esc(T.unit)+'</b></li></ul>';
+};
+let lastFocus=null;
+function openModal(sel){ lastFocus=document.activeElement; const m=$(sel); m.classList.add('show');
+  const f=m.querySelector('input,select,button'); if(f) f.focus(); }
+function closeModal(sel){ $(sel).classList.remove('show'); if(lastFocus&&lastFocus.focus) lastFocus.focus(); }
+$$('.modal-bg').forEach(m=>m.addEventListener('click',ev=>{ if(ev.target===m) closeModal('#'+m.id); }));
+document.addEventListener('keydown',ev=>{
+  if(ev.key!=='Escape') return;
+  const open=$$('.modal-bg.show'); if(open.length) closeModal('#'+open[open.length-1].id);
+});
+
+/* =========================================================
+   PANEL WIDTHS, THEME, MODE, PERSISTENCE
+   ========================================================= */
+const COL_DEF={L:280,R:420},COL_MIN={L:200,R:320},COL_MAX={L:440,R:660},BENCH_MIN=420;
+let cols={L:COL_DEF.L,R:COL_DEF.R},folded={L:false,R:false};
+const widthOf=k=>folded[k]?0:cols[k];
+function clampCols(){
+  const avail=Math.max(320,window.innerWidth-28-28);
+  for(const k of ['L','R']) cols[k]=Math.min(COL_MAX[k],Math.max(COL_MIN[k],Math.round(cols[k])));
+  let over=(widthOf('L')+widthOf('R')+BENCH_MIN)-avail;
+  while(over>0){
+    const open=['L','R'].filter(k=>!folded[k]&&cols[k]>COL_MIN[k]); if(!open.length) break;
+    const k=open.length===2?((cols.L-COL_MIN.L)>=(cols.R-COL_MIN.R)?'L':'R'):open[0];
+    const cut=Math.min(cols[k]-COL_MIN[k],over); cols[k]-=cut; over-=cut;
+  }
+}
+const FOLD_NAME={L:'the practical list',R:'the observations panel'};
+function applyCols(){
+  clampCols();
+  document.documentElement.style.setProperty('--colL',widthOf('L')+'px');
+  document.documentElement.style.setProperty('--colR',widthOf('R')+'px');
+  $('#shelfPanel').classList.toggle('is-hidden',folded.L);
+  $('#sidePanel').classList.toggle('is-hidden',folded.R);
+  for(const [id,k] of [['#splitL','L'],['#splitR','R']]){
+    const el=$(id); el.classList.toggle('folded',folded[k]);
+    el.setAttribute('aria-valuenow',widthOf(k)); el.setAttribute('aria-valuemin',0); el.setAttribute('aria-valuemax',COL_MAX[k]);
+    const t=el.querySelector('.tog');
+    t.setAttribute('aria-expanded',String(!folded[k]));
+    const lbl=(folded[k]?'Show ':'Hide ')+FOLD_NAME[k];
+    t.setAttribute('title',lbl); t.setAttribute('aria-label',lbl);
+    const away=(k==='L')?'#i-chevL':'#i-chevR', back=(k==='L')?'#i-chevR':'#i-chevL';
+    t.querySelector('use').setAttribute('href',folded[k]?back:away);
+  }
+}
+document.addEventListener('click',ev=>{ const b=ev.target.closest('.tog'); if(b){ folded[b.dataset.fold]=!folded[b.dataset.fold]; applyCols(); save(); } });
+function dragSplit(id,k,dir){
+  const el=$(id);
+  el.addEventListener('pointerdown',ev=>{
+    if(ev.button!==0||ev.target.closest('.tog')||folded[k]) return;
+    ev.preventDefault(); el.setPointerCapture(ev.pointerId); el.classList.add('dragging');
+    const x0=ev.clientX,w0=cols[k];
+    const move=e2=>{ cols[k]=w0+(e2.clientX-x0)*dir; applyCols(); };
+    const up=()=>{ el.classList.remove('dragging'); el.removeEventListener('pointermove',move);
+      el.removeEventListener('pointerup',up); el.removeEventListener('pointercancel',up); save(); };
+    el.addEventListener('pointermove',move); el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up);
+  });
+  el.addEventListener('keydown',ev=>{
+    if(folded[k]) return;
+    const step=ev.shiftKey?48:12;
+    if(ev.key==='ArrowLeft') cols[k]-=step*dir;
+    else if(ev.key==='ArrowRight') cols[k]+=step*dir;
+    else if(ev.key==='Home'||ev.key==='End') cols[k]=ev.key==='Home'?COL_MIN[k]:COL_MAX[k];
+    else return;
+    ev.preventDefault(); applyCols(); save();
+  });
+  el.addEventListener('dblclick',()=>{ cols[k]=COL_DEF[k]; applyCols(); save(); toast('Panel width reset.'); });
+}
+dragSplit('#splitL','L',1); dragSplit('#splitR','R',-1);
+window.addEventListener('resize',applyCols);
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme',theme);
+  const dark=theme==='dark';
+  $('#themeIcon').setAttribute('href',dark?'#i-sun':'#i-moon');
+  $('#themeLbl').textContent=dark?'Light':'Dark';
+  $('#btnTheme').setAttribute('aria-pressed',dark);
+  $('#btnTheme').setAttribute('aria-label',dark?'Switch to the light bench':'Switch to the dark bench');
+}
+$('#btnTheme').onclick=()=>{ theme=(theme==='dark')?'light':'dark'; applyTheme(); save(); };
+function applyMode(){
+  $$('#modeSw button').forEach(b=>{ const on=b.dataset.mode===mode; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); });
+}
+function setMode(m){ mode=m; applyMode(); renderGuide(); renderObt(); markConst(); renderCalc(); save(); }
+$('#modeSw').addEventListener('click',ev=>{
+  const b=ev.target.closest('button'); if(!b||b.dataset.mode===mode) return;
+  setMode(b.dataset.mode);
+  toast(mode==='learn'?'Learning mode — every reading is checked as you write it.':'Test mode — nothing is checked until you press Check result.');
+});
+function askMode(){
+  $$('#modeModal .pick').forEach(b=>b.classList.toggle('current',b.dataset.pick===mode));
+  $('#modeRemembered').textContent='Last time you used '+(mode==='learn'?'Learning':'Test')+' mode.';
+  openModal('#modeModal');
+}
+$('#modeModal').addEventListener('click',ev=>{
+  const b=ev.target.closest('.pick'); if(!b) return;
+  setMode(b.dataset.pick); closeModal('#modeModal');
+  toast(mode==='learn'?'Learning mode — every reading is checked as you write it.':'Test mode — nothing is checked until you press Check result.');
+});
+/* ---- rough work ---- */
+let roughT;
+function roughCount(){ const v=$('#roughText').value; $('#roughCount').textContent=v.trim()?v.trim().split(/\s+/).length+' words':'nothing yet'; }
+$('#roughText').oninput=()=>{ roughCount(); clearTimeout(roughT); roughT=setTimeout(save,400); };
+$('#btnRoughClear').onclick=()=>{ if($('#roughText').value&&!confirm('Clear the rough work?')) return; $('#roughText').value=''; roughCount(); save(); };
+/* ---- persistence ---- */
+const KEY='physlab';
+function save(){ try{
+  const out={};
+  Object.keys(S).forEach(id=>{ const s=S[id];
+    out[id]={seed:s.seed,sp:s.sp,rows:s.rows,zeroTyped:s.zeroTyped,lcTyped:s.lcTyped||'',
+             ticks:s.ticks,held:s.held,jit:s.jit,P:s.P,Q:s.Q,active:s.active,
+             wP:s.wP,wQ:s.wQ,view:s.view,tool:s.tool,scale:s.scale,
+             paper:s.paper?{strokes:s.paper.strokes,ruler:s.paper.ruler}:null}; });
+  localStorage.setItem(KEY,JSON.stringify({v:1,mode,theme,cols,folded,expId,step:curStep,lens:lens.on,
+    rough:$('#roughText').value,states:out}));
+}catch(e){} }
+function load(){ try{
+  const d=JSON.parse(localStorage.getItem(KEY)); if(!d||typeof d!=='object') return;
+  if(d.mode==='learn'||d.mode==='test') mode=d.mode;
+  if(d.theme==='light'||d.theme==='dark') theme=d.theme;
+  if(d.cols&&typeof d.cols.L==='number'&&typeof d.cols.R==='number') cols={L:d.cols.L,R:d.cols.R};
+  if(d.folded) folded={L:!!d.folded.L,R:!!d.folded.R};
+  if(EXP[d.expId]) expId=d.expId;
+  if(typeof d.lens==='boolean') lens.on=d.lens;
+  if(typeof d.step==='number'&&d.step>=0) curStep=Math.min(d.step,EXP[expId].procedure.length-1);
+  if(typeof d.rough==='string') $('#roughText').value=d.rough;
+  if(d.states&&typeof d.states==='object') Object.keys(d.states).forEach(id=>{
+    const e=EXP[id],o=d.states[id]; if(!e||!o||typeof o!=='object') return;
+    const s=freshState(e,(o.seed>>>0)||1);
+    if(o.sp&&typeof o.sp==='object') s.sp=o.sp;
+    if(o.rows&&typeof o.rows==='object') Object.keys(s.rows).forEach(k=>{ if(Array.isArray(o.rows[k])) s.rows[k]=o.rows[k].slice(0,nRows(e)); });
+    if(typeof o.zeroTyped==='string') s.zeroTyped=o.zeroTyped;
+    if(typeof o.lcTyped==='string') s.lcTyped=o.lcTyped;
+    if(typeof o.jit==='number') s.jit=o.jit;
+    if(typeof o.held==='string'&&s.rows[o.held]) s.held=o.held;
+    if(typeof o.active==='string'&&s.rows[o.active]) s.active=o.active;
+    if(Array.isArray(o.wP)) s.wP=o.wP.filter(g=>WEIGHTS.indexOf(g)>=0);
+    if(Array.isArray(o.wQ)) s.wQ=o.wQ.filter(g=>WEIGHTS.indexOf(g)>=0);
+    if(s.wP) s.P=sumW(s.wP);
+    if(s.wQ) s.Q=sumW(s.wQ);
+    if(o.view==='board'||o.view==='paper') s.view=o.view;
+    if(['line','free','erase'].indexOf(o.tool)>=0) s.tool=o.tool;
+    if(SCALES.indexOf(o.scale)>=0) s.scale=o.scale;
+    if(o.paper&&s.paper){
+      if(Array.isArray(o.paper.strokes)) s.paper.strokes=o.paper.strokes
+        .filter(k=>k&&(k.t==='l'?Array.isArray(k.a)&&Array.isArray(k.b):Array.isArray(k.p))).slice(0,400);
+      const r=o.paper.ruler;
+      if(r&&typeof r.x==='number'&&typeof r.y==='number'&&typeof r.ang==='number')
+        s.paper.ruler={on:!!r.on,x:r.x,y:r.y,ang:r.ang};
+    }
+    if(typeof o.ticks==='number'&&isFinite(o.ticks)) s.ticks=Math.round(o.ticks);
+    S[id]=s;
+  });
+}catch(e){} }
+/* ---- reset ---- */
+function resetAll(){
+  if(!confirm('Reset everything?\n\nEvery experiment loses its readings and its specimen, the rough work is cleared, and the panel widths, theme and mode go back to their defaults.')) return;
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  Object.keys(S).forEach(k=>delete S[k]);
+  mode='learn'; theme='light'; expId=EXPERIMENTS[0].id; curStep=0;
+  cols={L:COL_DEF.L,R:COL_DEF.R}; folded={L:false,R:false};
+  $('#roughText').value=''; roughCount();
+  $('#verdict').className='verdict'; $('#repBody').innerHTML='';
+  ensure(expId); applyTheme(); applyCols(); applyMode(); renderAll(); save();
+  toast('Everything reset. Fresh specimens all round.');
+}
+/* ---- print ---- */
+function printRecord(){
+  const e=cur(),s=st(),cs=specOf(),I=INSTR[e.instrument],r=studentResult();
+  const ul=(t,a)=>'<h3>'+t+'</h3><ul>'+a.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+  let h='<h2>Experiment No. '+e.no+' — '+esc(e.title.toUpperCase())+'</h2>'
+    +'<h3>Aim</h3><p>'+esc(e.aim)+'</p>'
+    +ul('Apparatus',e.apparatus)
+    +'<h3>Formula</h3><ul>'+e.formula.map(f=>'<li><b>'+esc(f.b)+':</b> '+esc(f.eq)+'</li>').join('')+'</ul>'
+    +'<h3>Procedure</h3><ol>'+e.procedure.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ol>'
+    +'<h3>Observations</h3>';
+  if(I) h+='<p>'+(e.instrument==='vernier'
+      ?'Value of one main scale division = '+I.msdMM+' mm &middot; number of divisions on the vernier scale = '+I.vsd
+      :'Pitch of the screw = '+I.pitchMM+' mm &middot; number of divisions on the circular scale = '+I.csd)
+    +'<br>Least count = '+esc(s.lcTyped||'............')+' mm'
+    +'<br>Zero error = '+esc(s.zeroTyped||'............')+' divisions'
+    +'<br>Zero correction = '+(isFinite(num(s.zeroTyped))?signed(-num(s.zeroTyped)):'............')+' divisions</p>';
+  e.targets.forEach(tg=>{
+    h+='<h3>Readings for the '+esc(tg.label)+'</h3><table><tr><th>S.No</th>'
+      +cs.cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')+'<th>'+esc(cs.totalH)+'</th></tr>';
+    for(let i=0;i<nRows(e);i++){ const row=s.rows[tg.key][i];
+      h+='<tr><td>'+(i+1)+'</td>'+cs.cols.map(c=>'<td>'+(row&&row[c.k]!==undefined&&row[c.k]!==''?esc(row[c.k]):'')+'</td>').join('')
+        +'<td>'+(row&&isFinite(rowTotal(row))?fx(rowTotal(row),cs.dp):'')+'</td></tr>'; }
+    const m=meanOf(tg.key);
+    h+='<tr><td colspan="'+(cs.cols.length+1)+'" style="text-align:right"><b>Mean '+esc(tg.sym||tg.label)+'</b></td><td><b>'
+      +(isFinite(m)?fx(m,cs.dp+1)+' '+cs.unit:'')+'</b></td></tr></table>';
+  });
+  h+='<h3>Calculations</h3>'+(r.err?'<p>'+esc(r.err)+'</p>':'<pre>'+esc(r.R.work)+'</pre>')
+    +'<h3>Result</h3><p>'+(r.err?'............':esc(r.R.final))+'</p>'
+    +ul('Precautions',e.precautions)+ul('Sources of error',e.errors);
+  $('#printArea').innerHTML=h;
+  window.print();
+}
+$('#btnPrint').onclick=printRecord;
+$('#btnReset').onclick=resetAll;
+/* ---- init ---- */
+load();
+ensure(expId);
+applyTheme(); applyCols(); applyMode(); roughCount(); lensHome(); renderAll();
+askMode();
+</script>
+</body>
+</html>

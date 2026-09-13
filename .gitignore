@@ -1,0 +1,7 @@
+# the practical record itself is the school's document, not ours to publish
+*.doc
+*.docx
+*.pdf
+.claude/
+.vercel/
+node_modules/
