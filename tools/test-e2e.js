@@ -29,19 +29,19 @@ function runOne(id,seed){
   A.S[id]=A.freshState(A.EXP[id],seed); A.setExp(id);
   const e=A.EXP[id], s=A.S[id], vern=(e.instrument==='vernier');
   // 1. the zero error, read off the closed instrument
-  A.setHeld(null); A.closeJaws();
+  A.setFace('outer'); A.setHeld(null); A.seat();
   let ze;
   if(vern){ const z=eyeVernier(A.magVernier()); ze=z.leftOfZero?z.vsr-10:z.vsr; }
   else { const z=eyeScrew(A.magScrew()); ze=z.csr<=50?z.csr:z.csr-100; }
   s.zeroTyped=String(ze); s.lcTyped=String(A.INSTR[e.instrument].lcMM);
-  // 2. five readings of each dimension
-  e.targets.forEach(tg=>{
+  // 2. fill the record's tables, a row at a time; the instrument moves on with them
+  A.recTargets(e).forEach(tg=>{
     for(let i=0;i<A.nRows(e);i++){
-      A.setHeld(tg.key); A.closeJaws();
-      const row={t:s.ticks};
+      A.setHeld(tg.key); A.seat();
+      if(A.activeRow(tg.key)!==i) return {err:'the instrument is on row '+A.activeRow(tg.key)+', not '+i};
+      const row=s.rows[tg.key][i];
       if(vern){ const r=eyeVernier(A.magVernier()); row.msr=(r.msrMM/10).toFixed(2); row.vsr=String(r.vsr); }
-      else { const r=eyeScrew(A.magScrew()); row.psr=String(r.psrMM); row.csrO=String(r.csr); row.csrC=String(r.csr-ze); }
-      s.rows[tg.key].push(row);
+      else { const r=eyeScrew(A.magScrew()); row.psr=String(r.psrMM); row.csr=String(r.csr); }
     }
   });
   const got=A.studentResult(); if(got.err) return {err:got.err};

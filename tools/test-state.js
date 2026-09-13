@@ -49,7 +49,8 @@ const back=A.S.v1;
 if(!back) bad('nothing came back from the saved state');
 else {
   if(JSON.stringify(back.sp)!==specBefore) bad('the specimen changed across a reload');
-  if(back.rows.l.length!==2) bad('the readings did not come back ('+back.rows.l.length+' rows)');
+  if(back.rows.l[0].msr!=='3.40'||back.rows.l[1].vsr!=='6') bad('the readings did not come back');
+  if(back.rows.l.length!==5) bad('the table came back with '+back.rows.l.length+' rows, not the record’s five');
   if(back.zeroTyped!=='2'||back.lcTyped!=='0.1') bad('the least count or zero error did not come back');
   else console.log('   specimen, readings, least count and zero error all came back');
 }
@@ -115,7 +116,7 @@ for(let i=0;i<50;i++){
   A.load();
   const v=A.ensure('v1');
   if(JSON.stringify(v.sp)===JSON.stringify(frozen)) same++;
-  if(v.rows.l.length!==1) bad('a recorded reading was lost on reload');
+  if(!v.rows.l[0]||v.rows.l[0].msr!=='3.40') bad('a recorded reading was lost on reload');
   if(v.zeroTyped!=='2') bad('the typed zero error was lost on reload');
 }
 if(same!==50) bad('an experiment with a reading in it was redrawn '+(50-same)+' times out of 50');
@@ -127,6 +128,26 @@ A.load();
 if(JSON.stringify(A.ensure('v1').sp)!==JSON.stringify(frozen))
   bad('writing the zero error down was not enough to hold on to the specimen');
 console.log('   writing the zero error down alone is enough to hold the specimen');
+
+console.log('7. a table full of blank rows is not work');
+const e1=A.EXP.v1;
+const blank=JSON.stringify({v:1,expId:'v1',states:{v1:{seed:777,sp:frozen,
+  rows:{l:[{},{},{},{},{}],b:[{},{},{},{},{}],h:[{},{},{},{},{}],id:[],dp:[]},zeroTyped:'',lcTyped:''}}});
+const zs2=new Set();
+for(let i=0;i<200;i++){
+  A.__store['physlab']=blank;
+  Object.keys(A.S).forEach(k=>delete A.S[k]);
+  A.load(); zs2.add(A.ensure('v1').sp.zeroTicks);
+}
+if(zs2.size<5) bad('blank rows were mistaken for work: only '+zs2.size+' zero errors in 200 visits');
+// one figure written into one cell is enough to hold on to it
+const oneCell=JSON.stringify({v:1,expId:'v1',states:{v1:{seed:777,sp:frozen,
+  rows:{l:[{msr:'3.40'},{},{},{},{}],b:[{},{},{},{},{}],h:[{},{},{},{},{}],id:[],dp:[]},zeroTyped:'',lcTyped:''}}});
+A.__store['physlab']=oneCell;
+Object.keys(A.S).forEach(k=>delete A.S[k]);
+A.load();
+if(JSON.stringify(A.ensure('v1').sp)!==JSON.stringify(frozen)) bad('one written cell was not enough to hold the specimen');
+console.log('   blank rows redraw the unknown ('+zs2.size+' zero errors in 200 visits); one written cell holds it');
 
 console.log(fail?('\n'+fail+' PROBLEMS'):'\nall clean');
 process.exit(fail?1:0);

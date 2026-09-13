@@ -152,13 +152,13 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 .bench{container:bench/inline-size;position:relative;--ap:1;display:flex;flex-direction:column;background:
   radial-gradient(1200px 400px at 50% 120%,var(--bench-gloss),transparent),
   linear-gradient(180deg,var(--bench-air) 0%,var(--bench-air) 74%,var(--wood1) 74%,var(--wood2) 100%);}
-.bench-top{display:flex;gap:12px;padding:14px 18px 0;position:relative;z-index:2;flex:0 0 auto}
+.bench-top{display:flex;gap:10px;align-items:center;padding:14px 18px 0;position:relative;z-index:2;flex:0 0 auto}
 .spec-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;transition:.15s;min-width:0}
 .spec-card.pick{cursor:pointer}
 .spec-card.pick:hover{box-shadow:var(--shadow);border-color:var(--accent-line)}
 .spec-card.on{border-color:var(--accent);background:var(--accent-bg);box-shadow:inset 0 0 0 1px var(--accent)}
 .spec-card svg{width:46px;height:46px;flex:0 0 auto}
-.spec-card b{display:block;font-size:13px}
+.spec-card b{font-size:13px;white-space:nowrap}
 .spec-card small{color:var(--muted);font-size:11px;display:block;line-height:1.35}
 .bench-main{--ap:1;flex:1 1 auto;min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(10px*var(--ap));padding:12px 18px 0}
 @container bench (max-width:820px){.bench-main{--ap:.92}}
@@ -217,13 +217,14 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 .badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);text-transform:uppercase;letter-spacing:.3px}
 .badge.nbc{margin-left:5px;font-size:10.5px;padding:2px 6px;letter-spacing:0}
 .badge.sec{background:var(--chip);color:var(--ink2);font-weight:600;text-transform:none;letter-spacing:0}
+.obs #obsExp{font-size:13.5px;line-height:1.5;color:var(--ink2)}
 .obs .row{display:grid;grid-template-columns:92px 1fr;gap:8px;font-size:13.5px;line-height:1.5;margin:5px 0}
 .obs .row b{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding-top:3px}
 .obs .oblist{margin:0;padding:0;list-style:none}
 .obs .oblist li{position:relative;padding-left:15px;margin:2px 0}
 .obs .oblist li:before{content:"";position:absolute;left:2px;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
 .obs .foot{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;align-items:center}
-.obs .hintq{font-size:12px;color:var(--muted);margin-right:auto;line-height:1.4}
+.obs .hintq{font-size:12px;color:var(--muted);margin-left:auto;line-height:1.4;text-align:right}
 .side-tabs{display:flex;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
 .side-tabs::-webkit-scrollbar{display:none}
 .side-tabs button{display:block;text-align:center;flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:0;border-radius:0;background:transparent;
@@ -232,10 +233,6 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 .side-tabs button.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--accent-bg)}
 .side-tabs button:focus-visible{box-shadow:inset 0 0 0 2px var(--accent);border-radius:0}
 .side-body{overflow:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.prog{padding:10px 14px;border-bottom:1px solid var(--line);background:var(--hover);font-size:12.5px;color:var(--muted);line-height:1.5}
-.prog b{color:var(--ink)}
-.prog .bar{height:7px;border-radius:999px;background:var(--line);margin-top:7px;overflow:hidden}
-.prog .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#38bdf8);border-radius:999px;transition:width .45s cubic-bezier(.3,1,.4,1)}
 /* procedure: the record, section by section */
 .guide details{border-bottom:1px solid var(--line)}
 .guide summary{padding:11px 14px;font-weight:700;cursor:pointer;font-size:13.5px;list-style:none;display:flex;align-items:center;gap:9px}
@@ -276,7 +273,8 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 .obt input:focus{outline:none;border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px rgba(15,118,110,.15)}
 .obt input.bad{border-color:var(--bad);background:var(--bad-soft)}
 .obt input.good{border-color:var(--ok)}
-.obt tr.pending td{background:var(--mine)}
+.obt tr.here td{background:var(--accent-bg)}
+.obt tr.here td.sn{box-shadow:inset 3px 0 0 var(--accent);color:var(--accent);font-weight:700}
 .obt .mark{width:22px;text-align:center;padding:0}
 .obt .mark .ic{width:14px;height:14px}
 .obt .mark .y{color:var(--ok)}
@@ -424,7 +422,7 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 <header>
   <div class="brand">
     <div class="logo" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px"><use href="#i-ruler"/></svg></div>
-    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 3</span></small></div>
+    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 4</span></small></div>
   </div>
   <div class="exp-tag" id="expTag">No experiment selected</div>
   <div class="actions">
@@ -472,12 +470,10 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
   <!-- ===== RIGHT: procedure, readings, result ===== -->
   <aside class="panel" id="sidePanel" aria-label="Procedure, observations and result">
     <div class="obs" id="obs" aria-live="polite">
-      <div class="head"><span class="badge" id="obsTest">Ready</span><span class="badge sec" id="obsSec"></span></div>
-      <div class="row"><b>Step</b><div id="obsExp">Pick an experiment on the left to begin.</div></div>
-      <div class="row"><b>Reading</b><div id="obsObs">&mdash;</div></div>
-      <div class="foot"><span class="hintq" id="obsHint"></span><button id="btnGrip" disabled><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-grip"/></svg>Take a reading</button></div>
+      <div class="head"><span class="badge" id="obsTest">Ready</span><span class="hintq" id="obsHint"></span>
+        <button id="btnGrip" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-grip"/></svg>Take a reading</button></div>
+      <div id="obsExp">Pick an experiment on the left to begin.</div>
     </div>
-    <div class="prog" id="prog" hidden></div>
     <div class="side-tabs" role="tablist" aria-label="Side panel">
       <button class="active" data-side="guide" role="tab" aria-selected="true">Procedure</button
       ><button data-side="obt" role="tab" aria-selected="false">Readings <span id="obCount" class="badge nbc" hidden>0</span></button
@@ -825,7 +821,7 @@ function freshState(e,seed){
   const rng=mulberry(seed>>>0);
   const st={seed:seed>>>0, sp:e.make(rng), zeroTyped:'', depthZeroTyped:'', rows:{}, ticks:0, held:null,
             face:'outer', jit:[-1,0,0,0,1][Math.floor(rng()*5)], tries:0, checked:null, logged:false};
-  (e.targets||[{key:'main'}]).forEach(t=>st.rows[t.key]=[]);
+  (e.targets||[{key:'main'}]).forEach(t=>st.rows[t.key]=(e.instrument==='gravesand')?[]:blankRows(e));
   st.active=(e.targets?e.targets[0].key:'main');
   if(e.instrument==='gravesand'){
     st.wP=[50,50]; st.wQ=[50,50]; st.P=100; st.Q=100;
@@ -867,7 +863,7 @@ function bounds(){
   if(e.instrument==='gravesand') return {lo:0,hi:0,stop:0,dir:'min'};
   const home=zeroFor(curFace());
   if(s.held==null) return {lo:home,hi:hi,stop:home,dir:'min'};
-  const at=e.sizeOf(s.sp,s.held)+zeroFor(faceOf(s.held))+s.jit;
+  const at=trueTicks(s.held,activeRow(s.held));
   return (faceOf(s.held)==='outer')
     ? {lo:at,hi:hi,stop:at,dir:'min'}
     : {lo:home,hi:at,stop:at,dir:'max'};
@@ -877,21 +873,31 @@ const gripped=()=>cur().instrument!=='gravesand'&&st().ticks===stopTicks();
 const maxTicks=()=>Math.round(INSTR[cur().instrument].maxMM/INSTR[cur().instrument].lcMM);
 // A fresh grip is never quite the last one: pressure and tilt move it by up to one
 // least count either way, which is exactly why the record asks for five readings.
+// Each trial keeps its own error for good, worked out from the specimen's seed,
+// so the instrument shows the same thing whenever you come back to that row.
+function hash32(seed,str){
+  let h=(seed>>>0)^0x9e3779b9;
+  for(let j=0;j<str.length;j++) h=Math.imul(h^str.charCodeAt(j),16777619)>>>0;
+  return h>>>0;
+}
+const jitterFor=(key,i)=>[-1,0,0,0,1][hash32(st().seed,key+'#'+i)%5];
+// The row you are about to fill in: the first one with a blank in it.
+function activeRow(key){
+  const rows=(st().rows[key]||[]), cs=specOf();
+  for(let i=0;i<rows.length;i++)
+    if(cs.cols.some(c=>!c.ro&&(rows[i][c.k]===''||rows[i][c.k]===undefined))) return i;
+  return Math.max(0,rows.length-1);
+}
+const trueTicks=(key,i)=>cur().sizeOf(st().sp,key)+zeroFor(faceOf(key))+jitterFor(key,i);
 function reJitter(){ const s=st(); s.jit=[-1,0,0,0,1][Math.floor(Math.random()*5)]; }
 // The jitter has to be redrawn BEFORE the jaw is clamped, or the clamp would use
 // the old stop and the jaws would end up a hair off the object.
 function setTicks(t){
-  const s=st(); t=Math.round(t);
-  let b=bounds();
-  // Coming on to the stop from the free side is a fresh contact, so the jitter is
-  // redrawn first -- before the clamp, or the clamp would use the old stop.
-  const arriving=(b.dir==='min')?(t<=b.stop&&s.ticks>b.stop):(t>=b.stop&&s.ticks<b.stop);
-  if(arriving){ reJitter(); b=bounds(); }
+  const s=st(),b=bounds(); t=Math.round(t);
   s.slip=(s.held!=null)&&((b.dir==='min')?(t<b.stop):(t>b.stop));   // the ratchet is slipping
   s.ticks=Math.max(b.lo,Math.min(b.hi,t));
-  if(s.ticks!==b.stop) s.logged=false;         // moved off the stop: the next contact is a new trial
 }
-function seat(){ const s=st(); reJitter(); s.ticks=stopTicks(); s.logged=false; }
+function seat(){ const s=st(); s.ticks=stopTicks(); }
 function closeJaws(){ seat(); }
 function setHeld(k){ const s=st(); s.held=k; if(k!=null) s.face=faceOf(k); seat(); }
 function setFace(f){ const s=st();
@@ -1471,9 +1477,9 @@ function renderBenchTop(){
   const e=cur(),s=st(),el=$('#benchTop');
   if(e.instrument==='gravesand'){ el.innerHTML=pgBenchTop(); return; }
   const face=curFace(), vern=(e.instrument==='vernier');
-  const card=(key,name,note,icon)=>'<button class="spec-card pick'+(s.held===key?' on':'')+'" data-held="'+(key===null?'':key)+'" type="button">'
-    +(icon||SPEC_ICON[e.id])
-    +'<div style="min-width:0"><b>'+esc(name)+'</b>'+(note?'<small>'+esc(note)+'</small>':'')+'</div></button>';
+  const card=(key,name,note,icon)=>'<button class="spec-card pick'+(s.held===key?' on':'')+'" data-held="'+(key===null?'':key)+'"'
+    +' type="button"'+(note?' title="'+esc(note)+'"':'')+'>'
+    +(icon||SPEC_ICON[e.id])+'<b>'+esc(name)+'</b></button>';
   const shut='<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 10v28M33 10v28" stroke="var(--steel-line)" stroke-width="4" stroke-linecap="round"/></svg>';
   const bore='<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="12" width="34" height="24" rx="3" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/><rect x="15" y="12" width="18" height="24" fill="var(--bench-air)" stroke="var(--brass2)" stroke-width="1.5"/></svg>';
   // Which of the calliper's three faces you are using decides what you can measure
@@ -1482,9 +1488,9 @@ function renderBenchTop(){
   // with nothing on the bench to measure is disabled rather than leading nowhere.
   const usable=f=>(e.targets||[]).some(t=>(t.face||'outer')===f);
   const faces=!vern?'':'<div class="segs" id="faceSw" role="group" aria-label="Measuring face" style="align-self:center">'
-    +[['outer','Outer jaws','external'],['inner','Inner jaws','internal'],['depth','Depth rod','a depth']]
+    +[['outer','Outer jaws','an external dimension'],['inner','Inner jaws','an internal dimension'],['depth','Depth rod','a depth']]
       .map(f=>'<button data-face="'+f[0]+'"'+(face===f[0]?' class="on"':'')+(usable(f[0])?'':' disabled')
-        +' type="button" title="'+(usable(f[0])?'Measure '+f[2]+' dimensions':'Nothing with '+f[2]+' dimensions in this experiment')
+        +' type="button" title="'+(usable(f[0])?'Measure '+f[2]:'Nothing with '+f[2]+' in this experiment')
         +'">'+f[1]+'</button>').join('')
     +'</div>';
   const shown=(e.targets||[]).filter(t=>!vern||(t.face||'outer')===face);
@@ -1535,40 +1541,20 @@ function canTake(){
 }
 // What the panel says about the instrument -- its state, never its reading.
 // Handing over the number here would leave nothing to read off the scale.
+// One short line, or nothing at all. The bench already shows what is happening.
 function renderObsPanel(){
-  const e=cur(),s=st(),box=$('#obsObs');
-  if(e.instrument==='gravesand'){
+  const e=cur(),s=st(),grav=(e.instrument==='gravesand'),b=$('#btnGrip');
+  b.hidden=!grav;
+  if(grav){
     const sol=gravSolve(s.P,s.Q,s.sp.R);
-    box.innerHTML=sol.err
-      ?'<span style="color:var(--warn)">'+esc(sol.err)+'</span>'
-      :'<ul class="oblist"><li>P = '+s.P+' g wt and Q = '+s.Q+' g wt, junction steady.</li>'
-        +'<li>The three directions are marked on the paper.</li>'
-        +'<li>Draw OA and OB to scale, complete the parallelogram, then measure OC.</li></ul>';
-  } else if(!gripped()){
-    const f=curFace();
-    box.innerHTML='<span style="color:var(--warn)">Not touching yet — '
-      +(f==='inner'?'open the inner jaws until they meet the wall.'
-       :f==='depth'?'run the rod down until it reaches the bottom.'
-       :'close the instrument on it.')+'</span>';
-  } else if(s.held==null){
-    box.innerHTML='<ul class="oblist"><li>'+(curFace()==='depth'?'The rod is home against the tail.':'Closed on nothing.')
-      +'</li><li>Find the division that coincides: that is the zero error'
-      +(curFace()==='depth'?' of the depth rod, which is its own.':'.')+'</li>'
-      +'<li>Write it in the Readings tab.</li></ul>';
-  } else if(s.logged){
-    box.innerHTML='<ul class="oblist"><li>This reading is already in the table.</li>'
-      +'<li>The instrument is still holding it — read the scale and write the figures in.</li>'
-      +'<li>Close it on the object again for the next trial.</li></ul>';
-  } else {
-    box.innerHTML='<ul class="oblist"><li>Gripping the '+esc(tLabel(s.held))+'.</li>'
-      +'<li>Read the magnified scale and write the figures in the table.</li></ul>';
+    b.disabled=!!sol.err;
+    $('#obsHint').textContent=sol.err?'Adjust P or Q until the junction settles.'
+      :'In equilibrium — take the trial, then measure OC on the paper.';
+    return;
   }
-  const can=canTake();
-  $('#btnGrip').disabled=!can;
-  $('#obsHint').textContent=can?'':(e.instrument==='gravesand'
-    ?'Change P or Q until the junction settles on the paper.'
-    :s.logged?'Written down? Close the instrument again for the next trial.'
-    :(s.held==null?'Pick a dimension above, then close on it.':'Close the instrument on it first.'));
+  $('#obsHint').textContent=gripped()
+    ? (s.held==null?'Read the zero error and write it in.':'Read the scale and fill in row '+(activeRow(s.held)+1)+'.')
+    : (s.held==null?'Pick what to measure, then close the instrument.':'Close the instrument on the '+tLabel(s.held)+'.');
 }
 function renderBench(){
   const bench=document.querySelector('.bench');
@@ -1585,7 +1571,7 @@ const nRows=e=>e.rows||5;
 // to do. It is not in the class record, so it stays out of the result, the
 // progress count and the print.
 const recTargets=e=>(e.targets||[]).filter(t=>!t.practice);
-function rowsDone(e,s){ let n=0,t=0; recTargets(e).forEach(k=>{ t+=nRows(e); n+=s.rows[k.key].length; }); return {n,t}; }
+function rowsDone(e,s){ let n=0,t=0; recTargets(e).forEach(k=>{ t+=nRows(e); n+=filledRows(k.key); }); return {n,t}; }
 function renderExpList(){
   $('#expList').innerHTML=EXPERIMENTS.map(e=>{
     const s=S[e.id], got=s?Object.values(s.rows).reduce((a,r)=>a+r.length,0):0;
@@ -1638,7 +1624,6 @@ $('#guide').addEventListener('click',e=>{
 function showStep(){
   const e=cur();
   $('#obsTest').textContent='Step '+(curStep+1)+' of '+e.procedure.length;
-  $('#obsSec').style.display='none';
   $('#obsExp').textContent=e.procedure[curStep];
 }
 
@@ -1652,33 +1637,50 @@ function showStep(){
 const num=v=>{ const n=parseFloat(v); return isFinite(n)?n:NaN; };
 const COLSPEC={
   vernier:{
-    cols:[{k:'msr',h:'M.S.R. (cm)',step:'0.1'},{k:'vsr',h:'V.S.R. (div)',step:'1'}],
-    totalH:'Total = M.S.R. + (V.S.R. × L.C.)  (cm)', unit:'cm', dp:2,
+    cols:[{k:'msr',h:'M.S.R. (cm)',step:'0.1'},{k:'vsr',h:'V.S.R.',step:'1'}],
+    unit:'cm', dp:2, mdp:3,
     total:r=>num(r.msr)+num(r.vsr)*0.01,
-    truth:(r,sp)=>{ const v=VERNIER.read(r.t); return {msr:v.msrMM/10,vsr:v.vsr}; }
+    truth:(key,i)=>{ const v=VERNIER.read(trueTicks(key,i)); return {msr:v.msrMM/10,vsr:v.vsr}; }
   },
   screw:{
-    cols:[{k:'psr',h:'P.S.R. (mm)',step:'1'},{k:'csrO',h:'C.S.R. observed (div)',step:'1'},{k:'csrC',h:'C.S.R. corrected (div)',step:'1'}],
-    totalH:'Total = P.S.R. + (corrected C.S.R. × L.C.)  (mm)', unit:'mm', dp:2,
-    total:r=>num(r.psr)+num(r.csrC)*0.01,
-    truth:(r,sp)=>{ const v=SCREW.read(r.t); return {psr:v.psrMM,csrO:v.csr,csrC:v.csr-sp.zeroTicks}; }
+    cols:[{k:'psr',h:'P.S.R. (mm)',step:'1'},{k:'csr',h:'C.S.R.',step:'1'}],
+    unit:'mm', dp:2, mdp:3,
+    total:r=>num(r.psr)+num(r.csr)*0.01,
+    truth:(key,i)=>{ const v=SCREW.read(trueTicks(key,i)); return {psr:v.psrMM,csr:v.csr}; }
   },
   gravesand:{
     cols:[{k:'P',h:'P (g wt)',ro:true},{k:'Q',h:'Q (g wt)',ro:true},
           {k:'oa',h:'OA (cm)',step:'0.1'},{k:'ob',h:'OB (cm)',step:'0.1'},{k:'oc',h:'OC (cm)',step:'0.1'}],
-    totalH:'R = OC × scale  (g wt)', unit:'g wt', dp:1,
+    unit:'g wt', dp:1, mdp:1, noCorr:true,          // nothing to correct: no zero error on a board
     total:r=>num(r.oc)*(r.sc||10),
-    truth:(r,sp)=>({oa:r.P/10,ob:r.Q/10,oc:r.oc_true})
+    truth:(key,i)=>{ const r=st().rows[key][i]; return r?{oa:r.P/10,ob:r.Q/10,oc:r.oc_true}:{}; }
   }
 };
 const specOf=()=>COLSPEC[cur().instrument];
 const close=(a,b,tol)=>isFinite(a)&&isFinite(b)&&Math.abs(a-b)<(tol||1e-6);
+const blankRows=e=>Array.from({length:nRows(e)},()=>({}));
 function rowTotal(r){ const v=specOf().total(r); return isFinite(v)?v:NaN; }
-function meanOf(key){
-  const rows=st().rows[key].filter(r=>isFinite(rowTotal(r)));
-  if(!rows.length) return NaN;
-  return rows.reduce((a,r)=>a+rowTotal(r),0)/rows.length;
+// The zero correction that applies to this column: the depth rod has its own.
+function zcFor(key){
+  const s=st(),f=faceOf(key);
+  const z=num((f==='depth')?s.depthZeroTyped:s.zeroTyped);
+  return isFinite(z)?-z:NaN;
 }
+// One least count is a hundredth of the unit each table is written in: a tenth of
+// a millimetre in centimetres, a hundredth of a millimetre in millimetres.
+function rowCorr(key,i){
+  const r=st().rows[key][i]; if(!r) return NaN;
+  const t=rowTotal(r);
+  if(cur().instrument==='gravesand') return t;
+  const zc=zcFor(key);
+  return (isFinite(t)&&isFinite(zc))?t+zc*0.01:NaN;
+}
+function meanOf(key){
+  const rows=st().rows[key]||[];
+  const v=rows.map((_,i)=>rowCorr(key,i)).filter(x=>isFinite(x));
+  return v.length?v.reduce((a,b)=>a+b,0)/v.length:NaN;
+}
+const filledRows=key=>(st().rows[key]||[]).filter((_,i)=>isFinite(rowCorr(key,i))).length;
 // How close a typed figure has to be to count as the same reading: whole
 // divisions are exact, lengths are to the last decimal the column carries.
 const tolOf=k=>({oc:0.049,oa:0.049,ob:0.049,msr:0.0049})[k]||0.49;
@@ -1707,58 +1709,60 @@ function obsHead(){
     +'</tbody></table>';
 }
 function renderObt(){
-  const e=cur(),s=st(),cs=specOf(),show=(mode==='learn');
+  const e=cur(),s=st(),cs=specOf(),show=(mode==='learn'),grav=(e.instrument==='gravesand');
   const keys=(e.targets||[{key:'main',label:e.short,sym:'R'}]);
   let h=obsHead(),saidPractice=false;
   keys.forEach(tg=>{
-    const rows=s.rows[tg.key], n=nRows(e), mean=meanOf(tg.key);
+    const rows=s.rows[tg.key], n=grav?nRows(e):rows.length, mean=meanOf(tg.key);
+    const act=grav?-1:activeRow(tg.key);
     if(tg.practice&&!saidPractice){ saidPractice=true;
-      h+='<p class="lead" style="margin-top:16px">The hollow cylinder is not in the record. It is on the bench so that the'
-        +' <b>inner jaws</b> and the <b>depth rod</b> have something to measure — these two tables are practice and'
-        +' are left out of the result.</p>'; }
-    h+='<h4>Readings for the '+esc(tg.label)+(s.active===tg.key&&e.instrument!=='gravesand'?' &nbsp;<span class="badge">next reading goes here</span>':'')+'</h4>';
+      h+='<p class="lead" style="margin-top:16px">Practice only — the hollow cylinder is not in the record, and these two tables are left out of the result.</p>'; }
+    h+='<h4>'+esc(tg.label.charAt(0).toUpperCase()+tg.label.slice(1))+'</h4>';
     h+='<table><thead><tr><th class="sn">S.No</th>'
       +cs.cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')
-      +'<th>'+esc(cs.totalH)+'</th>'+(show?'<th class="mark"></th>':'')+'</tr></thead><tbody>';
+      +'<th>Total ('+cs.unit+')</th>'+(cs.noCorr?'':'<th>Corrected ('+cs.unit+')</th>')
+      +(show?'<th class="mark"></th>':'')+'</tr></thead><tbody>';
     for(let i=0;i<n;i++){
       const r=rows[i];
-      if(!r){ h+='<tr><td class="sn">'+(i+1)+'</td><td colspan="'+(cs.cols.length+1+(show?1:0))+'" style="color:var(--muted);font-style:italic">not taken yet</td></tr>'; continue; }
-      const tv=cs.truth(r,s.sp), tot=rowTotal(r);
-      const pend=cs.cols.some(c=>!c.ro&&(r[c.k]===''||r[c.k]===undefined));
-      h+='<tr'+(pend?' class="pending"':'')+'>'+'<td class="sn">'+(i+1)+'</td>';
+      if(grav&&!r){ h+='<tr><td class="sn">'+(i+1)+'</td><td colspan="'+(cs.cols.length+(cs.noCorr?1:2)+(show?1:0))+'" style="color:var(--muted);font-style:italic">not taken yet</td></tr>'; continue; }
+      const tv=cs.truth(tg.key,i), tot=rowTotal(r), cor=rowCorr(tg.key,i);
+      h+='<tr data-row="'+tg.key+'-'+i+'"'+(i===act?' class="here"':'')+'><td class="sn">'+(i+1)+'</td>';
       cs.cols.forEach(c=>{
         if(c.ro){ h+='<td class="tot">'+r[c.k]+'</td>'; return; }
-        const v=r[c.k]===undefined?'':r[c.k];
-        const ok=close(num(v),tv[c.k],tolOf(c.k));
-        const cls=show&&v!==''?(ok?' good':' bad'):'';
-        h+='<td><input type="number" class="cell'+cls+'" step="'+c.step+'" data-k="'+tg.key+'" data-i="'+i+'" data-c="'+c.k+'" value="'+esc(v)+'"></td>';
+        const v=(r[c.k]===undefined?'':r[c.k]);
+        const cls=(show&&v!=='')?(close(num(v),tv[c.k],tolOf(c.k))?' good':' bad'):'';
+        h+='<td><input type="number" class="cell'+cls+'" step="'+c.step+'" inputmode="decimal"'
+          +' data-k="'+tg.key+'" data-i="'+i+'" data-c="'+c.k+'" value="'+esc(v)+'"></td>';
       });
-      h+='<td class="tot" data-tot="'+tg.key+'-'+i+'">'+(isFinite(tot)?fx(tot,cs.dp):'—')+'</td>';
-      if(show){ const allOk=cs.cols.filter(c=>!c.ro).every(c=>close(num(r[c.k]),tv[c.k],tolOf(c.k)));
-        const any=cs.cols.filter(c=>!c.ro).some(c=>r[c.k]!==''&&r[c.k]!==undefined);
-        h+='<td class="mark" data-mk="'+tg.key+'-'+i+'">'+(!any?'':allOk?'<span class="y">'+ICON('check')+'</span>':'<span class="n">'+ICON('x')+'</span>')+'</td>'; }
+      h+='<td class="tot" data-tot="'+tg.key+'-'+i+'">'+(isFinite(tot)?fx(tot,cs.dp):'—')+'</td>'
+        +(cs.noCorr?'':'<td class="tot" data-cor="'+tg.key+'-'+i+'">'+(isFinite(cor)?fx(cor,cs.dp):'—')+'</td>');
+      if(show){
+        const fields=cs.cols.filter(c=>!c.ro);
+        const any=fields.some(c=>r[c.k]!==''&&r[c.k]!==undefined);
+        const all=fields.every(c=>close(num(r[c.k]),tv[c.k],tolOf(c.k)));
+        h+='<td class="mark" data-mk="'+tg.key+'-'+i+'">'+(!any?'':all?'<span class="y">'+ICON('check')+'</span>':'<span class="n">'+ICON('x')+'</span>')+'</td>';
+      }
       h+='</tr>';
     }
-    h+='</tbody><tfoot><tr><td colspan="'+(cs.cols.length+1)+'" style="text-align:right">Mean '+esc(tg.sym||tg.label)+'</td>'
-      +'<td class="tot" data-mean="'+tg.key+'">'+(isFinite(mean)?fx(mean,cs.dp+1)+' '+cs.unit:'—')+'</td>'+(show?'<td class="mark"></td>':'')+'</tr></tfoot></table>';
+    h+='</tbody><tfoot><tr><td colspan="'+(cs.cols.length+(cs.noCorr?1:2))+'" style="text-align:right">Mean</td>'
+      +'<td class="tot" data-mean="'+tg.key+'">'+(isFinite(mean)?fx(mean,cs.mdp):'—')+'</td>'
+      +(show?'<td class="mark"></td>':'')+'</tr></tfoot></table>';
   });
-  h+='<div class="rowtools"><button id="btnClearRows">'+ICON('refresh')+'Clear the table</button></div>';
-  h+='<p class="note">'+(e.instrument==='gravesand'
-      ?'Each trial must use a different pair of weights — that is the point of repeating it.'
-      :'A reading is only taken when the instrument is actually gripping. The five trials differ by about one least count, which is why the record asks for a mean.')+'</p>';
+  h+='<div class="rowtools"><button id="btnClearRows">'+ICON('refresh')+'Clear the tables</button></div>';
   $('#obt').innerHTML=h;
-  const c=$('#obCount'); const got=Object.values(s.rows).reduce((a,r)=>a+r.length,0);
+  const c=$('#obCount'), got=keys.reduce((a,t)=>a+filledRows(t.key),0);
   c.textContent=got; c.hidden=!got;
 }
 // Typing must not redraw the table -- that would throw the caret out of the box
 // mid-number. Only the cells that actually derive from the value are patched.
 function patchRow(key,i){
-  const s=st(),cs=specOf(),r=s.rows[key][i],show=(mode==='learn');
+  const s=st(),cs=specOf(),r=(s.rows[key]||[])[i],show=(mode==='learn');
   if(!r) return;
-  const tv=cs.truth(r,s.sp),tot=rowTotal(r);
-  const tc=$('[data-tot="'+key+'-'+i+'"]'); if(tc) tc.textContent=isFinite(tot)?fx(tot,cs.dp):'—';
-  const mn=$('[data-mean="'+key+'"]'),m=meanOf(key);
-  if(mn) mn.textContent=isFinite(m)?fx(m,cs.dp+1)+' '+cs.unit:'—';
+  const tv=cs.truth(key,i),tot=rowTotal(r),cor=rowCorr(key,i),m=meanOf(key);
+  const put=(sel,txt)=>{ const el=$(sel); if(el) el.textContent=txt; };
+  put('[data-tot="'+key+'-'+i+'"]',isFinite(tot)?fx(tot,cs.dp):'—');
+  put('[data-cor="'+key+'-'+i+'"]',isFinite(cor)?fx(cor,cs.dp):'—');
+  put('[data-mean="'+key+'"]',isFinite(m)?fx(m,cs.mdp):'—');
   cs.cols.filter(c=>!c.ro).forEach(c=>{
     const el=$('input[data-k="'+key+'"][data-i="'+i+'"][data-c="'+c.k+'"]'); if(!el) return;
     el.classList.remove('good','bad');
@@ -1766,15 +1770,27 @@ function patchRow(key,i){
   });
   const mk=$('[data-mk="'+key+'-'+i+'"]');
   if(mk&&show){
-    const fields=cs.cols.filter(c=>!c.ro);
-    const any=fields.some(c=>r[c.k]!==''&&r[c.k]!==undefined);
-    const all=fields.every(c=>close(num(r[c.k]),tv[c.k],tolOf(c.k)));
+    const f=cs.cols.filter(c=>!c.ro);
+    const any=f.some(c=>r[c.k]!==''&&r[c.k]!==undefined);
+    const all=f.every(c=>close(num(r[c.k]),tv[c.k],tolOf(c.k)));
     mk.innerHTML=!any?'':all?'<span class="y">'+ICON('check')+'</span>':'<span class="n">'+ICON('x')+'</span>';
   }
-  const tr=$('input[data-k="'+key+'"][data-i="'+i+'"]'); if(tr&&tr.closest('tr'))
-    tr.closest('tr').classList.toggle('pending',cs.cols.some(c=>!c.ro&&(r[c.k]===''||r[c.k]===undefined)));
 }
-function patchAll(){ const s=st(); Object.keys(s.rows).forEach(k=>s.rows[k].forEach((_,i)=>patchRow(k,i))); }
+// Every corrected figure moves when the zero error does, so they are all patched
+// together rather than the table being rebuilt under the caret.
+function patchAll(){
+  const s=st();
+  Object.keys(s.rows).forEach(k=>(s.rows[k]||[]).forEach((_,i)=>patchRow(k,i)));
+  markHere();
+}
+function markHere(){
+  if(cur().instrument==='gravesand') return;
+  const s=st();
+  Object.keys(s.rows).forEach(k=>{
+    const a=activeRow(k);
+    (s.rows[k]||[]).forEach((_,j)=>{ const tr=$('tr[data-row="'+k+'-'+j+'"]'); if(tr) tr.classList.toggle('here',j===a); });
+  });
+}
 function markConst(){
   const s=st(),e=cur(),I=INSTR[e.instrument]; if(!I) return;
   const show=(mode==='learn');
@@ -1793,16 +1809,12 @@ function markConst(){
    answer — that is the whole reason the record asks for it separately.
    ========================================================= */
 function means(){
-  const e=cur(),s=st(),out={};
-  recTargets(e).forEach(t=>out[t.key]=meanOf(t.key));
-  if(e.instrument==='vernier'){ const ze=num(s.zeroTyped);
-    Object.keys(out).forEach(k=>out[k]=out[k]-ze*0.01); }   // cm; the screw gauge table corrects in place
-  return out;
+  const out={}; recTargets(cur()).forEach(t=>out[t.key]=meanOf(t.key)); return out;
 }
 function studentResult(){
   const e=cur(),s=st();
-  if(recTargets(e).some(t=>!isFinite(meanOf(t.key)))) return {err:'Fill in at least one complete reading for every table in the record before the result can be worked out.'};
-  if(e.instrument==='vernier'&&!isFinite(num(s.zeroTyped))) return {err:'Write the zero error in the Readings tab first — the mean has to be corrected for it.'};
+  if(recTargets(e).some(t=>!isFinite(meanOf(t.key))))
+    return {err:'Fill in at least one full row in every table, and write the zero error in — the corrected column needs it.'};
   return {R:e.result(s.sp,means())};
 }
 function renderCalc(){
@@ -1811,7 +1823,6 @@ function renderCalc(){
   const R=r.R;
   el.innerHTML='<div class="card"><h4>From your table</h4><div class="in">'
      +R.lines.map(l=>'<div class="line"><span>'+esc(l[0])+'</span><span>'+esc(l[1])+'</span></div>').join('')
-     +(e.instrument==='vernier'?'<div class="line"><span>Zero correction applied</span><span>'+signed(-num(s.zeroTyped))+' div = '+signed(-num(s.zeroTyped)*0.01)+' cm</span></div>':'')
      +'</div></div>'
     +'<div class="card"><h4>Calculation</h4><div class="in"><pre class="work">'+esc(R.work)+'</pre></div></div>'
     +(R.extra&&R.extra.length?'<div class="card"><h4>In SI units</h4><div class="in">'
@@ -1843,13 +1854,7 @@ function checkResult(){
    INTERACTION
    ========================================================= */
 function refreshBench(){ renderInstr(); renderMag(); renderCtrl(); renderObsPanel(); }
-function renderAll(){ renderExpList(); renderAppa(); renderBench(); renderGuide(); showStep(); renderObt(); renderCalc(); renderProg(); $('#expTag').textContent='No. '+cur().no+' — '+cur().title; }
-function renderProg(){
-  const e=cur(),s=st(),p=$('#prog'),d=rowsDone(e,s);
-  p.hidden=false;
-  p.innerHTML='<b>'+d.n+'</b> of '+d.t+' readings taken'+(e.instrument!=='gravesand'?' · least count and zero error '+((s.lcTyped&&s.zeroTyped)?'written':'still blank'):'')
-    +'<div class="bar"><i style="width:'+Math.round(d.n/d.t*100)+'%"></i></div>';
-}
+function renderAll(){ renderExpList(); renderAppa(); renderBench(); renderGuide(); showStep(); renderObt(); renderCalc(); $('#expTag').textContent='No. '+cur().no+' — '+cur().title; }
 let drag=null,raf=0;
 // svg units per screen pixel, taken from the element's own viewBox, so the lens
 // tracks the pointer at whatever size the bench happens to be.
@@ -2015,38 +2020,36 @@ function takeReading(){
     if(rows.some(r=>r.P===s.P&&r.Q===s.Q)){ toast('That pair of weights has been used. Change P or Q for the next trial.'); return; }
     rows.push({P:s.P,Q:s.Q,sc:s.scale,oc_true:gOC(),oa:'',ob:'',oc:''});
     toast('Trial recorded. Measure OC on the paper and write it in.');
-  } else {
-    if(!gripped()){ toast('The instrument is not gripping — close it on the object first.'); return; }
-    if(s.held==null){ toast('Closed on nothing: that is the zero error, not a reading. Write it in the Readings tab.'); return; }
-    const rows=s.rows[s.held];
-    if(rows.length>=n){ toast('The table for the '+tLabel(s.held)+' already holds its '+n+' readings.'); return; }
-    rows.push({t:s.ticks});
-    s.active=s.held; s.logged=true;            // the jaws stay shut: you still have to read them
-    toast('Reading taken — the instrument is still holding it. Write it in, then close on the object again for the next trial.');
-  }
-  renderBench(); renderObt(); renderCalc(); renderProg(); renderExpList(); save();
+  } else return;
+  renderBench(); renderObt(); renderCalc(); renderExpList(); save();
   const tab=$('.side-tabs button[data-side="obt"]'); if(tab&&!tab.classList.contains('active')) tab.click();
 }
 $('#btnGrip').onclick=takeReading;
 $('#obt').addEventListener('input',ev=>{
   const el=ev.target,s=st();
-  if(el.id==='inLC'){ s.lcTyped=el.value; markConst(); renderProg(); save(); return; }
-  if(el.id==='inDZE'){ s.depthZeroTyped=el.value; markConst(); save();
+  if(el.id==='inLC'){ s.lcTyped=el.value; markConst(); save(); return; }
+  if(el.id==='inDZE'){ s.depthZeroTyped=el.value; markConst(); patchAll(); renderCalc(); save();
     const dz=$('#dzcVal'); if(dz) dz.textContent=isFinite(num(el.value))?signed(-num(el.value))+' div':'—';
     return; }
-  if(el.id==='inZE'){ s.zeroTyped=el.value; markConst(); patchAll(); renderProg(); renderCalc(); save();
+  if(el.id==='inZE'){ s.zeroTyped=el.value; markConst(); patchAll(); renderCalc(); save();
     const zc=$('#zcVal'); if(zc) zc.textContent=isFinite(num(el.value))?signed(-num(el.value))+' div':'—';
     return; }
   if(!el.classList.contains('cell')) return;
-  const r=s.rows[el.dataset.k][+el.dataset.i]; if(!r) return;
+  const key=el.dataset.k, i=+el.dataset.i;
+  const r=(s.rows[key]||[])[i]; if(!r) return;
+  const before=activeRow(key);
   r[el.dataset.c]=el.value;
-  patchRow(el.dataset.k,+el.dataset.i); renderCalc(); save();
+  patchRow(key,i); markHere(); renderCalc(); save();
+  // Finishing a row moves the instrument on to the next trial, so the bench has to
+  // follow -- otherwise it would still be showing the reading you just wrote down.
+  if(activeRow(key)!==before&&key===s.held) refreshBench();
 });
 $('#obt').addEventListener('click',ev=>{
   if(ev.target.closest('#btnClearRows')){
     if(!confirm('Clear every reading in this experiment’s tables?')) return;
-    const s=st(); Object.keys(s.rows).forEach(k=>s.rows[k]=[]);
-    renderObt(); renderCalc(); renderProg(); renderExpList(); save();
+    const s=st(),e=cur();
+    Object.keys(s.rows).forEach(k=>s.rows[k]=(e.instrument==='gravesand')?[]:blankRows(e));
+    seat(); renderBench(); renderObt(); renderCalc(); renderExpList(); save();
   }
 });
 $('#shelfTabs').addEventListener('click',ev=>{
@@ -2200,7 +2203,10 @@ function save(){ try{
 // filled in, a line drawn on the paper, a weight moved off the default hanger.
 function started(e,o){
   if(!o) return false;
-  if(o.rows&&typeof o.rows==='object'&&Object.keys(o.rows).some(k=>Array.isArray(o.rows[k])&&o.rows[k].length)) return true;
+  // Rows exist from the start now, blank and waiting, so their mere presence is
+  // not work -- something has to have been written into one.
+  const written=r=>r&&typeof r==='object'&&Object.keys(r).some(k=>r[k]!==''&&r[k]!==undefined&&r[k]!==null);
+  if(o.rows&&typeof o.rows==='object'&&Object.keys(o.rows).some(k=>Array.isArray(o.rows[k])&&o.rows[k].some(written))) return true;
   if(['zeroTyped','lcTyped','depthZeroTyped'].some(k=>typeof o[k]==='string'&&o[k].trim()!=='')) return true;
   if(o.paper&&Array.isArray(o.paper.strokes)&&o.paper.strokes.length) return true;
   if(Array.isArray(o.wP)&&Array.isArray(o.wQ)&&(sumW(o.wP)!==100||sumW(o.wQ)!==100)) return true;
@@ -2226,7 +2232,12 @@ function load(){ try{
     const s=keep?freshState(e,(o.seed>>>0)||1):freshState(e,(Math.random()*4294967296)>>>0);
     if(keep){
       s.sp=o.sp;
-      if(o.rows&&typeof o.rows==='object') Object.keys(s.rows).forEach(k=>{ if(Array.isArray(o.rows[k])) s.rows[k]=o.rows[k].slice(0,nRows(e)); });
+      if(o.rows&&typeof o.rows==='object') Object.keys(s.rows).forEach(k=>{
+        if(!Array.isArray(o.rows[k])) return;
+        const want=nRows(e), got=o.rows[k].slice(0,want).map(r=>(r&&typeof r==='object')?r:{});
+        while(e.instrument!=='gravesand'&&got.length<want) got.push({});
+        s.rows[k]=got;
+      });
       if(typeof o.zeroTyped==='string') s.zeroTyped=o.zeroTyped;
       if(typeof o.depthZeroTyped==='string') s.depthZeroTyped=o.depthZeroTyped;
       if(typeof o.lcTyped==='string') s.lcTyped=o.lcTyped;

@@ -30,8 +30,9 @@ for(let k=0;k<400;k++){
     if(A.faceOf(key)!==want) bad(key+' should use the '+want+' face, uses '+A.faceOf(key));
     A.setHeld(key);
     if(A.curFace()!==want) bad('selecting '+key+' did not switch to the '+want+' face');
-    const z=(want==='depth')?s.sp.depthZeroTicks:s.sp.zeroTicks;
-    const at=s.sp.dims[key]+z+s.jit;
+    // Each row keeps its own error now, so the instrument seats on the reading for
+    // whichever row is next to be filled in.
+    const at=A.trueTicks(key,A.activeRow(key));
     if(!A.gripped()) bad(key+': seating it did not reach the specimen');
     if(s.ticks!==at) bad(key+': seated at '+s.ticks+', the specimen is at '+at);
     const b=A.bounds();

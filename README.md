@@ -50,10 +50,17 @@ number of least-count ticks. The scale you read is drawn from that position — 
 scale ticks at whole millimetres, vernier ticks at `x + 0.9k` mm — so the division
 that coincides coincides because of where the jaw is.
 
-You close the instrument on the object, read the magnified scale, and write M.S.R.
-and V.S.R. into the record's own table. The app knows what the instrument showed,
-so learning mode can mark each reading as you type it; test mode stays quiet and
-marks the result at the end against the true value, with a percentage error.
+You close the instrument on the object, read the magnified scale, and type the
+figures straight into the table — **S.No, M.S.R., V.S.R., Total, Corrected** for the
+calliper, **S.No, P.S.R., C.S.R., Total, Corrected** for the screw gauge, with the
+mean underneath. Total and Corrected follow from what you write, the zero
+correction coming from the zero error you found yourself.
+
+Each of the five trials keeps its own error for good, worked out from the
+specimen's seed, so the instrument shows the reading for whichever row is next to
+be filled in and releases once you have written it down. Learning mode marks each
+figure as you type it; test mode stays quiet and marks the result at the end
+against the true value, with a percentage error.
 
 The parallelogram experiment is a small drawing board: slotted weights drag on to
 the hangers, the junction is solved for rather than placed, and the paper carries
