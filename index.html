@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light">
 <meta name="description" content="Measurement practicals for CBSE Class XI physics — read a vernier calliper and a screw gauge on screen, tabulate, and work the result out.">
 <title>PhysLab · Physics Practicals (CBSE XI)</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Crect x='8' y='20' width='48' height='13' rx='2' fill='%23e2e8f0'/%3E%3Cg stroke='%230f172a' stroke-width='2'%3E%3Cpath d='M16 20v7M24 20v5M32 20v7M40 20v5M48 20v7'/%3E%3C/g%3E%3Crect x='22' y='33' width='30' height='11' rx='2' fill='%232dd4bf'/%3E%3Cg stroke='%230f172a' stroke-width='1.6'%3E%3Cpath d='M28 44v-6M34 44v-6M40 44v-6M46 44v-6'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="favicon.png">
 <style>
 /* ---------- theme ----------
    Two hand-picked palettes. Dark mode is not an inversion: the instruments keep
@@ -213,6 +213,8 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 .grab{cursor:grab}
 .grab:active{cursor:grabbing}
 /* the magnified strip under the instrument: this is what you actually read */
+.whyzero{margin:0 0 7px;font-weight:500;font-size:11.5px;line-height:1.45;color:var(--muted);
+  border-left:3px solid var(--accent-line);padding-left:9px}
 .mag{width:100%;max-width:calc(940px*var(--ap));background:var(--surface);border:1px solid var(--line);border-radius:14px;
   box-shadow:var(--shadow);padding:9px 12px 11px;position:relative}
 .mag h5{margin:0 0 6px;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:flex;align-items:center;gap:8px}
@@ -642,6 +644,7 @@ const EXPERIMENTS=[
            // keeps a hollow cylinder on the bench for the other two.
            {key:'id',label:'internal diameter',sym:'d',face:'inner',practice:true},
            {key:'dp',label:'internal depth',sym:'h',face:'depth',practice:true}],
+  practiceNote:'Practice only — the hollow cylinder is not in the record, and these two tables are left out of the result.',
   // A block a school lab would actually hand you: a few cm each way, each
   // dimension a whole number of least counts.
   // The depth rod carries its own zero error -- the record says so in its own
@@ -728,11 +731,21 @@ const EXPERIMENTS=[
     ['What is pitch?','The distance moved by the screw when the head is given one complete rotation.'],
     ['What is zero correction?','Zero correction is the negative of the zero error.']
   ],
-  targets:[{key:'d',label:'diameter',sym:'d'}],
+  targets:[{key:'d',label:'wire A',sym:'d'},
+           {key:'d2',label:'wire B',sym:'d',practice:true},
+           {key:'d3',label:'wire C',sym:'d',practice:true}],
+  practiceNote:'Wires B and C are there to measure too — each is a different gauge, drawn fresh with the specimen. Only wire A goes in the record.',
   // 0.60-1.68 mm: thick enough that one least count is under 2% of the diameter,
   // so a careful reading is never dragged out of the good band by honest scatter.
-  make(rng){ return { zeroTicks:randInt(rng,-5,5), dims:{d:randInt(rng,60,168)},
-    lengthCM:randInt(rng,80,220)/10, label:'Copper wire' };},
+  // The three are forced apart so they are visibly different gauges, not three
+  // wires you cannot tell from one another.
+  make(rng){
+    const gauge=()=>randInt(rng,60,168), len=()=>randInt(rng,80,220)/10;
+    let a=gauge(),b=gauge(),c=gauge();
+    while(Math.abs(b-a)<18) b=gauge();
+    while(Math.abs(c-a)<18||Math.abs(c-b)<18) c=gauge();
+    return { zeroTicks:randInt(rng,-5,5), dims:{d:a,d2:b,d3:c},
+      lengthCM:len(), lens:{d2:len(),d3:len()}, label:'Copper wire' };},
   sizeOf(sp,k){ return sp.dims[k]; },
   result(sp,m){
     const dCM=m.d/10, r=dCM/2, l=sp.lengthCM, V=Math.PI*r*r*l;
@@ -862,7 +875,8 @@ function spOK(e,sp){
   if(!sp.dims||typeof sp.zeroTicks!=='number') return false;
   if((e.targets||[]).some(t=>typeof sp.dims[t.key]!=='number'||!isFinite(sp.dims[t.key]))) return false;
   if((e.targets||[]).some(t=>t.face==='depth')&&typeof sp.depthZeroTicks!=='number') return false;
-  if(e.id==='s1'&&typeof sp.lengthCM!=='number') return false;
+  if(e.id==='s1'&&(typeof sp.lengthCM!=='number'
+    ||!sp.lens||['d2','d3'].some(k=>typeof sp.lens[k]!=='number'||!isFinite(sp.lens[k])))) return false;
   if(e.id==='s2'&&typeof sp.sheets!=='number') return false;
   return true;
 }
@@ -1513,8 +1527,8 @@ function renderBenchTop(){
   const e=cur(),s=st(),el=$('#benchTop');
   if(e.instrument==='gravesand'){ el.innerHTML=pgBenchTop(); return; }
   const face=curFace(), vern=(e.instrument==='vernier');
-  const card=(key,name,note,icon)=>'<button class="spec-card pick'+(s.held===key?' on':'')+'" data-held="'+(key===null?'':key)+'"'
-    +' type="button"'+(note?' title="'+esc(note)+'"':'')+'>'
+  const card=(key,name,note,icon,why)=>'<button class="spec-card pick'+(s.held===key?' on':'')+'" data-held="'+(key===null?'':key)+'"'
+    +' type="button"'+((why||note)?' title="'+esc(why||note)+'"':'')+'>'
     +(icon||SPEC_ICON[e.id])+'<b>'+esc(name)+'</b></button>';
   const shut='<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 10v28M33 10v28" stroke="var(--steel-line)" stroke-width="4" stroke-linecap="round"/></svg>';
   const bore='<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="12" width="34" height="24" rx="3" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/><rect x="15" y="12" width="18" height="24" fill="var(--bench-air)" stroke="var(--brass2)" stroke-width="1.5"/></svg>';
@@ -1530,9 +1544,16 @@ function renderBenchTop(){
         +'">'+f[1]+'</button>').join('')
     +'</div>';
   const shown=(e.targets||[]).filter(t=>!vern||(t.face||'outer')===face);
+  const shutName = !vern ? 'Studs closed'
+      : face==='depth' ? 'Rod home'
+      : face==='inner' ? 'Jaws together'
+      : 'Jaws closed';
+  const shutWhy = !vern ? 'Nothing between the studs. Whatever it reads here is not zero by accident — that offset is the zero error, and every reading you take has to be corrected by it.'
+      : face==='depth' ? 'The rod fully home, level with the end of the beam. Its reading here is the depth rod’s own zero error, which is not the same as the jaws’.'
+      : face==='inner' ? 'The inner jaws shut on to each other. The reading here is the zero error for an internal measurement.'
+      : 'The jaws touching with nothing between them. It ought to read zero; what it actually reads is the zero error, to be subtracted from every reading.';
   el.innerHTML=faces
-    +card(null,vern&&face==='depth'?'Rod home':'Jaws closed',
-          'find the zero error'+(vern&&face==='depth'?' of the rod':''),shut)
+    +card(null,shutName,'find the zero error',shut,shutWhy)
     +shown.map(t=>card(t.key,t.label.charAt(0).toUpperCase()+t.label.slice(1),'',
           (t.face&&t.face!=='outer')?bore:null)).join('');
 }
@@ -1547,8 +1568,15 @@ function renderMag(){
   m.hidden=(e.instrument==='gravesand');        // the paper is its own full-size surface
   if(m.hidden) return;
   const I=INSTR[e.instrument],ok=gripped();
-  m.innerHTML=(ok?'':'<h5><em style="color:var(--warn)">not touching — this is not a reading</em></h5>')
-    +(e.instrument==='vernier'?magVernier():magScrew());
+  const vern=(e.instrument==='vernier'), face=curFace();
+  const why = s.held!==null ? ''
+    : !vern ? 'Studs closed — nothing between them. It ought to read zero; what it actually reads is the zero error, and every reading must be corrected by it.'
+    : face==='depth' ? 'Rod fully home — the depth rod has a zero error of its own, separate from the jaws’.'
+    : face==='inner' ? 'Inner jaws shut on to each other — this reading is the zero error for an internal measurement.'
+    : 'Jaws closed with nothing between them. It ought to read zero; what it actually reads is the zero error, to be subtracted from every reading.';
+  m.innerHTML=(why?'<h5 class="whyzero">'+esc(why)+'</h5>':'')
+    +(ok?'':'<h5><em style="color:var(--warn)">not touching — this is not a reading</em></h5>')
+    +(vern?magVernier():magScrew());
 }
 const lensBtn=()=>'<button id="btnLens" type="button"'+(lens.on?' class="primary"':'')
   +' aria-pressed="'+lens.on+'" title="A magnifying glass you can drag over the drawing">'+ICON('lens')+'Magnifier</button>';
@@ -1608,7 +1636,12 @@ function renderAppa(){
   }
   h+='<h4>The specimen</h4><div class="ac">'+(SPEC_ICON[e.id]||'')+'<div><b>'+esc(s.sp.label||e.short)+'</b>'
     +'<small>'+(e.instrument==='gravesand'?'Its weight is what you are after.':'Drawn fresh each time. Its true size is hidden until you check your result.')+'</small></div></div>';
-  if(e.id==='s1') h+='<div class="ac"><div><b>Length of the wire</b><small>measured with the metre scale: '+fx(s.sp.lengthCM,1)+' cm</small></div></div>';
+  if(e.id==='s1'){
+    const L=k=>k==='d'?s.sp.lengthCM:((s.sp.lens||{})[k]);
+    h+='<div class="ac"><div><b>Length of each wire</b><small>'
+      +(e.targets||[]).map(t=>t.label.charAt(0).toUpperCase()+t.label.slice(1)+': '+fx(L(t.key),1)+' cm').join(' · ')
+      +'<br>measured with the metre scale</small></div></div>';
+  }
   if(e.id==='s2') h+='<div class="ac"><div><b>Number of sheets in the stack</b><small>'+s.sp.sheets+' sheets</small></div></div>';
   $('#appaList').innerHTML=h;
 }
@@ -1710,7 +1743,7 @@ function renderObt(){
     const rows=s.rows[tg.key], n=grav?nRows(e):rows.length, mean=meanOf(tg.key);
     const act=grav?-1:activeRow(tg.key);
     if(tg.practice&&!saidPractice){ saidPractice=true;
-      h+='<p class="lead" style="margin-top:16px">Practice only — the hollow cylinder is not in the record, and these two tables are left out of the result.</p>'; }
+      h+='<p class="lead" style="margin-top:16px">'+esc(e.practiceNote||'Practice only — these tables are left out of the result.')+'</p>'; }
     h+='<h4>'+esc(tg.label.charAt(0).toUpperCase()+tg.label.slice(1))+'</h4>';
     h+='<table><thead><tr><th class="sn">S.No</th>'
       +cs.cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')+(show?'<th class="mark"></th>':'')+'</tr></thead><tbody>';

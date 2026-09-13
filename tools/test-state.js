@@ -149,7 +149,33 @@ A.load();
 if(JSON.stringify(A.ensure('v1').sp)!==JSON.stringify(frozen)) bad('one written cell was not enough to hold the specimen');
 console.log('   blank rows redraw the unknown ('+zs2.size+' zero errors in 200 visits); one written cell holds it');
 
-console.log('8. the picture on the wall goes down and comes back');
+console.log('8. the wire experiment gives three wires, all different and all measurable');
+{
+  const e=A.EXP.s1, gaps=[], lens=new Set(), keys=(e.targets||[]).map(t=>t.key);
+  if(keys.join(',')!=='d,d2,d3') bad('the wire targets are '+keys.join(',')+', not d,d2,d3');
+  for(let k=0;k<500;k++){
+    const st=A.freshState(e,(k*2654435761+7)>>>0), sp=st.sp;
+    const d=[sp.dims.d,sp.dims.d2,sp.dims.d3];
+    if(d.some(x=>typeof x!=='number'||x<60||x>168)) bad('a wire gauge out of range: '+JSON.stringify(d));
+    const g=Math.min(Math.abs(d[0]-d[1]),Math.abs(d[0]-d[2]),Math.abs(d[1]-d[2]));
+    if(g<18) bad('two wires only '+g+' ticks apart: '+JSON.stringify(d));
+    gaps.push(g);
+    [sp.lengthCM,sp.lens.d2,sp.lens.d3].forEach(l=>{
+      if(typeof l!=='number'||l<8||l>22) bad('a wire length out of range: '+l);
+      lens.add(l);
+    });
+    // every wire must be measurable: a true reading exists for each
+    keys.forEach(k2=>{ const t=e.sizeOf(sp,k2);
+      if(typeof t!=='number'||!isFinite(t)) bad('wire '+k2+' has no size'); });
+  }
+  console.log('   500 draws: smallest gap between two wires '+Math.min(...gaps)+' ticks, '+lens.size+' distinct lengths');
+  // only wire A is in the record
+  const rec=A.recTargets(e).map(t=>t.key);
+  if(rec.join(',')!=='d') bad('the record should carry wire A alone, it carries '+rec.join(','));
+  console.log('   wire A alone goes in the record; B and C are extra');
+}
+
+console.log('9. the picture on the wall goes down and comes back');
 A.__store['physlab']='{"v":1}';
 A.setFrame(true); A.load();
 if(A.getFrame()!==true) bad('the picture was not on the wall to begin with');
