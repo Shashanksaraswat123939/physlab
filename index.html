@@ -408,7 +408,7 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 <header>
   <div class="brand">
     <div class="logo" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px"><use href="#i-ruler"/></svg></div>
-    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 6</span></small></div>
+    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 7</span></small></div>
   </div>
   <div class="exp-tag" id="expTag">No experiment selected</div>
   <div class="actions">
@@ -949,10 +949,11 @@ function drawVernier(){
     ticks+='M'+t+' '+V_BEAM_B+'V'+(big?240:mid?256:266);
     if(big) nums+='<text x="'+t+'" y="232" text-anchor="middle">'+(i/10)+'</text>';
   }
-  let vt='',vn='';
-  for(let k=0;k<=10;k++){ const t=(px+k*0.9*V_U).toFixed(1);
-    vt+='M'+t+' '+V_BEAM_B+'V'+(k%5===0?318:308);
-    if(k%5===0) vn+='<text x="'+t+'" y="328" text-anchor="middle">'+k+'</text>'; }
+  // The vernier plate carries no figures, only its divisions -- a little longer
+  // every fifth, as they are engraved. The magnified view shows the same plate,
+  // so it carries none either.
+  let vt='';
+  for(let k=0;k<=10;k++) vt+='M'+(px+k*0.9*V_U).toFixed(1)+' '+V_BEAM_B+'V'+(k%5===0?318:308);
   const rodFull=x*V_U, rodMax=1186-V_TAIL, rodLen=Math.min(rodFull,rodMax), cut=rodFull>rodMax+0.5;
   // The rod really does run out whenever the slider moves, so it is always drawn;
   // it just steps back when you are not using it.
@@ -1002,8 +1003,7 @@ function drawVernier(){
     +'<path d="M'+(px+164).toFixed(1)+' 294v26M'+(px+178).toFixed(1)+' 294v26M'+(px+192).toFixed(1)+' 294v26M'+(px+206).toFixed(1)+' 294v26" stroke="var(--steel-line)" stroke-width="1.8"/>'
     +'<g stroke="var(--scale-tick)" stroke-width="2" fill="none"><path d="'+ticks+'"/></g>'
     +'<g font-size="24" fill="var(--scale-ink)">'+nums+'</g>'
-    +'<g stroke="var(--vern-ink)" stroke-width="2.2" fill="none"><path d="'+vt+'"/></g>'
-    +'<g font-size="21" fill="var(--vern-ink)" font-weight="700">'+vn+'</g>'+lbl;
+    +'<g stroke="var(--vern-ink)" stroke-width="2.2" fill="none"><path d="'+vt+'"/></g>'+lbl;
   return '<svg viewBox="0 0 1200 590" role="img" aria-label="Vernier calliper with inside jaws, outside jaws and a depth rod. Drag the slider; read the magnified scale below.">'
    +'<g class="grab" data-drag="jaw">'+scene+'</g>'+lensLayer(scene)
    +'</svg>';
@@ -1024,9 +1024,7 @@ function magVernier(){
   }
   let vs='';
   for(let k=0;k<=10;k++) vs+='M'+mx(x+k*0.9).toFixed(1)+' 108V174';
-  const vnum=[];
-  for(let k=0;k<=10;k++) vnum.push('<text x="'+mx(x+k*0.9).toFixed(1)+'" y="198">'+k+'</text>');
-  return '<svg viewBox="0 0 1200 212" role="img" aria-label="Magnified view of the vernier scale against the main scale">'
+  return '<svg viewBox="0 0 1200 196" role="img" aria-label="Magnified view of the vernier scale against the main scale">'
    +'<rect x="0" y="30" width="1200" height="78" fill="var(--scale-face)"/>'
    +'<rect x="'+mx(x).toFixed(1)+'" y="108" width="'+(9*M_U).toFixed(1)+'" height="76" rx="6" fill="var(--vern-face)"'
    +' stroke="var(--vern-ink)" stroke-width="1.5" opacity=".92"/>'
@@ -1034,7 +1032,6 @@ function magVernier(){
    +'<g stroke="var(--scale-tick)" stroke-width="3" stroke-linecap="butt" fill="none"><path d="'+ms+'"/></g>'
    +'<g font-size="22" font-weight="700" fill="var(--scale-ink)">'+nums+'</g>'
    +'<g stroke="var(--vern-ink)" stroke-width="3" stroke-linecap="butt" fill="none"><path d="'+vs+'"/></g>'
-   +'<g font-size="21" font-weight="700" fill="var(--vern-ink)" text-anchor="middle">'+vnum.join('')+'</g>'
    +'<path d="M'+mx(x).toFixed(1)+' 100l-11 -17h22z" fill="var(--accent)"/>'
    +'<text x="'+mx(x).toFixed(1)+'" y="76" text-anchor="middle" font-size="17" font-weight="700" fill="var(--accent)">index</text>'
    +'</svg>';
