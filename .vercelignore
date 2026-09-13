@@ -1,0 +1,4 @@
+# ship the page and nothing else: no test harness, no readme, no repo furniture
+tools/
+.claude/
+*.md
