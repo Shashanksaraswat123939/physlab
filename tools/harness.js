@@ -22,7 +22,7 @@ const localStorage={ getItem:k=>(k in store?store[k]:null), setItem:(k,v)=>{stor
 const EXPORT='\n;return {VERNIER,SCREW,INSTR,EXPERIMENTS,EXP,S,st,cur,expId,freshState,ensure,'
   +'setTicks,closeJaws,setHeld,setFace,seat,bounds,faceOf,curFace,zeroFor,trueTicks,jitterFor,activeRow,rowMean,filledRows,stopTicks,gripped,maxTicks,magVernier,drawVernier,magScrew,drawScrew,'
   +'gravSolve,gOC,drawBoard,drawPaper,syncWeights,WEIGHTS,SCALES,paperDirs,P_O,snapPoint,snapEnd,nearestPoint,knownPoints,COLSPEC,specOf,meanOf,studentResult,means,num,fx,tolOf,nRows,rowsDone,recTargets,'
-  +'setExp:(id)=>{expId=id;ensure(id);},getExpId:()=>expId,setMode:(m)=>{mode=m;},takeReading,save,load,resetAll,KEY,printRecord,renderObt,renderCalc,renderGuide,obsHead,setModeOnly:(m)=>{mode=m;},mode:()=>mode,theme:()=>theme,cols:()=>cols};';
+  +'setExp:(id)=>{expId=id;ensure(id);},getExpId:()=>expId,setMode:(m)=>{mode=m;},takeReading,save,load,resetAll,KEY,printRecord,renderObt,renderCalc,renderGuide,obsHead,setModeOnly:(m)=>{mode=m;},mode:()=>mode,theme:()=>theme,cols:()=>cols,applyFrame,getFrame:()=>showFrame,setFrame:(v)=>{showFrame=v;}};';
 const fn=new Function('document','window','localStorage','requestAnimationFrame','cancelAnimationFrame','confirm','alert','Element',
   src+EXPORT);
 const api=fn(document,window,localStorage,f=>0,()=>{},()=>true,()=>{},function(){});

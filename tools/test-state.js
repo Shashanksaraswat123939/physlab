@@ -149,5 +149,34 @@ A.load();
 if(JSON.stringify(A.ensure('v1').sp)!==JSON.stringify(frozen)) bad('one written cell was not enough to hold the specimen');
 console.log('   blank rows redraw the unknown ('+zs2.size+' zero errors in 200 visits); one written cell holds it');
 
+console.log('8. the picture on the wall goes down and comes back');
+A.__store['physlab']='{"v":1}';
+A.setFrame(true); A.load();
+if(A.getFrame()!==true) bad('the picture was not on the wall to begin with');
+A.setFrame(false); A.save();
+A.setFrame(true); A.load();
+if(A.getFrame()!==false) bad('the picture came back up after a reload');
+A.setFrame(true); A.save();
+A.setFrame(false); A.load();
+if(A.getFrame()!==true) bad('the picture did not stay up after a reload');
+console.log('   down stays down, up stays up, across a save and a reload');
+
+['{"frame":"yes"}','{"frame":1}','{"frame":null}','{"frame":{}}','{"frame":[]}'].forEach((raw,i)=>{
+  A.__store['physlab']=raw;
+  A.setFrame(true);
+  let threw=null;
+  try{ A.load(); }catch(e){ threw=e.message; }
+  if(threw) bad('frame poison '+i+' threw: '+threw);
+  if(typeof A.getFrame()!=='boolean') bad('frame poison '+i+' left it as '+JSON.stringify(A.getFrame()));
+});
+console.log('   5 tampered flags ignored, the flag stays a boolean');
+
+A.setFrame(false); A.applyFrame();
+A.setExp('v1');
+if(!A.ensure('v1').sp) bad('the bench was unusable with the picture down');
+A.resetAll();
+if(A.getFrame()!==true) bad('reset did not put the picture back on the wall');
+console.log('   reset hangs it again');
+
 console.log(fail?('\n'+fail+' PROBLEMS'):'\nall clean');
 process.exit(fail?1:0);

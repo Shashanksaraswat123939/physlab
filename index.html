@@ -149,7 +149,7 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 .appa .lcbox .lcrow span:last-child{font-weight:700;white-space:nowrap}
 .appa .lcbox .q{margin-top:8px;font-size:11.5px;color:var(--muted);line-height:1.5}
 /* ---------- bench ---------- */
-.bench{container:bench/inline-size;position:relative;--ap:1;display:flex;flex-direction:column;background:
+.bench{container:bench/inline-size;position:relative;--ap:1;--aph:1;display:flex;flex-direction:column;background:
   radial-gradient(1200px 400px at 50% 120%,var(--bench-gloss),transparent),
   linear-gradient(180deg,var(--bench-air) 0%,var(--bench-air) 74%,var(--wood1) 74%,var(--wood2) 100%);}
 .bench-top{display:flex;gap:10px;align-items:center;padding:14px 18px 0;position:relative;z-index:2;flex:0 0 auto}
@@ -160,15 +160,47 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 .spec-card svg{width:46px;height:46px;flex:0 0 auto}
 .spec-card b{font-size:13px;white-space:nowrap}
 .spec-card small{color:var(--muted);font-size:11px;display:block;line-height:1.35}
-.bench-main{--ap:1;flex:1 1 auto;min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(10px*var(--ap));padding:12px 18px 0}
-@container bench (max-width:820px){.bench-main{--ap:.92}}
-@container bench (max-width:720px){.bench-main{--ap:.82}}
-@container bench (max-width:620px){.bench-main{--ap:.72}}
-@container bench (max-width:520px){.bench-main{--ap:.62}}
-@container bench (max-width:440px){.bench-main{--ap:.54}}
+.bench-main{--apw:1;--ap:calc(var(--apw)*var(--aph));flex:1 1 auto;min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(10px*var(--ap));padding:12px 18px 0}
+@container bench (max-width:820px){.bench-main{--apw:.92}}
+@container bench (max-width:720px){.bench-main{--apw:.82}}
+@container bench (max-width:620px){.bench-main{--apw:.72}}
+@container bench (max-width:520px){.bench-main{--apw:.62}}
+@container bench (max-width:440px){.bench-main{--apw:.54}}
+@media (max-height:860px){.bench{--aph:.86}}
+@media (max-height:760px){.bench{--aph:.74}}
+@media (max-height:680px){.bench{--aph:.58}}
+@media (max-height:620px){.bench{--aph:.50}}
+@media (max-height:560px){.bench{--aph:.42}}
+@media (max-height:500px){.bench{--aph:.34}}
 .instr{width:100%;max-width:calc(860px*var(--ap));position:relative}
 .bench.wide .instr{max-width:calc(1060px*var(--ap))}
 .bench.wide .bench-main{justify-content:flex-start;padding-top:6px}
+/* A framed picture on the wall behind the apparatus. It has no z-index of its
+   own, so it paints behind the instrument in the bench's stacking context, and
+   it takes no pointer events, so it can never swallow a drag -- only its cross
+   is clickable. The pill brings it back, so closing it is not a one-way door. */
+.wall-frame{position:absolute;right:16px;top:104px;
+  width:calc(min(20cqi,232px)*var(--aph));margin:0;pointer-events:none;
+  padding:min(1.1cqi,12px);border-radius:6px;
+  background:linear-gradient(160deg,#8a6a43,#6b5133);
+  box-shadow:0 22px 46px rgba(16,24,40,.30),inset 0 0 0 1px rgba(255,255,255,.18)}
+.wall-frame:before{content:"";position:absolute;left:50%;top:-22px;width:2px;height:22px;background:rgba(80,60,40,.6)}
+.wall-frame img{display:block;width:100%;height:auto;border-radius:3px;border:1px solid rgba(0,0,0,.35)}
+.wall-frame[hidden]{display:none}
+.wall-frame .fr-x{position:absolute;top:-11px;right:-11px;z-index:6;pointer-events:auto;
+  width:26px;height:26px;padding:0;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  border-radius:50%;box-shadow:0 2px 10px rgba(0,0,0,.35);display:grid;place-items:center;transition:.15s}
+.wall-frame .fr-x:hover{background:var(--bad);color:#fff;border-color:var(--bad);transform:scale(1.1)}
+.wall-frame .fr-x .ic{width:13px;height:13px;stroke-width:2.4}
+.fr-show{position:absolute;right:16px;top:104px;z-index:6;
+  font-size:11.5px;padding:5px 11px;border-radius:999px;
+  background:var(--panel);border:1px dashed var(--line);color:var(--muted);opacity:.75}
+.fr-show:hover{opacity:1;border-style:solid}
+@container bench (max-width:880px){.wall-frame,.fr-show{display:none}}
+/* The drawing board fills the bench end to end, so there is no wall left to
+   hang anything on; the picture steps aside for it. */
+.bench.wide .wall-frame,.bench.wide .fr-show,
+.bench.paper .wall-frame,.bench.paper .fr-show{display:none}
 /* The drawing paper is taller than it is wide once it is on the bench, so it is
    fitted to the height that is going rather than to the width, and centred. */
 .bench.paper .bench-main{padding-bottom:6px}
@@ -442,6 +474,12 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
   <!-- ===== BENCH ===== -->
   <section class="panel bench">
     <div class="bench-top" id="benchTop"></div>
+    <figure class="wall-frame" id="wallFrame">
+      <img src="wall.jpg" alt="A picture hanging on the lab wall" width="396" height="700" decoding="async">
+      <button class="fr-x" id="frHide" type="button" title="Take the picture down"
+        aria-label="Take the picture off the wall"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </figure>
+    <button class="fr-show" id="frShow" type="button" hidden>Show picture</button>
     <div class="bench-main" id="benchMain">
       <div class="instr" id="instr" tabindex="0" role="group" aria-label="The instrument — drag it, or use the arrow keys; Home closes it"></div>
       <div class="mag" id="mag"></div>
@@ -2086,6 +2124,16 @@ function applyTheme(){
   $('#btnTheme').setAttribute('aria-label',dark?'Switch to the light bench':'Switch to the dark bench');
 }
 $('#btnTheme').onclick=()=>{ theme=(theme==='dark')?'light':'dark'; applyTheme(); save(); };
+// The picture on the wall behind the apparatus. The cross takes it down, the
+// pill puts it back, and which way round it is survives a reload.
+let showFrame=true;
+function applyFrame(){
+  const f=$('#wallFrame'),b=$('#frShow');
+  if(!f||!b) return;
+  f.hidden=!showFrame; b.hidden=showFrame;
+}
+$('#frHide').onclick=()=>{ showFrame=false; applyFrame(); save(); $('#frShow').focus(); };
+$('#frShow').onclick=()=>{ showFrame=true; applyFrame(); save(); $('#frHide').focus(); };
 function applyMode(){
   $$('#modeSw button').forEach(b=>{ const on=b.dataset.mode===mode; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); });
 }
@@ -2121,7 +2169,7 @@ function save(){ try{
              wP:s.wP,wQ:s.wQ,view:s.view,tool:s.tool,scale:s.scale,
              paper:s.paper?{strokes:s.paper.strokes,ruler:s.paper.ruler}:null}; });
   localStorage.setItem(KEY,JSON.stringify({v:1,mode,theme,cols,folded,expId,step:curStep,lens:lens.on,
-    rough:$('#roughText').value,states:out}));
+    frame:showFrame,rough:$('#roughText').value,states:out}));
 }catch(e){} }
 // Has this experiment actually been touched? A reading written down, a constant
 // filled in, a line drawn on the paper, a weight moved off the default hanger.
@@ -2144,6 +2192,7 @@ function load(){ try{
   if(d.folded) folded={L:!!d.folded.L,R:!!d.folded.R};
   if(EXP[d.expId]) expId=d.expId;
   if(typeof d.lens==='boolean') lens.on=d.lens;
+  if(typeof d.frame==='boolean') showFrame=d.frame;
   if(typeof d.step==='number'&&d.step>=0) curStep=Math.min(d.step,EXP[expId].procedure.length-1);
   if(typeof d.rough==='string') $('#roughText').value=d.rough;
   if(d.states&&typeof d.states==='object') Object.keys(d.states).forEach(id=>{
@@ -2199,11 +2248,11 @@ function resetAll(){
   if(!confirm('Reset everything?\n\nEvery experiment loses its readings and its specimen, the rough work is cleared, and the panel widths, theme and mode go back to their defaults.')) return;
   try{ localStorage.removeItem(KEY); }catch(e){}
   Object.keys(S).forEach(k=>delete S[k]);
-  mode='learn'; theme='light'; expId=EXPERIMENTS[0].id; curStep=0;
+  mode='learn'; theme='light'; expId=EXPERIMENTS[0].id; curStep=0; showFrame=true;
   cols={L:COL_DEF.L,R:COL_DEF.R}; folded={L:false,R:false};
   $('#roughText').value=''; roughCount();
   $('#verdict').className='verdict'; $('#repBody').innerHTML='';
-  ensure(expId); applyTheme(); applyCols(); applyMode(); renderAll(); save();
+  ensure(expId); applyTheme(); applyCols(); applyMode(); applyFrame(); renderAll(); save();
   toast('Everything reset. Fresh specimens all round.');
 }
 /* ---- print ---- */
@@ -2243,7 +2292,7 @@ $('#btnReset').onclick=resetAll;
 /* ---- init ---- */
 load();
 ensure(expId);
-applyTheme(); applyCols(); applyMode(); roughCount(); lensHome(); renderAll();
+applyTheme(); applyCols(); applyMode(); applyFrame(); roughCount(); lensHome(); renderAll();
 askMode();
 </script>
 </body>
