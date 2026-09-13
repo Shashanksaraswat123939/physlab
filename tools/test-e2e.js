@@ -33,15 +33,23 @@ function runOne(id,seed){
   let ze;
   if(vern){ const z=eyeVernier(A.magVernier()); ze=z.leftOfZero?z.vsr-10:z.vsr; }
   else { const z=eyeScrew(A.magScrew()); ze=z.csr<=50?z.csr:z.csr-100; }
-  s.zeroTyped=String(ze); s.lcTyped=String(A.INSTR[e.instrument].lcMM);
+  s.zeroTyped=String(ze); s.zcTyped=String(-ze); s.lcTyped=String(A.INSTR[e.instrument].lcMM);
   // 2. fill the record's tables, a row at a time; the instrument moves on with them
   A.recTargets(e).forEach(tg=>{
     for(let i=0;i<A.nRows(e);i++){
       A.setHeld(tg.key); A.seat();
       if(A.activeRow(tg.key)!==i) return {err:'the instrument is on row '+A.activeRow(tg.key)+', not '+i};
+      // the student does every sum in the row: total, then the zero correction
       const row=s.rows[tg.key][i];
-      if(vern){ const r=eyeVernier(A.magVernier()); row.msr=(r.msrMM/10).toFixed(2); row.vsr=String(r.vsr); }
-      else { const r=eyeScrew(A.magScrew()); row.psr=String(r.psrMM); row.csr=String(r.csr); }
+      let tot;
+      if(vern){ const r=eyeVernier(A.magVernier());
+        row.msr=(r.msrMM/10).toFixed(2); row.vsr=String(r.vsr);
+        tot=r.msrMM/10+r.vsr*0.01; }
+      else { const r=eyeScrew(A.magScrew());
+        row.psr=String(r.psrMM); row.csr=String(r.csr);
+        tot=r.psrMM+r.csr*0.01; }
+      row.tot=tot.toFixed(2);
+      row.cor=(tot+(-ze)*0.01).toFixed(2);
     }
   });
   const got=A.studentResult(); if(got.err) return {err:got.err};

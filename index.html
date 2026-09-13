@@ -408,7 +408,7 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 <header>
   <div class="brand">
     <div class="logo" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px"><use href="#i-ruler"/></svg></div>
-    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 5</span></small></div>
+    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 6</span></small></div>
   </div>
   <div class="exp-tag" id="expTag">No experiment selected</div>
   <div class="actions">
@@ -800,7 +800,7 @@ let mode='learn', theme='light', expId='v1';
 const S={};
 function freshState(e,seed){
   const rng=mulberry(seed>>>0);
-  const st={seed:seed>>>0, sp:e.make(rng), zeroTyped:'', depthZeroTyped:'', rows:{}, ticks:0, held:null,
+  const st={seed:seed>>>0, sp:e.make(rng), zeroTyped:'', zcTyped:'', depthZeroTyped:'', depthZcTyped:'', rows:{}, ticks:0, held:null,
             face:'outer', jit:[-1,0,0,0,1][Math.floor(rng()*5)], tries:0, checked:null, logged:false};
   (e.targets||[{key:'main'}]).forEach(t=>st.rows[t.key]=(e.instrument==='gravesand')?[]:blankRows(e));
   st.active=(e.targets?e.targets[0].key:'main');
@@ -1592,70 +1592,61 @@ $('#guide').addEventListener('click',e=>{
    stay quiet until the end.
    ========================================================= */
 const num=v=>{ const n=parseFloat(v); return isFinite(n)?n:NaN; };
+// Every figure in the table is the student's: the reading, the total, the
+// corrected total. The app works out one thing only, the mean of the last column,
+// and checks the rest against the instrument. One least count is a hundredth of
+// the unit each table is kept in -- a tenth of a millimetre written in
+// centimetres, a hundredth of a millimetre written in millimetres -- which is why
+// both instruments divide their ticks by a hundred.
 const COLSPEC={
   vernier:{
-    cols:[{k:'msr',h:'M.S.R. (cm)',step:'0.1'},{k:'vsr',h:'V.S.R.',step:'1'}],
-    unit:'cm', dp:2, mdp:3,
-    total:r=>num(r.msr)+num(r.vsr)*0.01,
-    truth:(key,i)=>{ const v=VERNIER.read(trueTicks(key,i)); return {msr:v.msrMM/10,vsr:v.vsr}; }
+    cols:[{k:'msr',h:'M.S.R. (cm)',step:'0.01'},{k:'vsr',h:'V.S.R.',step:'1'},
+          {k:'tot',h:'Total (cm)',step:'0.01'},{k:'cor',h:'Corrected (cm)',step:'0.01'}],
+    mean:'cor', unit:'cm', mdp:3,
+    truth:(key,i)=>{ const t=trueTicks(key,i),v=VERNIER.read(t);
+      return {msr:v.msrMM/10,vsr:v.vsr,tot:t/100,cor:(t-zeroFor(faceOf(key)))/100}; }
   },
   screw:{
-    cols:[{k:'psr',h:'P.S.R. (mm)',step:'1'},{k:'csr',h:'C.S.R.',step:'1'}],
-    unit:'mm', dp:2, mdp:3,
-    total:r=>num(r.psr)+num(r.csr)*0.01,
-    truth:(key,i)=>{ const v=SCREW.read(trueTicks(key,i)); return {psr:v.psrMM,csr:v.csr}; }
+    cols:[{k:'psr',h:'P.S.R. (mm)',step:'1'},{k:'csr',h:'C.S.R.',step:'1'},
+          {k:'tot',h:'Total (mm)',step:'0.01'},{k:'cor',h:'Corrected (mm)',step:'0.01'}],
+    mean:'cor', unit:'mm', mdp:3,
+    truth:(key,i)=>{ const t=trueTicks(key,i),v=SCREW.read(t);
+      return {psr:v.psrMM,csr:v.csr,tot:t/100,cor:(t-zeroFor(faceOf(key)))/100}; }
   },
   gravesand:{
     cols:[{k:'P',h:'P (g wt)',ro:true},{k:'Q',h:'Q (g wt)',ro:true},
-          {k:'oa',h:'OA (cm)',step:'0.1'},{k:'ob',h:'OB (cm)',step:'0.1'},{k:'oc',h:'OC (cm)',step:'0.1'}],
-    unit:'g wt', dp:1, mdp:1, noCorr:true,          // nothing to correct: no zero error on a board
-    total:r=>num(r.oc)*(r.sc||10),
-    truth:(key,i)=>{ const r=st().rows[key][i]; return r?{oa:r.P/10,ob:r.Q/10,oc:r.oc_true}:{}; }
+          {k:'oa',h:'OA (cm)',step:'0.1'},{k:'ob',h:'OB (cm)',step:'0.1'},
+          {k:'oc',h:'OC (cm)',step:'0.1'},{k:'R',h:'R = OC × scale (g wt)',step:'1'}],
+    mean:'R', unit:'g wt', mdp:1,
+    truth:(key,i)=>{ const r=st().rows[key][i];
+      return r?{oa:r.P/10,ob:r.Q/10,oc:r.oc_true,R:r.oc_true*(r.sc||10)}:{}; }
   }
 };
 const specOf=()=>COLSPEC[cur().instrument];
 const close=(a,b,tol)=>isFinite(a)&&isFinite(b)&&Math.abs(a-b)<(tol||1e-6);
 const blankRows=e=>Array.from({length:nRows(e)},()=>({}));
-function rowTotal(r){ const v=specOf().total(r); return isFinite(v)?v:NaN; }
-// The zero correction that applies to this column: the depth rod has its own.
-function zcFor(key){
-  const s=st(),f=faceOf(key);
-  const z=num((f==='depth')?s.depthZeroTyped:s.zeroTyped);
-  return isFinite(z)?-z:NaN;
-}
-// One least count is a hundredth of the unit each table is written in: a tenth of
-// a millimetre in centimetres, a hundredth of a millimetre in millimetres.
-function rowCorr(key,i){
-  const r=st().rows[key][i]; if(!r) return NaN;
-  const t=rowTotal(r);
-  if(cur().instrument==='gravesand') return t;
-  const zc=zcFor(key);
-  return (isFinite(t)&&isFinite(zc))?t+zc*0.01:NaN;
-}
+const rowMean=(key,i)=>{ const r=(st().rows[key]||[])[i]; return r?num(r[specOf().mean]):NaN; };
 function meanOf(key){
-  const rows=st().rows[key]||[];
-  const v=rows.map((_,i)=>rowCorr(key,i)).filter(x=>isFinite(x));
+  const v=(st().rows[key]||[]).map((_,i)=>rowMean(key,i)).filter(isFinite);
   return v.length?v.reduce((a,b)=>a+b,0)/v.length:NaN;
 }
-const filledRows=key=>(st().rows[key]||[]).filter((_,i)=>isFinite(rowCorr(key,i))).length;
+const filledRows=key=>(st().rows[key]||[]).filter((_,i)=>isFinite(rowMean(key,i))).length;
 // How close a typed figure has to be to count as the same reading: whole
 // divisions are exact, lengths are to the last decimal the column carries.
-const tolOf=k=>({oc:0.049,oa:0.049,ob:0.049,msr:0.0049})[k]||0.49;
+const tolOf=k=>({oc:0.049,oa:0.049,ob:0.049,msr:0.0049,tot:0.0049,cor:0.0049})[k]||0.49;
 function obsHead(){
   const e=cur(),s=st(),I=INSTR[e.instrument];
   if(!I) return '';
-  const ze=num(s.zeroTyped), zc=isFinite(ze)?signed(-ze)+' div':'—';
   const hasDepth=(e.targets||[]).some(t=>t.face==='depth');
-  const dze=num(s.depthZeroTyped), dzc=isFinite(dze)?signed(-dze)+' div':'—';
   const fld=(id,val,step,unit,ph)=>'<span style="display:inline-flex;align-items:center;gap:6px">'
     +'<input type="number" id="'+id+'" value="'+esc(val)+'" step="'+step+'" placeholder="'+ph+'" style="width:88px;text-align:right">'
     +'<span>'+unit+'</span></span>';
   return '<table style="table-layout:auto;margin-bottom:10px"><tbody>'
     +'<tr><th style="width:52%">Least count</th><td>'+fld('inLC',s.lcTyped||'','0.01','mm','')+'<span class="mark" id="mkLC"></span></td></tr>'
     +'<tr><th>Zero error</th><td>'+fld('inZE',s.zeroTyped||'','1','divisions','')+'<span class="mark" id="mkZE"></span></td></tr>'
-    +'<tr><th>Zero correction</th><td><b id="zcVal">'+zc+'</b> <span style="color:var(--muted);font-size:11.5px">(= &minus; zero error)</span></td></tr>'
+    +'<tr><th>Zero correction</th><td>'+fld('inZC',s.zcTyped||'','1','divisions','')+'<span class="mark" id="mkZC"></span></td></tr>'
     +(hasDepth?'<tr><th>Zero error of the depth rod</th><td>'+fld('inDZE',s.depthZeroTyped||'','1','divisions','')+'<span class="mark" id="mkDZ"></span></td></tr>'
-      +'<tr><th>Its zero correction</th><td><b id="dzcVal">'+dzc+'</b> <span style="color:var(--muted);font-size:11.5px">found separately — it is a different face</span></td></tr>':'')
+      +'<tr><th>Its zero correction</th><td>'+fld('inDZC',s.depthZcTyped||'','1','divisions','')+'<span class="mark" id="mkDZC"></span></td></tr>':'')
     +'</tbody></table>';
 }
 function renderObt(){
@@ -1669,13 +1660,11 @@ function renderObt(){
       h+='<p class="lead" style="margin-top:16px">Practice only — the hollow cylinder is not in the record, and these two tables are left out of the result.</p>'; }
     h+='<h4>'+esc(tg.label.charAt(0).toUpperCase()+tg.label.slice(1))+'</h4>';
     h+='<table><thead><tr><th class="sn">S.No</th>'
-      +cs.cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')
-      +'<th>Total ('+cs.unit+')</th>'+(cs.noCorr?'':'<th>Corrected ('+cs.unit+')</th>')
-      +(show?'<th class="mark"></th>':'')+'</tr></thead><tbody>';
+      +cs.cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')+(show?'<th class="mark"></th>':'')+'</tr></thead><tbody>';
     for(let i=0;i<n;i++){
       const r=rows[i];
-      if(grav&&!r){ h+='<tr><td class="sn">'+(i+1)+'</td><td colspan="'+(cs.cols.length+(cs.noCorr?1:2)+(show?1:0))+'" style="color:var(--muted);font-style:italic">not taken yet</td></tr>'; continue; }
-      const tv=cs.truth(tg.key,i), tot=rowTotal(r), cor=rowCorr(tg.key,i);
+      if(grav&&!r){ h+='<tr><td class="sn">'+(i+1)+'</td><td colspan="'+(cs.cols.length+(show?1:0))+'" style="color:var(--muted);font-style:italic">not taken yet</td></tr>'; continue; }
+      const tv=cs.truth(tg.key,i);
       h+='<tr data-row="'+tg.key+'-'+i+'"'+(i===act?' class="here"':'')+'><td class="sn">'+(i+1)+'</td>';
       cs.cols.forEach(c=>{
         if(c.ro){ h+='<td class="tot">'+r[c.k]+'</td>'; return; }
@@ -1684,17 +1673,15 @@ function renderObt(){
         h+='<td><input type="number" class="cell'+cls+'" step="'+c.step+'" inputmode="decimal"'
           +' data-k="'+tg.key+'" data-i="'+i+'" data-c="'+c.k+'" value="'+esc(v)+'"></td>';
       });
-      h+='<td class="tot" data-tot="'+tg.key+'-'+i+'">'+(isFinite(tot)?fx(tot,cs.dp):'—')+'</td>'
-        +(cs.noCorr?'':'<td class="tot" data-cor="'+tg.key+'-'+i+'">'+(isFinite(cor)?fx(cor,cs.dp):'—')+'</td>');
       if(show){
-        const fields=cs.cols.filter(c=>!c.ro);
-        const any=fields.some(c=>r[c.k]!==''&&r[c.k]!==undefined);
-        const all=fields.every(c=>close(num(r[c.k]),tv[c.k],tolOf(c.k)));
+        const f=cs.cols.filter(c=>!c.ro);
+        const any=f.some(c=>r[c.k]!==''&&r[c.k]!==undefined);
+        const all=f.every(c=>close(num(r[c.k]),tv[c.k],tolOf(c.k)));
         h+='<td class="mark" data-mk="'+tg.key+'-'+i+'">'+(!any?'':all?'<span class="y">'+ICON('check')+'</span>':'<span class="n">'+ICON('x')+'</span>')+'</td>';
       }
       h+='</tr>';
     }
-    h+='</tbody><tfoot><tr><td colspan="'+(cs.cols.length+(cs.noCorr?1:2))+'" style="text-align:right">Mean</td>'
+    h+='</tbody><tfoot><tr><td colspan="'+cs.cols.length+'" style="text-align:right">Mean</td>'
       +'<td class="tot" data-mean="'+tg.key+'">'+(isFinite(mean)?fx(mean,cs.mdp):'—')+'</td>'
       +(show?'<td class="mark"></td>':'')+'</tr></tfoot></table>';
   });
@@ -1704,15 +1691,12 @@ function renderObt(){
   c.textContent=got; c.hidden=!got;
 }
 // Typing must not redraw the table -- that would throw the caret out of the box
-// mid-number. Only the cells that actually derive from the value are patched.
+// mid-number. Only the mean and the marks move.
 function patchRow(key,i){
   const s=st(),cs=specOf(),r=(s.rows[key]||[])[i],show=(mode==='learn');
   if(!r) return;
-  const tv=cs.truth(key,i),tot=rowTotal(r),cor=rowCorr(key,i),m=meanOf(key);
-  const put=(sel,txt)=>{ const el=$(sel); if(el) el.textContent=txt; };
-  put('[data-tot="'+key+'-'+i+'"]',isFinite(tot)?fx(tot,cs.dp):'—');
-  put('[data-cor="'+key+'-'+i+'"]',isFinite(cor)?fx(cor,cs.dp):'—');
-  put('[data-mean="'+key+'"]',isFinite(m)?fx(m,cs.mdp):'—');
+  const tv=cs.truth(key,i),m=meanOf(key);
+  const mn=$('[data-mean="'+key+'"]'); if(mn) mn.textContent=isFinite(m)?fx(m,cs.mdp):'—';
   cs.cols.filter(c=>!c.ro).forEach(c=>{
     const el=$('input[data-k="'+key+'"][data-i="'+i+'"][data-c="'+c.k+'"]'); if(!el) return;
     el.classList.remove('good','bad');
@@ -1725,13 +1709,6 @@ function patchRow(key,i){
     const all=f.every(c=>close(num(r[c.k]),tv[c.k],tolOf(c.k)));
     mk.innerHTML=!any?'':all?'<span class="y">'+ICON('check')+'</span>':'<span class="n">'+ICON('x')+'</span>';
   }
-}
-// Every corrected figure moves when the zero error does, so they are all patched
-// together rather than the table being rebuilt under the caret.
-function patchAll(){
-  const s=st();
-  Object.keys(s.rows).forEach(k=>(s.rows[k]||[]).forEach((_,i)=>patchRow(k,i)));
-  markHere();
 }
 function markHere(){
   if(cur().instrument==='gravesand') return;
@@ -1748,8 +1725,11 @@ function markConst(){
     el.innerHTML=(!show||typed==='')?'':(ok?'<span class="y">'+ICON('check')+'</span>':'<span class="n">'+ICON('x')+'</span>'); };
   set('#mkLC',close(num(s.lcTyped),I.lcMM,0.0009),s.lcTyped||'');
   set('#mkZE',close(num(s.zeroTyped),s.sp.zeroTicks,0.49),s.zeroTyped||'');
-  if(typeof s.sp.depthZeroTicks==='number')
+  set('#mkZC',close(num(s.zcTyped),-s.sp.zeroTicks,0.49),s.zcTyped||'');
+  if(typeof s.sp.depthZeroTicks==='number'){
     set('#mkDZ',close(num(s.depthZeroTyped),s.sp.depthZeroTicks,0.49),s.depthZeroTyped||'');
+    set('#mkDZC',close(num(s.depthZcTyped),-s.sp.depthZeroTicks,0.49),s.depthZcTyped||'');
+  }
 }
 
 /* =========================================================
@@ -1764,7 +1744,7 @@ function means(){
 function studentResult(){
   const e=cur(),s=st();
   if(recTargets(e).some(t=>!isFinite(meanOf(t.key))))
-    return {err:'Fill in at least one full row in every table, and write the zero error in — the corrected column needs it.'};
+    return {err:'Fill in the corrected column of at least one row in every table — the mean is taken from it.'};
   return {R:e.result(s.sp,means())};
 }
 function renderCalc(){
@@ -1979,12 +1959,8 @@ function takeReading(){
 $('#obt').addEventListener('input',ev=>{
   const el=ev.target,s=st();
   if(el.id==='inLC'){ s.lcTyped=el.value; markConst(); save(); return; }
-  if(el.id==='inDZE'){ s.depthZeroTyped=el.value; markConst(); patchAll(); renderCalc(); save();
-    const dz=$('#dzcVal'); if(dz) dz.textContent=isFinite(num(el.value))?signed(-num(el.value))+' div':'—';
-    return; }
-  if(el.id==='inZE'){ s.zeroTyped=el.value; markConst(); patchAll(); renderCalc(); save();
-    const zc=$('#zcVal'); if(zc) zc.textContent=isFinite(num(el.value))?signed(-num(el.value))+' div':'—';
-    return; }
+  const CONST={inZE:'zeroTyped',inZC:'zcTyped',inDZE:'depthZeroTyped',inDZC:'depthZcTyped'};
+  if(CONST[el.id]){ s[CONST[el.id]]=el.value; markConst(); save(); return; }
   if(!el.classList.contains('cell')) return;
   const key=el.dataset.k, i=+el.dataset.i;
   const r=(s.rows[key]||[])[i]; if(!r) return;
@@ -2144,7 +2120,7 @@ function save(){ try{
   Object.keys(S).forEach(id=>{ const s=S[id];
     out[id]={seed:s.seed,sp:s.sp,rows:s.rows,zeroTyped:s.zeroTyped,lcTyped:s.lcTyped||'',
              ticks:s.ticks,held:s.held,jit:s.jit,P:s.P,Q:s.Q,active:s.active,
-             face:s.face,depthZeroTyped:s.depthZeroTyped||'',
+             face:s.face,depthZeroTyped:s.depthZeroTyped||'',zcTyped:s.zcTyped||'',depthZcTyped:s.depthZcTyped||'',
              wP:s.wP,wQ:s.wQ,view:s.view,tool:s.tool,scale:s.scale,
              paper:s.paper?{strokes:s.paper.strokes,ruler:s.paper.ruler}:null}; });
   localStorage.setItem(KEY,JSON.stringify({v:1,mode,theme,cols,folded,expId,step:curStep,lens:lens.on,
@@ -2158,7 +2134,7 @@ function started(e,o){
   // not work -- something has to have been written into one.
   const written=r=>r&&typeof r==='object'&&Object.keys(r).some(k=>r[k]!==''&&r[k]!==undefined&&r[k]!==null);
   if(o.rows&&typeof o.rows==='object'&&Object.keys(o.rows).some(k=>Array.isArray(o.rows[k])&&o.rows[k].some(written))) return true;
-  if(['zeroTyped','lcTyped','depthZeroTyped'].some(k=>typeof o[k]==='string'&&o[k].trim()!=='')) return true;
+  if(['zeroTyped','lcTyped','depthZeroTyped','zcTyped','depthZcTyped'].some(k=>typeof o[k]==='string'&&o[k].trim()!=='')) return true;
   if(o.paper&&Array.isArray(o.paper.strokes)&&o.paper.strokes.length) return true;
   if(Array.isArray(o.wP)&&Array.isArray(o.wQ)&&(sumW(o.wP)!==100||sumW(o.wQ)!==100)) return true;
   return false;
@@ -2191,6 +2167,8 @@ function load(){ try{
       });
       if(typeof o.zeroTyped==='string') s.zeroTyped=o.zeroTyped;
       if(typeof o.depthZeroTyped==='string') s.depthZeroTyped=o.depthZeroTyped;
+      if(typeof o.zcTyped==='string') s.zcTyped=o.zcTyped;
+      if(typeof o.depthZcTyped==='string') s.depthZcTyped=o.depthZcTyped;
       if(typeof o.lcTyped==='string') s.lcTyped=o.lcTyped;
       if(typeof o.jit==='number') s.jit=o.jit;
       if(typeof o.held==='string'&&s.rows[o.held]) s.held=o.held;
@@ -2246,16 +2224,16 @@ function printRecord(){
       :'Pitch of the screw = '+I.pitchMM+' mm &middot; number of divisions on the circular scale = '+I.csd)
     +'<br>Least count = '+esc(s.lcTyped||'............')+' mm'
     +'<br>Zero error = '+esc(s.zeroTyped||'............')+' divisions'
-    +'<br>Zero correction = '+(isFinite(num(s.zeroTyped))?signed(-num(s.zeroTyped)):'............')+' divisions</p>';
+    +'<br>Zero correction = '+esc(s.zcTyped||'............')+' divisions</p>';
   recTargets(e).forEach(tg=>{
     h+='<h3>Readings for the '+esc(tg.label)+'</h3><table><tr><th>S.No</th>'
-      +cs.cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')+'<th>'+esc(cs.totalH)+'</th></tr>';
+      +cs.cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')+'</tr>';
     for(let i=0;i<nRows(e);i++){ const row=s.rows[tg.key][i];
-      h+='<tr><td>'+(i+1)+'</td>'+cs.cols.map(c=>'<td>'+(row&&row[c.k]!==undefined&&row[c.k]!==''?esc(row[c.k]):'')+'</td>').join('')
-        +'<td>'+(row&&isFinite(rowTotal(row))?fx(rowTotal(row),cs.dp):'')+'</td></tr>'; }
+      h+='<tr><td>'+(i+1)+'</td>'
+        +cs.cols.map(c=>'<td>'+(row&&row[c.k]!==undefined&&row[c.k]!==''?esc(row[c.k]):'')+'</td>').join('')+'</tr>'; }
     const m=meanOf(tg.key);
-    h+='<tr><td colspan="'+(cs.cols.length+1)+'" style="text-align:right"><b>Mean '+esc(tg.sym||tg.label)+'</b></td><td><b>'
-      +(isFinite(m)?fx(m,cs.dp+1)+' '+cs.unit:'')+'</b></td></tr></table>';
+    h+='<tr><td colspan="'+cs.cols.length+'" style="text-align:right"><b>Mean '+esc(tg.sym||tg.label)+'</b></td><td><b>'
+      +(isFinite(m)?fx(m,cs.mdp)+' '+cs.unit:'')+'</b></td></tr></table>';
   });
   h+='<h3>Calculations</h3>'+(r.err?'<p>'+esc(r.err)+'</p>':'<pre>'+esc(r.R.work)+'</pre>')
     +'<h3>Result</h3><p>'+(r.err?'............':esc(r.R.final))+'</p>'

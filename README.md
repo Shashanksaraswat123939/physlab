@@ -53,8 +53,9 @@ that coincides coincides because of where the jaw is.
 You close the instrument on the object, read the magnified scale, and type the
 figures straight into the table — **S.No, M.S.R., V.S.R., Total, Corrected** for the
 calliper, **S.No, P.S.R., C.S.R., Total, Corrected** for the screw gauge, with the
-mean underneath. Total and Corrected follow from what you write, the zero
-correction coming from the zero error you found yourself.
+mean underneath. **Every figure in the table is yours** — the reading, the total,
+the corrected total. The app works one thing out, the mean of the corrected
+column, and marks the rest against the instrument.
 
 Each of the five trials keeps its own error for good, worked out from the
 specimen's seed, so the instrument shows the reading for whichever row is next to

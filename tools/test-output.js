@@ -5,10 +5,13 @@ let fail=0; const bad=m=>{ if(fail<10) console.log('  FAIL '+m); fail++; };
 // a fully worked experiment
 A.setExp('v1');
 const s=A.S.v1, z=s.sp.zeroTicks;
-['l','b','h'].forEach(k=>{ s.rows[k]=[];
-  for(let i=0;i<5;i++){ const t=s.sp.dims[k]+z+[-1,0,0,0,1][i], msr=Math.floor(t/10)*10;
-    s.rows[k].push({t,msr:(msr/100).toFixed(2),vsr:String(t-msr)}); } });
-s.zeroTyped=String(z); s.lcTyped='0.1';
+['l','b','h'].forEach(k=>{
+  for(let i=0;i<5;i++){
+    const t=A.trueTicks(k,i), msr=Math.floor(t/10)*10, tot=t/100;
+    s.rows[k][i]={msr:(msr/100).toFixed(2),vsr:String(t-msr),
+                  tot:tot.toFixed(2),cor:(tot+(-z)*0.01).toFixed(2)};
+  } });
+s.zeroTyped=String(z); s.zcTyped=String(-z); s.lcTyped='0.1';
 
 console.log('1. the printed record carries every section the class record has');
 A.printRecord();
