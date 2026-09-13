@@ -166,7 +166,7 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 @container bench (max-width:620px){.bench-main{--ap:.72}}
 @container bench (max-width:520px){.bench-main{--ap:.62}}
 @container bench (max-width:440px){.bench-main{--ap:.54}}
-.instr{width:100%;max-width:calc(940px*var(--ap));position:relative}
+.instr{width:100%;max-width:calc(860px*var(--ap));position:relative}
 .bench.wide .instr{max-width:calc(1060px*var(--ap))}
 .bench.wide .bench-main{justify-content:flex-start;padding-top:6px}
 /* The drawing paper is taller than it is wide once it is on the bench, so it is
@@ -424,7 +424,7 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 <header>
   <div class="brand">
     <div class="logo" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px"><use href="#i-ruler"/></svg></div>
-    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 2</span></small></div>
+    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 3</span></small></div>
   </div>
   <div class="exp-tag" id="expTag">No experiment selected</div>
   <div class="actions">
@@ -556,7 +556,7 @@ const VERNIER={
   vsd:10,             // 10 vernier divisions ...
   span:9,             // ... spread over 9 main scale divisions
   lcMM:0.1,           // so the least count is 1/10 mm
-  maxMM:150,
+  maxMM:75,
   // msr is the main-scale mark just before the vernier zero; vsr is the vernier
   // division that lines up with a main-scale mark.
   read(t){ const msrT=Math.floor(t/10)*10; return {ticks:t,msrMM:msrT/10,vsr:t-msrT,totalMM:t/10}; }
@@ -631,7 +631,7 @@ const EXPERIMENTS=[
   make(rng){ return {
     zeroTicks:randInt(rng,-3,3), depthZeroTicks:randInt(rng,-3,3),
     dims:{l:randInt(rng,300,560),b:randInt(rng,190,299),h:randInt(rng,95,189),
-          id:randInt(rng,140,260),dp:randInt(rng,150,310)},
+          id:randInt(rng,140,260),dp:randInt(rng,100,180)},
     label:'Rectangular metal block', label2:'Hollow cylinder'
   };},
   sizeOf(sp,k){ return sp.dims[k]; },
@@ -925,7 +925,7 @@ function lensLayer(scene){
 // thimble edge, or over the marked junction on the paper.
 function lensHome(){
   const e=cur(),s=st();
-  if(e.instrument==='vernier'){ lens.x=Math.min(1050,vpx(s.ticks/10)+90); lens.y=176; }
+  if(e.instrument==='vernier'){ lens.x=Math.min(1040,vpx(s.ticks/10)+110); lens.y=250; }
   else if(e.instrument==='screw'){ lens.x=Math.min(1080,530+s.ticks/100*S_U+40); lens.y=S_AX; }
   else if(s.view==='paper'){ lens.x=pcx(P_O[0]); lens.y=pcy(P_O[1])-120; }
   else { lens.x=600; lens.y=300; }
@@ -939,91 +939,86 @@ function lensHome(){
    the coincidence you hunt for here. The ticks are where they are because of
    where the jaw is; nothing about the reading is decided in advance.
    ========================================================= */
-const V_X0=180, V_U=5.4, V_TAIL=1008;           // main-scale zero, units per mm, end of the beam
-const V_IN=146;                                 // the fixed inside jaw's measuring flank
+/* Proportions follow the instrument: the beam is cut short with a break, as every
+   textbook diagram does, so the jaws are not dwarfed by 15 cm of empty rule. One
+   centimetre of scale is 100 units, the jaws reach about two centimetres, the
+   blades about one. */
+const V_U=10, V_X0=140, V_TAIL=960, V_IN=100;
+const V_BEAM_T=150, V_BEAM_B=280, V_PLATE_B=332, V_JAW_B=522;
 const vpx=mm=>V_X0+mm*V_U;
-// The two jaw sets are castings, not blocks. The outside jaws flare from the
-// frame and taper down to a narrow contact face, with the measuring face
-// vertical; the inside jaws are thin blades tapering to a knife edge, and it is
-// their OUTER flanks that measure, because they press apart inside a bore.
-const jawFixed='M96 96 H180 V330 H140 L96 254 Z';
-const jawSlide=px=>'M'+px.toFixed(1)+' 222 V330 H'+(px+40).toFixed(1)+' L'+(px+88).toFixed(1)+' 254 V222 Z';
-const bladeFixed='M'+V_IN+' 96 V14 H'+(V_IN+18)+' L180 96 Z';
-const bladeSlide=px=>'M'+(px+34).toFixed(1)+' 96 V14 H'+(px+16).toFixed(1)+' L'+px.toFixed(1)+' 96 Z';
+// The two outside jaws are mirror images: the same depth below the plate and the
+// same taper. Only the fixed one carries on up as the frame that holds the beam.
+const jawFixed='M40 '+V_BEAM_T+' H'+V_X0+' V'+V_JAW_B+' H100 L40 '+V_PLATE_B+' Z';
+const jawSlide=px=>'M'+px.toFixed(1)+' '+V_PLATE_B+' V'+V_JAW_B+' H'+(px+40).toFixed(1)
+  +' L'+(px+110).toFixed(1)+' 430 V'+V_PLATE_B+' Z';
+const bladeFixed='M'+V_IN+' '+V_BEAM_T+' V40 H'+(V_IN+22)+' L'+V_X0+' '+V_BEAM_T+' Z';
+const bladeSlide=px=>'M'+(px+40).toFixed(1)+' '+V_BEAM_T+' V40 H'+(px+18).toFixed(1)
+  +' L'+px.toFixed(1)+' '+V_BEAM_T+' Z';
 function drawVernier(){
   const s=st(),e=cur(),x=s.ticks/10,px=vpx(x),face=curFace();
   let ticks='',nums='';
-  for(let i=0;i<=150;i++){
+  for(let i=0;i<=75;i++){
     const t=vpx(i).toFixed(1), big=(i%10===0), mid=(i%5===0);
-    ticks+='M'+t+' 170V'+(big?132:mid?147:156);
-    if(big) nums+='<text x="'+t+'" y="124" text-anchor="middle">'+(i/10)+'</text>';
+    ticks+='M'+t+' '+V_BEAM_B+'V'+(big?240:mid?256:266);
+    if(big) nums+='<text x="'+t+'" y="232" text-anchor="middle">'+(i/10)+'</text>';
   }
   let vt='',vn='';
   for(let k=0;k<=10;k++){ const t=(px+k*0.9*V_U).toFixed(1);
-    vt+='M'+t+' 170V'+(k%5===0?202:192);
-    if(k%5===0) vn+='<text x="'+t+'" y="218" text-anchor="middle">'+k+'</text>'; }
+    vt+='M'+t+' '+V_BEAM_B+'V'+(k%5===0?318:308);
+    if(k%5===0) vn+='<text x="'+t+'" y="328" text-anchor="middle">'+k+'</text>'; }
   const rodFull=x*V_U, rodMax=1186-V_TAIL, rodLen=Math.min(rodFull,rodMax), cut=rodFull>rodMax+0.5;
-  const rod='<rect x="'+V_TAIL+'" y="122" width="'+Math.max(2,rodLen).toFixed(1)+'" height="22" rx="2"'
+  // The rod really does run out whenever the slider moves, so it is always drawn;
+  // it just steps back when you are not using it.
+  const rod='<g opacity="'+(face==='depth'?1:.45)+'">'
+    +'<rect x="'+V_TAIL+'" y="200" width="'+Math.max(2,rodLen).toFixed(1)+'" height="30" rx="2"'
     +' fill="var(--steel2)" stroke="var(--steel-line)" stroke-width="2"/>'
-    +(cut?'<path d="M1186 118l10 7-10 7 10 7-10 7" stroke="var(--steel-line)" stroke-width="2" fill="none"/>':'');
+    +(cut?'<path d="M1186 194l10 10-10 10 10 10-10 10" stroke="var(--steel-line)" stroke-width="2" fill="none"/>':'')+'</g>';
+  // the beam is cut, not ended: the zigzag says it carries on
+  const brk='<path d="M900 '+V_BEAM_T+' l22 22 -22 22 22 22 -22 22 v22 h60 V'+V_BEAM_T+' Z"'
+    +' fill="var(--bench-air)" stroke="var(--steel-line)" stroke-width="2"/>';
   const w=(s.held!=null?e.sizeOf(s.sp,s.held)/10:0), ow=w*V_U;
-  let spec='',cap='';
-  if(s.held==null){
-    cap=(face==='depth')?'depth rod home \u2014 read its own zero error'
-       :(face==='inner')?'inside jaws together \u2014 read the zero error'
-       :'outside jaws closed \u2014 read the zero error';
-  } else if(face==='outer'){
-    // a sphere is gripped at its equator and hangs below the jaws, as on the
-    // bench; anything else sits square between them
+  let spec='';
+  if(s.held!=null&&face==='outer'){
     spec=(e.id==='v2')
-      ? '<circle cx="'+(V_X0+ow/2).toFixed(1)+'" cy="276" r="'+(ow/2).toFixed(1)+'" fill="var(--steel)" stroke="var(--steel-line)" stroke-width="2"/>'
-        +'<ellipse cx="'+(V_X0+ow*0.32).toFixed(1)+'" cy="'+(276-ow*0.22).toFixed(1)+'" rx="'+(ow*0.13).toFixed(1)+'" ry="'+(ow*0.08).toFixed(1)+'" fill="#fff" opacity=".45"/>'
-      : '<rect x="'+V_X0+'" y="240" width="'+ow.toFixed(1)+'" height="72" rx="3" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/>';
-    cap=esc(tLabel(s.held))+' of the '+esc((s.sp.label||'').toLowerCase());
-  } else if(face==='inner'){
-    const R=px+34;
+      ? '<circle cx="'+(V_X0+ow/2).toFixed(1)+'" cy="427" r="'+(ow/2).toFixed(1)+'" fill="var(--steel2)" stroke="var(--steel-line)" stroke-width="2"/>'
+        +'<ellipse cx="'+(V_X0+ow*0.3).toFixed(1)+'" cy="'+(427-ow*0.24).toFixed(1)+'" rx="'+(ow*0.14).toFixed(1)+'" ry="'+(ow*0.09).toFixed(1)+'" fill="#fff" opacity=".4"/>'
+      : '<rect x="'+V_X0+'" y="362" width="'+ow.toFixed(1)+'" height="130" rx="4" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/>';
+  } else if(s.held!=null&&face==='inner'){
+    const R=px+40;
     spec='<g fill="var(--brass)" stroke="var(--brass2)" stroke-width="2">'
-      +'<rect x="'+(V_IN-34)+'" y="2" width="34" height="70" rx="3"/>'
-      +'<rect x="'+R.toFixed(1)+'" y="2" width="34" height="70" rx="3"/></g>'
-      +'<g stroke="var(--accent)" stroke-width="2" fill="none">'
-      +'<path d="M'+V_IN+' 34H'+R.toFixed(1)+'"/>'
-      +'<path d="M'+(V_IN+9)+' 28l-9 6 9 6M'+(R-9).toFixed(1)+' 28l9 6-9 6"/></g>';
-    cap=esc(tLabel(s.held))+' of the '+esc((s.sp.label2||'hollow cylinder').toLowerCase());
-  } else {
+      +'<rect x="'+(V_IN-40)+'" y="16" width="40" height="98" rx="4"/>'
+      +'<rect x="'+R.toFixed(1)+'" y="16" width="40" height="98" rx="4"/></g>'
+      +'<g stroke="var(--accent)" stroke-width="2.5" fill="none">'
+      +'<path d="M'+V_IN+' 66H'+R.toFixed(1)+'"/>'
+      +'<path d="M'+(V_IN+11)+' 58l-11 8 11 8M'+(R-11).toFixed(1)+' 58l11 8-11 8"/></g>';
+  } else if(s.held!=null){
     const bore=w*V_U;
     spec='<g fill="var(--brass)" stroke="var(--brass2)" stroke-width="2">'
-      +'<rect x="'+V_TAIL+'" y="70" width="'+(bore+24).toFixed(1)+'" height="28" rx="3"/>'
-      +'<rect x="'+V_TAIL+'" y="168" width="'+(bore+24).toFixed(1)+'" height="28" rx="3"/>'
-      +'<rect x="'+(V_TAIL+bore).toFixed(1)+'" y="70" width="24" height="126" rx="3"/></g>';
-    cap=esc(tLabel(s.held))+' of the '+esc((s.sp.label2||'hollow cylinder').toLowerCase());
+      +'<rect x="'+V_TAIL+'" y="'+V_BEAM_T+'" width="'+(bore+26).toFixed(1)+'" height="28" rx="3"/>'
+      +'<rect x="'+V_TAIL+'" y="252" width="'+(bore+26).toFixed(1)+'" height="28" rx="3"/>'
+      +'<rect x="'+(V_TAIL+bore).toFixed(1)+'" y="'+V_BEAM_T+'" width="26" height="130" rx="3"/></g>';
   }
+  // only the face in use is named; three labels at once is three too many
+  const lbl=face==='inner'?'<text x="56" y="130" font-size="17" fill="var(--muted)">inside jaws</text>'
+    :face==='depth'?'<text x="'+(V_TAIL+8)+'" y="190" font-size="17" fill="var(--muted)">depth rod</text>'
+    :'<text x="90" y="556" font-size="17" fill="var(--muted)">outside jaws</text>';
   const scene=
-     '<rect x="180" y="96" width="'+(V_TAIL-180)+'" height="74" fill="var(--scale-face)" stroke="var(--steel-line)" stroke-width="2"/>'
-    +spec+rod
+     '<rect x="'+V_X0+'" y="'+V_BEAM_T+'" width="'+(V_TAIL-V_X0)+'" height="'+(V_BEAM_B-V_BEAM_T)+'" fill="var(--scale-face)" stroke="var(--steel-line)" stroke-width="2"/>'
+    +brk+spec+rod
     +'<g stroke="var(--steel-line)" stroke-width="2" fill="var(--steel)">'
     +'<path d="'+jawFixed+'"/><path d="'+bladeFixed+'"/>'
     +'<path d="'+jawSlide(px)+'"/><path d="'+bladeSlide(px)+'"/>'
-    +'<rect x="'+px.toFixed(1)+'" y="96" width="8" height="74" fill="var(--steel-dark)"/>'
-    +'<rect x="'+px.toFixed(1)+'" y="170" width="196" height="52" rx="3" fill="var(--vern-face)"/>'
-    +'<rect x="'+(px+128).toFixed(1)+'" y="174" width="60" height="44" rx="6" fill="var(--steel2)"/>'
+    +'<rect x="'+px.toFixed(1)+'" y="'+V_BEAM_T+'" width="10" height="'+(V_BEAM_B-V_BEAM_T)+'" fill="var(--steel-dark)"/>'
+    +'<rect x="'+px.toFixed(1)+'" y="'+V_BEAM_B+'" width="230" height="'+(V_PLATE_B-V_BEAM_B)+'" rx="4" fill="var(--vern-face)"/>'
+    +'<rect x="'+(px+150).toFixed(1)+'" y="286" width="72" height="42" rx="7" fill="var(--steel2)"/>'
     +'</g>'
-    +'<path d="M'+(px+140).toFixed(1)+' 182v28M'+(px+152).toFixed(1)+' 182v28M'+(px+164).toFixed(1)+' 182v28M'+(px+176).toFixed(1)+' 182v28" stroke="var(--steel-line)" stroke-width="1.6"/>'
-    +'<g stroke="var(--scale-tick)" stroke-width="1.7" fill="none"><path d="'+ticks+'"/></g>'
-    +'<g font-size="19" fill="var(--scale-ink)">'+nums+'</g>'
-    +'<g stroke="var(--vern-ink)" stroke-width="1.9" fill="none"><path d="'+vt+'"/></g>'
-    +'<g font-size="17" fill="var(--vern-ink)" font-weight="700">'+vn+'</g>'
-    +'<g font-size="15" fill="var(--muted)">'
-    +'<text x="'+(V_IN-46)+'" y="40" text-anchor="end">inside</text>'
-    +'<text x="'+(V_IN-46)+'" y="58" text-anchor="end">jaws</text>'
-    +'<text x="122" y="352" text-anchor="middle">outside jaws</text>'
-    +'<text x="'+(V_TAIL+6)+'" y="114">depth rod</text></g>';
-  return '<svg viewBox="0 0 1200 420" role="img" aria-label="Vernier calliper with inside jaws, outside jaws and a depth rod. Drag the slider; read the magnified scale below.">'
+    +'<path d="M'+(px+164).toFixed(1)+' 294v26M'+(px+178).toFixed(1)+' 294v26M'+(px+192).toFixed(1)+' 294v26M'+(px+206).toFixed(1)+' 294v26" stroke="var(--steel-line)" stroke-width="1.8"/>'
+    +'<g stroke="var(--scale-tick)" stroke-width="2" fill="none"><path d="'+ticks+'"/></g>'
+    +'<g font-size="24" fill="var(--scale-ink)">'+nums+'</g>'
+    +'<g stroke="var(--vern-ink)" stroke-width="2.2" fill="none"><path d="'+vt+'"/></g>'
+    +'<g font-size="21" fill="var(--vern-ink)" font-weight="700">'+vn+'</g>'+lbl;
+  return '<svg viewBox="0 0 1200 590" role="img" aria-label="Vernier calliper with inside jaws, outside jaws and a depth rod. Drag the slider; read the magnified scale below.">'
    +'<g class="grab" data-drag="jaw">'+scene+'</g>'+lensLayer(scene)
-   +'<text x="620" y="384" text-anchor="middle" font-size="19" fill="var(--ink)">'+cap+'</text>'
-   +'<text x="620" y="410" text-anchor="middle" font-size="17" fill="var(--muted)">'
-   +(face==='outer'?'drag the slider \u2014 the outside jaws close until they touch'
-    :face==='inner'?'drag the slider \u2014 the inside jaws open until they touch the wall'
-    :'drag the slider \u2014 the rod runs out until it reaches the bottom')+'</text>'
    +'</svg>';
 }
 // The magnified window: 12 mm of main scale, which always contains at least one
@@ -1478,7 +1473,7 @@ function renderBenchTop(){
   const face=curFace(), vern=(e.instrument==='vernier');
   const card=(key,name,note,icon)=>'<button class="spec-card pick'+(s.held===key?' on':'')+'" data-held="'+(key===null?'':key)+'" type="button">'
     +(icon||SPEC_ICON[e.id])
-    +'<div style="min-width:0"><b>'+esc(name)+'</b><small>'+esc(note)+'</small></div></button>';
+    +'<div style="min-width:0"><b>'+esc(name)+'</b>'+(note?'<small>'+esc(note)+'</small>':'')+'</div></button>';
   const shut='<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 10v28M33 10v28" stroke="var(--steel-line)" stroke-width="4" stroke-linecap="round"/></svg>';
   const bore='<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="12" width="34" height="24" rx="3" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/><rect x="15" y="12" width="18" height="24" fill="var(--bench-air)" stroke="var(--brass2)" stroke-width="1.5"/></svg>';
   // Which of the calliper's three faces you are using decides what you can measure
@@ -1496,8 +1491,7 @@ function renderBenchTop(){
   el.innerHTML=faces
     +card(null,vern&&face==='depth'?'Rod home':'Jaws closed',
           'find the zero error'+(vern&&face==='depth'?' of the rod':''),shut)
-    +shown.map(t=>card(t.key,t.label.charAt(0).toUpperCase()+t.label.slice(1),
-          (t.face==='outer'||!vern)?s.sp.label:(s.sp.label2||''),
+    +shown.map(t=>card(t.key,t.label.charAt(0).toUpperCase()+t.label.slice(1),'',
           (t.face&&t.face!=='outer')?bore:null)).join('');
 }
 function renderInstr(){
@@ -1511,8 +1505,7 @@ function renderMag(){
   m.hidden=(e.instrument==='gravesand');        // the paper is its own full-size surface
   if(m.hidden) return;
   const I=INSTR[e.instrument],ok=gripped();
-  m.innerHTML='<h5>'+(e.instrument==='vernier'?'Main scale and vernier scale':'Sleeve and thimble')
-    +'<span class="sp"></span>'+(ok?'<em>reading is steady</em>':'<em style="color:var(--warn)">not gripping — this is not a reading</em>')+'</h5>'
+  m.innerHTML=(ok?'':'<h5><em style="color:var(--warn)">not touching — this is not a reading</em></h5>')
     +(e.instrument==='vernier'?magVernier():magScrew());
 }
 const lensBtn=()=>'<button id="btnLens" type="button"'+(lens.on?' class="primary"':'')
@@ -1630,9 +1623,9 @@ function renderGuide(){
   const ul=a=>'<ul>'+a.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
   const viva=(e.viva||EXP[e.vivaFrom].viva);
   $('#guide').innerHTML=
-     sec('Aim','<p>'+esc(e.aim)+'</p>',true)
+     sec('Aim','<p>'+esc(e.aim)+'</p>')
     +sec('Apparatus',ul(e.apparatus))
-    +sec('Formula',e.formula.map(f=>'<div class="fml"><b>'+esc(f.b)+'</b><span class="eq">'+esc(f.eq)+'</span></div>').join(''),true)
+    +sec('Formula',e.formula.map(f=>'<div class="fml"><b>'+esc(f.b)+'</b><span class="eq">'+esc(f.eq)+'</span></div>').join(''))
     +sec('Procedure','<ol>'+e.procedure.map((p,i)=>'<li class="step'+(i===curStep?' on':'')+'" data-step="'+i+'">'+esc(p)+'</li>').join('')+'</ol>',true)
     +sec('Precautions',ul(e.precautions))
     +sec('Sources of error',ul(e.errors))
@@ -1645,7 +1638,7 @@ $('#guide').addEventListener('click',e=>{
 function showStep(){
   const e=cur();
   $('#obsTest').textContent='Step '+(curStep+1)+' of '+e.procedure.length;
-  $('#obsSec').textContent=e.title; $('#obsSec').style.display='';
+  $('#obsSec').style.display='none';
   $('#obsExp').textContent=e.procedure[curStep];
 }
 
