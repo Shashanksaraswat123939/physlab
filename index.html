@@ -212,19 +212,6 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
   background:linear-gradient(180deg,var(--steel),var(--steel2));border:1px solid var(--steel-line);
   border-radius:6px;padding:5px 10px;font:700 12px system-ui,sans-serif;color:var(--ink);box-shadow:0 8px 20px rgba(0,0,0,.3)}
 /* ---------- right panel ---------- */
-.obs{padding:13px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--surface),var(--accent-bg))}
-.obs .head{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
-.badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);text-transform:uppercase;letter-spacing:.3px}
-.badge.nbc{margin-left:5px;font-size:10.5px;padding:2px 6px;letter-spacing:0}
-.badge.sec{background:var(--chip);color:var(--ink2);font-weight:600;text-transform:none;letter-spacing:0}
-.obs #obsExp{font-size:13.5px;line-height:1.5;color:var(--ink2)}
-.obs .row{display:grid;grid-template-columns:92px 1fr;gap:8px;font-size:13.5px;line-height:1.5;margin:5px 0}
-.obs .row b{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding-top:3px}
-.obs .oblist{margin:0;padding:0;list-style:none}
-.obs .oblist li{position:relative;padding-left:15px;margin:2px 0}
-.obs .oblist li:before{content:"";position:absolute;left:2px;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
-.obs .foot{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;align-items:center}
-.obs .hintq{font-size:12px;color:var(--muted);margin-left:auto;line-height:1.4;text-align:right}
 .side-tabs{display:flex;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
 .side-tabs::-webkit-scrollbar{display:none}
 .side-tabs button{display:block;text-align:center;flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:0;border-radius:0;background:transparent;
@@ -361,7 +348,6 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 }
 @container side (max-width:340px){
   .side-tabs button{font-size:12px;padding:11px 3px}
-  .obs .row{grid-template-columns:1fr;gap:2px}
   .obt table{font-size:11.5px}
   .obt th{font-size:9.5px}
 }
@@ -422,7 +408,7 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 <header>
   <div class="brand">
     <div class="logo" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px"><use href="#i-ruler"/></svg></div>
-    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 4</span></small></div>
+    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 5</span></small></div>
   </div>
   <div class="exp-tag" id="expTag">No experiment selected</div>
   <div class="actions">
@@ -469,11 +455,6 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 
   <!-- ===== RIGHT: procedure, readings, result ===== -->
   <aside class="panel" id="sidePanel" aria-label="Procedure, observations and result">
-    <div class="obs" id="obs" aria-live="polite">
-      <div class="head"><span class="badge" id="obsTest">Ready</span><span class="hintq" id="obsHint"></span>
-        <button id="btnGrip" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-grip"/></svg>Take a reading</button></div>
-      <div id="obsExp">Pick an experiment on the left to begin.</div>
-    </div>
     <div class="side-tabs" role="tablist" aria-label="Side panel">
       <button class="active" data-side="guide" role="tab" aria-selected="true">Procedure</button
       ><button data-side="obt" role="tab" aria-selected="false">Readings <span id="obCount" class="badge nbc" hidden>0</span></button
@@ -1439,6 +1420,7 @@ function pgCtrl(){
     const sol=gravSolve(s.P,s.Q,s.sp.R);
     c.innerHTML=lensBtn()
       +'<span class="ctag">P = '+s.P+' g wt</span><span class="ctag">Q = '+s.Q+' g wt</span>'
+      +'<button id="btnTrial" type="button"'+(sol.err?' disabled':'')+'>'+ICON('grip')+'Take this trial</button>'
       +'<span class="sp"></span>'
       +(sol.err?'<span class="ctag warn">not in equilibrium</span>'
                :'<span class="ctag ok">in equilibrium \u00b7 \u03b8 = '+fx(sol.theta*180/Math.PI,1)+'\u00b0</span>');
@@ -1447,6 +1429,7 @@ function pgCtrl(){
   const d=paperDirs();
   const tool=(k,lab,t)=>'<button data-tool="'+k+'"'+(s.tool===k?' class="on"':'')+' type="button" title="'+t+'">'+lab+'</button>';
   c.innerHTML='<div class="toolbar">'+lensBtn()
+    +'<button id="btnTrial" type="button"'+(d?'':' disabled')+'>'+ICON('grip')+'Take this trial</button>'
     +tool('line','Line','Straight lines. Ends snap to marked points, directions snap to the marked threads and to lines already drawn.')
     +tool('free','Freehand','Draw anything, freely.')
     +tool('erase','Rubber','Click a line to rub it out.')
@@ -1534,33 +1517,11 @@ function renderCtrl(){
 }
 // Whether a reading may be taken at all: the instrument has to be gripping
 // something, or the junction has to be hanging in equilibrium.
-function canTake(){
-  const e=cur(),s=st();
-  if(e.instrument==='gravesand') return !gravSolve(s.P,s.Q,s.sp.R).err;
-  return gripped()&&s.held!=null&&!s.logged;
-}
-// What the panel says about the instrument -- its state, never its reading.
-// Handing over the number here would leave nothing to read off the scale.
-// One short line, or nothing at all. The bench already shows what is happening.
-function renderObsPanel(){
-  const e=cur(),s=st(),grav=(e.instrument==='gravesand'),b=$('#btnGrip');
-  b.hidden=!grav;
-  if(grav){
-    const sol=gravSolve(s.P,s.Q,s.sp.R);
-    b.disabled=!!sol.err;
-    $('#obsHint').textContent=sol.err?'Adjust P or Q until the junction settles.'
-      :'In equilibrium — take the trial, then measure OC on the paper.';
-    return;
-  }
-  $('#obsHint').textContent=gripped()
-    ? (s.held==null?'Read the zero error and write it in.':'Read the scale and fill in row '+(activeRow(s.held)+1)+'.')
-    : (s.held==null?'Pick what to measure, then close the instrument.':'Close the instrument on the '+tLabel(s.held)+'.');
-}
 function renderBench(){
   const bench=document.querySelector('.bench');
   bench.classList.toggle('wide',cur().instrument==='gravesand');
   bench.classList.toggle('paper',cur().instrument==='gravesand'&&st().view==='paper');
-  renderBenchTop(); renderInstr(); renderMag(); renderCtrl(); renderObsPanel();
+  renderBenchTop(); renderInstr(); renderMag(); renderCtrl();
 }
 
 /* =========================================================
@@ -1619,13 +1580,9 @@ function renderGuide(){
 }
 $('#guide').addEventListener('click',e=>{
   const li=e.target.closest('.step'); if(!li) return;
-  curStep=+li.dataset.step; renderGuide(); showStep();
+  curStep=+li.dataset.step; renderGuide();
 });
-function showStep(){
-  const e=cur();
-  $('#obsTest').textContent='Step '+(curStep+1)+' of '+e.procedure.length;
-  $('#obsExp').textContent=e.procedure[curStep];
-}
+
 
 /* =========================================================
    THE OBSERVATION TABLE
@@ -1686,21 +1643,14 @@ const filledRows=key=>(st().rows[key]||[]).filter((_,i)=>isFinite(rowCorr(key,i)
 const tolOf=k=>({oc:0.049,oa:0.049,ob:0.049,msr:0.0049})[k]||0.49;
 function obsHead(){
   const e=cur(),s=st(),I=INSTR[e.instrument];
-  if(!I) return '<p class="lead"><b>Observations.</b> Scale taken for the drawing: <b>1 cm = '+s.scale+' g wt</b>'
-    +' &middot; OA = P / scale &middot; OB = Q / scale. Hang the weights, let the junction settle, mark the directions,'
-    +' complete the parallelogram on the paper and measure the diagonal OC.</p>';
+  if(!I) return '';
   const ze=num(s.zeroTyped), zc=isFinite(ze)?signed(-ze)+' div':'—';
   const hasDepth=(e.targets||[]).some(t=>t.face==='depth');
   const dze=num(s.depthZeroTyped), dzc=isFinite(dze)?signed(-dze)+' div':'—';
   const fld=(id,val,step,unit,ph)=>'<span style="display:inline-flex;align-items:center;gap:6px">'
     +'<input type="number" id="'+id+'" value="'+esc(val)+'" step="'+step+'" placeholder="'+ph+'" style="width:88px;text-align:right">'
     +'<span>'+unit+'</span></span>';
-  return '<p class="lead"><b>Observations.</b> '
-    +(e.instrument==='vernier'
-      ?'One main scale division = <b>'+I.msdMM+' mm</b> &middot; divisions on the vernier scale = <b>'+I.vsd+'</b>'
-      :'Pitch of the screw = <b>'+I.pitchMM+' mm</b> &middot; divisions on the circular scale = <b>'+I.csd+'</b>')
-    +'. Work out the least count, and close the instrument on nothing to find the zero error.</p>'
-    +'<table style="table-layout:auto;margin-bottom:10px"><tbody>'
+  return '<table style="table-layout:auto;margin-bottom:10px"><tbody>'
     +'<tr><th style="width:52%">Least count</th><td>'+fld('inLC',s.lcTyped||'','0.01','mm','')+'<span class="mark" id="mkLC"></span></td></tr>'
     +'<tr><th>Zero error</th><td>'+fld('inZE',s.zeroTyped||'','1','divisions','')+'<span class="mark" id="mkZE"></span></td></tr>'
     +'<tr><th>Zero correction</th><td><b id="zcVal">'+zc+'</b> <span style="color:var(--muted);font-size:11.5px">(= &minus; zero error)</span></td></tr>'
@@ -1853,8 +1803,8 @@ function checkResult(){
 /* =========================================================
    INTERACTION
    ========================================================= */
-function refreshBench(){ renderInstr(); renderMag(); renderCtrl(); renderObsPanel(); }
-function renderAll(){ renderExpList(); renderAppa(); renderBench(); renderGuide(); showStep(); renderObt(); renderCalc(); $('#expTag').textContent='No. '+cur().no+' — '+cur().title; }
+function refreshBench(){ renderInstr(); renderMag(); renderCtrl(); }
+function renderAll(){ renderExpList(); renderAppa(); renderBench(); renderGuide(); renderObt(); renderCalc(); $('#expTag').textContent='No. '+cur().no+' — '+cur().title; }
 let drag=null,raf=0;
 // svg units per screen pixel, taken from the element's own viewBox, so the lens
 // tracks the pointer at whatever size the bench happens to be.
@@ -1974,6 +1924,7 @@ $('#ctrl').addEventListener('click',ev=>{
     if(!confirm('Rub out everything drawn on the paper?')) return;
     s.paper.strokes=[]; s.paper.live=null; renderInstr(); save(); toast('Paper cleared.'); return;
   }
+  if(b.id==='btnTrial'){ takeReading(); return; }
   if(b.id==='btnLens'){ lens.on=!lens.on; if(lens.on) lensHome(); refreshBench(); save();
     toast(lens.on?'Magnifier on — drag its rim over any part of the drawing.':'Magnifier put away.'); return; }
   if(b.dataset.w){ const k=b.dataset.w, d=+b.dataset.d;
@@ -2024,7 +1975,7 @@ function takeReading(){
   renderBench(); renderObt(); renderCalc(); renderExpList(); save();
   const tab=$('.side-tabs button[data-side="obt"]'); if(tab&&!tab.classList.contains('active')) tab.click();
 }
-$('#btnGrip').onclick=takeReading;
+
 $('#obt').addEventListener('input',ev=>{
   const el=ev.target,s=st();
   if(el.id==='inLC'){ s.lcTyped=el.value; markConst(); save(); return; }
