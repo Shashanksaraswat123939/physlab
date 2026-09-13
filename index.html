@@ -940,7 +940,16 @@ function lensHome(){
    where the jaw is; nothing about the reading is decided in advance.
    ========================================================= */
 const V_X0=180, V_U=5.4, V_TAIL=1008;           // main-scale zero, units per mm, end of the beam
+const V_IN=146;                                 // the fixed inside jaw's measuring flank
 const vpx=mm=>V_X0+mm*V_U;
+// The two jaw sets are castings, not blocks. The outside jaws flare from the
+// frame and taper down to a narrow contact face, with the measuring face
+// vertical; the inside jaws are thin blades tapering to a knife edge, and it is
+// their OUTER flanks that measure, because they press apart inside a bore.
+const jawFixed='M96 96 H180 V330 H140 L96 254 Z';
+const jawSlide=px=>'M'+px.toFixed(1)+' 222 V330 H'+(px+40).toFixed(1)+' L'+(px+88).toFixed(1)+' 254 V222 Z';
+const bladeFixed='M'+V_IN+' 96 V14 H'+(V_IN+18)+' L180 96 Z';
+const bladeSlide=px=>'M'+(px+34).toFixed(1)+' 96 V14 H'+(px+16).toFixed(1)+' L'+px.toFixed(1)+' 96 Z';
 function drawVernier(){
   const s=st(),e=cur(),x=s.ticks/10,px=vpx(x),face=curFace();
   let ticks='',nums='';
@@ -951,10 +960,8 @@ function drawVernier(){
   }
   let vt='',vn='';
   for(let k=0;k<=10;k++){ const t=(px+k*0.9*V_U).toFixed(1);
-    vt+='M'+t+' 170V'+(k%5===0?200:190);
+    vt+='M'+t+' 170V'+(k%5===0?202:192);
     if(k%5===0) vn+='<text x="'+t+'" y="218" text-anchor="middle">'+k+'</text>'; }
-  // The depth rod runs out of the tail by exactly the reading. Past the edge of
-  // the drawing it is cut off rather than drawn short, and said to be.
   const rodFull=x*V_U, rodMax=1186-V_TAIL, rodLen=Math.min(rodFull,rodMax), cut=rodFull>rodMax+0.5;
   const rod='<rect x="'+V_TAIL+'" y="122" width="'+Math.max(2,rodLen).toFixed(1)+'" height="22" rx="2"'
     +' fill="var(--steel2)" stroke="var(--steel-line)" stroke-width="2"/>'
@@ -963,21 +970,24 @@ function drawVernier(){
   let spec='',cap='';
   if(s.held==null){
     cap=(face==='depth')?'depth rod home \u2014 read its own zero error'
-       :(face==='inner')?'inner jaws together \u2014 read the zero error'
-       :'jaws closed \u2014 read the zero error';
+       :(face==='inner')?'inside jaws together \u2014 read the zero error'
+       :'outside jaws closed \u2014 read the zero error';
   } else if(face==='outer'){
-    spec='<rect x="'+V_X0+'" y="226" width="'+ow.toFixed(1)+'" height="40" rx="3" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/>';
+    // a sphere is gripped at its equator and hangs below the jaws, as on the
+    // bench; anything else sits square between them
+    spec=(e.id==='v2')
+      ? '<circle cx="'+(V_X0+ow/2).toFixed(1)+'" cy="276" r="'+(ow/2).toFixed(1)+'" fill="var(--steel)" stroke="var(--steel-line)" stroke-width="2"/>'
+        +'<ellipse cx="'+(V_X0+ow*0.32).toFixed(1)+'" cy="'+(276-ow*0.22).toFixed(1)+'" rx="'+(ow*0.13).toFixed(1)+'" ry="'+(ow*0.08).toFixed(1)+'" fill="#fff" opacity=".45"/>'
+      : '<rect x="'+V_X0+'" y="240" width="'+ow.toFixed(1)+'" height="72" rx="3" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/>';
     cap=esc(tLabel(s.held))+' of the '+esc((s.sp.label||'').toLowerCase());
   } else if(face==='inner'){
-    // A section through the bore at the jaws. The wall sits just outside each
-    // measuring face, and the dimension read is the distance between those faces.
-    const R=px+60;
+    const R=px+34;
     spec='<g fill="var(--brass)" stroke="var(--brass2)" stroke-width="2">'
-      +'<rect x="'+(V_X0-32)+'" y="4" width="32" height="54" rx="3"/>'
-      +'<rect x="'+R.toFixed(1)+'" y="4" width="32" height="54" rx="3"/></g>'
+      +'<rect x="'+(V_IN-34)+'" y="2" width="34" height="70" rx="3"/>'
+      +'<rect x="'+R.toFixed(1)+'" y="2" width="34" height="70" rx="3"/></g>'
       +'<g stroke="var(--accent)" stroke-width="2" fill="none">'
-      +'<path d="M'+V_X0+' 30H'+R.toFixed(1)+'"/>'
-      +'<path d="M'+(V_X0+9)+' 24l-9 6 9 6M'+(R-9).toFixed(1)+' 24l9 6-9 6"/></g>';
+      +'<path d="M'+V_IN+' 34H'+R.toFixed(1)+'"/>'
+      +'<path d="M'+(V_IN+9)+' 28l-9 6 9 6M'+(R-9).toFixed(1)+' 28l9 6-9 6"/></g>';
     cap=esc(tLabel(s.held))+' of the '+esc((s.sp.label2||'hollow cylinder').toLowerCase());
   } else {
     const bore=w*V_U;
@@ -985,37 +995,34 @@ function drawVernier(){
       +'<rect x="'+V_TAIL+'" y="70" width="'+(bore+24).toFixed(1)+'" height="28" rx="3"/>'
       +'<rect x="'+V_TAIL+'" y="168" width="'+(bore+24).toFixed(1)+'" height="28" rx="3"/>'
       +'<rect x="'+(V_TAIL+bore).toFixed(1)+'" y="70" width="24" height="126" rx="3"/></g>';
-    cap=esc(tLabel(s.held))+' of the '+esc((s.sp.label2||'bore').toLowerCase());
+    cap=esc(tLabel(s.held))+' of the '+esc((s.sp.label2||'hollow cylinder').toLowerCase());
   }
   const scene=
-     '<g stroke="var(--steel-line)" stroke-width="2">'
-    +'<rect x="180" y="96" width="'+(V_TAIL-180)+'" height="74" fill="var(--scale-face)"/>'
-    +'</g>'+spec+rod
-    +'<g stroke="var(--steel-line)" stroke-width="2">'
-    +'<path d="M180 58 H148 V96 H96 V170 H140 V268 H180 Z" fill="var(--steel)"/>'
-    +'<rect x="180" y="10" width="30" height="48" fill="var(--steel)"/>'
-    +'<rect x="'+px.toFixed(1)+'" y="58" width="60" height="38" fill="var(--steel)"/>'
-    +'<rect x="'+(px+30).toFixed(1)+'" y="10" width="30" height="48" fill="var(--steel)"/>'
-    +'<rect x="'+px.toFixed(1)+'" y="96" width="5" height="74" fill="var(--steel-dark)" stroke="none"/>'
-    +'<rect x="'+px.toFixed(1)+'" y="170" width="180" height="56" rx="3" fill="var(--vern-face)"/>'
-    +'<rect x="'+px.toFixed(1)+'" y="224" width="40" height="44" fill="var(--steel)"/>'
-    +'<rect x="'+(px+126).toFixed(1)+'" y="130" width="48" height="96" rx="7" fill="var(--steel2)"/>'
+     '<rect x="180" y="96" width="'+(V_TAIL-180)+'" height="74" fill="var(--scale-face)" stroke="var(--steel-line)" stroke-width="2"/>'
+    +spec+rod
+    +'<g stroke="var(--steel-line)" stroke-width="2" fill="var(--steel)">'
+    +'<path d="'+jawFixed+'"/><path d="'+bladeFixed+'"/>'
+    +'<path d="'+jawSlide(px)+'"/><path d="'+bladeSlide(px)+'"/>'
+    +'<rect x="'+px.toFixed(1)+'" y="96" width="8" height="74" fill="var(--steel-dark)"/>'
+    +'<rect x="'+px.toFixed(1)+'" y="170" width="196" height="52" rx="3" fill="var(--vern-face)"/>'
+    +'<rect x="'+(px+128).toFixed(1)+'" y="174" width="60" height="44" rx="6" fill="var(--steel2)"/>'
     +'</g>'
-    +'<path d="M'+(px+134).toFixed(1)+' 146v64M'+(px+146).toFixed(1)+' 146v64M'+(px+158).toFixed(1)+' 146v64" stroke="var(--steel-line)" stroke-width="1.6"/>'
+    +'<path d="M'+(px+140).toFixed(1)+' 182v28M'+(px+152).toFixed(1)+' 182v28M'+(px+164).toFixed(1)+' 182v28M'+(px+176).toFixed(1)+' 182v28" stroke="var(--steel-line)" stroke-width="1.6"/>'
     +'<g stroke="var(--scale-tick)" stroke-width="1.7" fill="none"><path d="'+ticks+'"/></g>'
     +'<g font-size="19" fill="var(--scale-ink)">'+nums+'</g>'
     +'<g stroke="var(--vern-ink)" stroke-width="1.9" fill="none"><path d="'+vt+'"/></g>'
     +'<g font-size="17" fill="var(--vern-ink)" font-weight="700">'+vn+'</g>'
     +'<g font-size="15" fill="var(--muted)">'
-    +'<text x="'+(V_X0-34)+'" y="140" text-anchor="end">inner</text>'
-    +'<text x="'+(V_X0-34)+'" y="250" text-anchor="end">outer</text>'
+    +'<text x="'+(V_IN-46)+'" y="40" text-anchor="end">inside</text>'
+    +'<text x="'+(V_IN-46)+'" y="58" text-anchor="end">jaws</text>'
+    +'<text x="122" y="352" text-anchor="middle">outside jaws</text>'
     +'<text x="'+(V_TAIL+6)+'" y="114">depth rod</text></g>';
-  return '<svg viewBox="0 0 1200 340" role="img" aria-label="Vernier calliper with outer jaws, inner jaws and depth rod. Drag the slider; read the magnified scale below.">'
+  return '<svg viewBox="0 0 1200 420" role="img" aria-label="Vernier calliper with inside jaws, outside jaws and a depth rod. Drag the slider; read the magnified scale below.">'
    +'<g class="grab" data-drag="jaw">'+scene+'</g>'+lensLayer(scene)
-   +'<text x="600" y="298" text-anchor="middle" font-size="19" fill="var(--ink)">'+cap+'</text>'
-   +'<text x="600" y="326" text-anchor="middle" font-size="17" fill="var(--muted)">'
-   +(face==='outer'?'drag the slider \u2014 the outer jaws close until they touch'
-    :face==='inner'?'drag the slider \u2014 the inner jaws open until they touch the wall'
+   +'<text x="620" y="384" text-anchor="middle" font-size="19" fill="var(--ink)">'+cap+'</text>'
+   +'<text x="620" y="410" text-anchor="middle" font-size="17" fill="var(--muted)">'
+   +(face==='outer'?'drag the slider \u2014 the outside jaws close until they touch'
+    :face==='inner'?'drag the slider \u2014 the inside jaws open until they touch the wall'
     :'drag the slider \u2014 the rod runs out until it reaches the bottom')+'</text>'
    +'</svg>';
 }
