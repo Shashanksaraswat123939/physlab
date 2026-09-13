@@ -918,6 +918,7 @@ function setTicks(t){
   const s=st(),b=bounds(); t=Math.round(t);
   s.slip=(s.held!=null)&&((b.dir==='min')?(t<b.stop):(t>b.stop));   // the ratchet is slipping
   s.ticks=Math.max(b.lo,Math.min(b.hi,t));
+  if(lens.on&&!lens.manual) lensHome();
 }
 function seat(){ const s=st(); s.ticks=stopTicks(); }
 function closeJaws(){ seat(); }
@@ -935,7 +936,20 @@ function setFace(f){ const s=st();
    scaled about the lens centre and clipped to the circle, so whatever is under
    the glass is the same thing magnified -- not a separate picture that could
    drift out of step with it. Drag the rim to move it. */
-let lens={on:false,x:600,y:180,r:150,k:4.2};
+let lens={on:false,x:600,y:180,r:150,k:2.8,manual:false};
+// The part of each drawing worth magnifying -- the glass is held inside it, so
+// it can never be dragged off into blank space.
+function lensBand(){
+  const e=cur();
+  if(e.instrument==='vernier') return {x0:200,x1:1000,y0:195,y1:330};
+  if(e.instrument==='screw')   return {x0:260,x1:1100,y0:S_AX-50,y1:S_AX+90};
+  return {x0:60,x1:1140,y0:40,y1:550};
+}
+function lensClamp(){
+  const b=lensBand();
+  lens.x=Math.max(b.x0,Math.min(b.x1,lens.x));
+  lens.y=Math.max(b.y0,Math.min(b.y1,lens.y));
+}
 function lensLayer(scene){
   if(!lens.on) return '';
   const L=lens,x=L.x.toFixed(1),y=L.y.toFixed(1);
@@ -953,10 +967,11 @@ function lensLayer(scene){
 // thimble edge, or over the marked junction on the paper.
 function lensHome(){
   const e=cur(),s=st();
-  if(e.instrument==='vernier'){ lens.x=Math.min(1040,vpx(s.ticks/10)+110); lens.y=250; }
-  else if(e.instrument==='screw'){ lens.x=Math.min(1080,530+s.ticks/100*S_U+40); lens.y=S_AX; }
+  if(e.instrument==='vernier'){ lens.x=vpx(s.ticks/10)+70; lens.y=280; }
+  else if(e.instrument==='screw'){ lens.x=S_X0+s.ticks/100*S_U+40; lens.y=S_AX+18; }
   else if(s.view==='paper'){ lens.x=pcx(P_O[0]); lens.y=pcy(P_O[1])-120; }
   else { lens.x=600; lens.y=300; }
+  lensClamp();
 }
 
 /* =========================================================
@@ -1834,8 +1849,9 @@ function dragMove(ev){
   if(!drag) return;
   let light=false;
   if(drag.kind==='lens'){
-    lens.x=Math.max(40,Math.min(drag.W-40,drag.lx+(ev.clientX-drag.x0)*drag.u));
-    lens.y=Math.max(30,Math.min(drag.H-30,drag.ly+(ev.clientY-drag.y0)*drag.u));
+    lens.x=drag.lx+(ev.clientX-drag.x0)*drag.u;
+    lens.y=drag.ly+(ev.clientY-drag.y0)*drag.u;
+    lensClamp(); lens.manual=true;
     light=(cur().instrument==='gravesand');
   } else if(drag.kind==='ruler'){
     const R=st().paper.ruler;
@@ -1943,7 +1959,7 @@ $('#ctrl').addEventListener('click',ev=>{
     s.paper.strokes=[]; s.paper.live=null; renderInstr(); save(); toast('Paper cleared.'); return;
   }
   if(b.id==='btnTrial'){ takeReading(); return; }
-  if(b.id==='btnLens'){ lens.on=!lens.on; if(lens.on) lensHome(); refreshBench(); save();
+  if(b.id==='btnLens'){ lens.on=!lens.on; lens.manual=false; if(lens.on) lensHome(); refreshBench(); save();
     toast(lens.on?'Magnifier on — drag its rim over any part of the drawing.':'Magnifier put away.'); return; }
   if(b.dataset.w){ const k=b.dataset.w, d=+b.dataset.d;
     s[k]=Math.max(20,Math.min(400,s[k]+d)); reJitter(); renderBench(); save(); return; }
