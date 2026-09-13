@@ -88,5 +88,45 @@ if(g.view!=='board'&&g.view!=='paper') bad('a bad view got through: '+g.view);
 if(['line','free','erase'].indexOf(g.tool)<0) bad('a bad tool got through: '+g.tool);
 console.log('   weights, scale, view and tool all filtered to known values');
 
+console.log('6. an unknown you never touched is drawn again; work in progress is not');
+const proto=A.freshState(A.EXP.v1,424242);
+const frozen=JSON.parse(JSON.stringify(proto.sp));
+const payload=(rows,typed)=>JSON.stringify({v:1,mode:'learn',theme:'light',expId:'v1',
+  states:{v1:{seed:424242,sp:frozen,rows:rows,zeroTyped:typed||'',lcTyped:'',depthZeroTyped:''}}});
+const empty={l:[],b:[],h:[],id:[],dp:[]};
+
+const zs=new Set(), dzs=new Set(), dims=new Set();
+for(let i=0;i<300;i++){
+  A.__store['physlab']=payload(empty);
+  Object.keys(A.S).forEach(k=>delete A.S[k]);
+  A.load();
+  const v=A.ensure('v1');
+  zs.add(v.sp.zeroTicks); dzs.add(v.sp.depthZeroTicks); dims.add(v.sp.dims.l);
+}
+if(zs.size<5) bad('an untouched experiment gave only '+zs.size+' distinct zero errors over 300 visits');
+if(dzs.size<5) bad('the depth rod zero was drawn only '+dzs.size+' ways over 300 visits');
+if(dims.size<40) bad('the specimen itself was redrawn only '+dims.size+' ways');
+console.log('   never started: '+zs.size+' distinct zero errors, '+dzs.size+' depth-rod zeros, '+dims.size+' specimens in 300 visits');
+
+let same=0;
+for(let i=0;i<50;i++){
+  A.__store['physlab']=payload({l:[{t:frozen.dims.l+frozen.zeroTicks,msr:'3.40',vsr:'5'}],b:[],h:[],id:[],dp:[]},'2');
+  Object.keys(A.S).forEach(k=>delete A.S[k]);
+  A.load();
+  const v=A.ensure('v1');
+  if(JSON.stringify(v.sp)===JSON.stringify(frozen)) same++;
+  if(v.rows.l.length!==1) bad('a recorded reading was lost on reload');
+  if(v.zeroTyped!=='2') bad('the typed zero error was lost on reload');
+}
+if(same!==50) bad('an experiment with a reading in it was redrawn '+(50-same)+' times out of 50');
+console.log('   started: the specimen, the reading and the typed zero error came back all 50 times');
+
+A.__store['physlab']=payload(empty,'-3');
+Object.keys(A.S).forEach(k=>delete A.S[k]);
+A.load();
+if(JSON.stringify(A.ensure('v1').sp)!==JSON.stringify(frozen))
+  bad('writing the zero error down was not enough to hold on to the specimen');
+console.log('   writing the zero error down alone is enough to hold the specimen');
+
 console.log(fail?('\n'+fail+' PROBLEMS'):'\nall clean');
 process.exit(fail?1:0);

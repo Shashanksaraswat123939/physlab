@@ -32,6 +32,16 @@ The screw gauge is turned, not slid — a quarter of a division per pixel, one f
 turn per 400 px, so the drum moves at about the speed of the pointer instead of
 flying past. Past contact the ratchet slips rather than letting you force it on.
 
+## The unknown is drawn fresh
+
+Every experiment draws its own specimen and its own zero error, and an experiment
+you have not started is drawn **again on every visit** — otherwise the unknown
+would be frozen in the saved state and there would be nothing left to find the
+second time you opened it.
+
+Work in progress is never touched: one reading written down, or one constant
+filled in, and that specimen and everything on it comes back exactly.
+
 ## How it works
 
 Nothing about a reading is decided in advance. Each experiment draws a fresh
