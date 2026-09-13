@@ -167,7 +167,7 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 @container bench (max-width:520px){.bench-main{--apw:.62}}
 @container bench (max-width:440px){.bench-main{--apw:.54}}
 @media (max-height:860px){.bench{--aph:.86}}
-@media (max-height:760px){.bench{--aph:.74}}
+@media (max-height:760px){.bench{--aph:.68}}
 @media (max-height:680px){.bench{--aph:.58}}
 @media (max-height:620px){.bench{--aph:.50}}
 @media (max-height:560px){.bench{--aph:.42}}
@@ -180,7 +180,10 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
    it takes no pointer events, so it can never swallow a drag -- only its cross
    is clickable. The pill brings it back, so closing it is not a one-way door. */
 .wall-frame{position:absolute;right:16px;top:104px;
-  width:calc(min(20cqi,232px)*var(--aph));margin:0;pointer-events:none;
+  /* as wide as the clear wall actually is: the instrument is 860px*ap wide and
+     its drawing fills 4/5 of that, which leaves (bench/2 - 274px) beside it.
+     300px keeps a margin on that, and 340px stops the photo upscaling. */
+  width:calc(clamp(0px,50cqi - 300px,340px)*var(--aph));margin:0;pointer-events:none;
   padding:min(1.1cqi,12px);border-radius:6px;
   background:linear-gradient(160deg,#8a6a43,#6b5133);
   box-shadow:0 22px 46px rgba(16,24,40,.30),inset 0 0 0 1px rgba(255,255,255,.18)}
