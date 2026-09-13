@@ -13,6 +13,25 @@ apparatus, formula, procedure, precautions, sources of error and viva:
 | 4 | Screw gauge — 2 | thickness of a sheet, by measuring a stack |
 | 5 | Parallelogram of vectors | an unknown weight, on Gravesand's apparatus |
 
+## The calliper has three measuring faces
+
+All three are modelled, and they do not behave alike:
+
+- **outer jaws** — close on to a thing and stop when they touch it, so the specimen
+  sets a *lower* bound on the reading
+- **inner jaws** — open into a bore and stop against its wall: an *upper* bound
+- **depth rod** — runs out of the tail and stops on the bottom of a hole, with a
+  **zero error of its own**, which is why the record asks for the height's zero
+  error to be found separately
+
+The record's tables are still length, breadth and height. A hollow cylinder sits on
+the bench so that the other two faces have something to measure; those two tables
+are marked as practice and stay out of the result.
+
+The screw gauge is turned, not slid — a quarter of a division per pixel, one full
+turn per 400 px, so the drum moves at about the speed of the pointer instead of
+flying past. Past contact the ratchet slips rather than letting you force it on.
+
 ## How it works
 
 Nothing about a reading is decided in advance. Each experiment draws a fresh

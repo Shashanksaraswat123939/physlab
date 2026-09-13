@@ -424,7 +424,7 @@ main{display:grid;grid-template-columns:var(--colL) 14px 1fr 14px var(--colR);he
 <header>
   <div class="brand">
     <div class="logo" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px"><use href="#i-ruler"/></svg></div>
-    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 1</span></small></div>
+    <div><h1 style="font:inherit">PhysLab</h1><small>Measurement practicals &middot; CBSE Class XI &middot; <span class="ver">build 2</span></small></div>
   </div>
   <div class="exp-tag" id="expTag">No experiment selected</div>
   <div class="actions">
@@ -616,13 +616,23 @@ const EXPERIMENTS=[
     'Take the mean of each dimension, apply the zero correction, and calculate the volume.'
   ],
   precautions:VERNIER_PREC, errors:VERNIER_ERR, viva:VERNIER_VIVA,
-  targets:[{key:'l',label:'length',sym:'l'},{key:'b',label:'breadth',sym:'b'},{key:'h',label:'height',sym:'h'}],
+  targets:[{key:'l',label:'length',sym:'l',face:'outer'},
+           {key:'b',label:'breadth',sym:'b',face:'outer'},
+           {key:'h',label:'height',sym:'h',face:'outer'},
+           // Not in the record's table, but the instrument has three measuring
+           // faces and only one of them is exercised by a solid block. The lab
+           // keeps a hollow cylinder on the bench for the other two.
+           {key:'id',label:'internal diameter',sym:'d',face:'inner',practice:true},
+           {key:'dp',label:'internal depth',sym:'h',face:'depth',practice:true}],
   // A block a school lab would actually hand you: a few cm each way, each
   // dimension a whole number of least counts.
+  // The depth rod carries its own zero error -- the record says so in its own
+  // precautions, and it is a separate scale face, so it is found separately.
   make(rng){ return {
-    zeroTicks:randInt(rng,-3,3),
-    dims:{l:randInt(rng,300,560),b:randInt(rng,190,299),h:randInt(rng,95,189)},
-    label:'Rectangular metal block'
+    zeroTicks:randInt(rng,-3,3), depthZeroTicks:randInt(rng,-3,3),
+    dims:{l:randInt(rng,300,560),b:randInt(rng,190,299),h:randInt(rng,95,189),
+          id:randInt(rng,140,260),dp:randInt(rng,150,310)},
+    label:'Rectangular metal block', label2:'Hollow cylinder'
   };},
   sizeOf(sp,k){ return sp.dims[k]; },
   result(sp,m){                       // m: corrected mean of each target, in cm
@@ -652,7 +662,7 @@ const EXPERIMENTS=[
     'Apply the zero correction, halve the diameter to get the radius, and calculate the volume.'
   ],
   precautions:VERNIER_PREC, errors:VERNIER_ERR, viva:VERNIER_VIVA,
-  targets:[{key:'d',label:'diameter',sym:'d'}],
+  targets:[{key:'d',label:'diameter',sym:'d',face:'outer'}],
   make(rng){ return { zeroTicks:randInt(rng,-3,3), dims:{d:randInt(rng,180,300)}, label:'Steel sphere' };},
   sizeOf(sp,k){ return sp.dims[k]; },
   result(sp,m){
@@ -813,8 +823,8 @@ let mode='learn', theme='light', expId='v1';
 const S={};
 function freshState(e,seed){
   const rng=mulberry(seed>>>0);
-  const st={seed:seed>>>0, sp:e.make(rng), zeroTyped:'', rows:{}, ticks:0, held:null,
-            jit:[-1,0,0,0,1][Math.floor(rng()*5)], tries:0, checked:null, logged:false};
+  const st={seed:seed>>>0, sp:e.make(rng), zeroTyped:'', depthZeroTyped:'', rows:{}, ticks:0, held:null,
+            face:'outer', jit:[-1,0,0,0,1][Math.floor(rng()*5)], tries:0, checked:null, logged:false};
   (e.targets||[{key:'main'}]).forEach(t=>st.rows[t.key]=[]);
   st.active=(e.targets?e.targets[0].key:'main');
   if(e.instrument==='gravesand'){
@@ -826,17 +836,43 @@ function freshState(e,seed){
   return st;
 }
 function ensure(id){ if(!S[id]) S[id]=freshState(EXP[id],(Math.random()*4294967296)>>>0); return S[id]; }
+// A specimen saved by an older build can be missing a dimension this one measures.
+// Carrying it forward would put NaN through every reading, so it is refused.
+function spOK(e,sp){
+  if(!sp||typeof sp!=='object') return false;
+  if(e.instrument==='gravesand') return typeof sp.R==='number'&&isFinite(sp.R);
+  if(!sp.dims||typeof sp.zeroTicks!=='number') return false;
+  if((e.targets||[]).some(t=>typeof sp.dims[t.key]!=='number'||!isFinite(sp.dims[t.key]))) return false;
+  if((e.targets||[]).some(t=>t.face==='depth')&&typeof sp.depthZeroTicks!=='number') return false;
+  if(e.id==='s1'&&typeof sp.lengthCM!=='number') return false;
+  if(e.id==='s2'&&typeof sp.sheets!=='number') return false;
+  return true;
+}
 const cur=()=>EXP[expId], st=()=>ensure(expId);
 const lcMM=e=>INSTR[e.instrument]?INSTR[e.instrument].lcMM:0;
 
-// Where the jaws come to rest: on the object if something is between them, on the
-// zero error if they are empty. Everything downstream reads this one function.
-function stopTicks(){
-  const e=cur(),s=st();
-  if(e.instrument==='gravesand') return 0;
-  if(s.held==null) return s.sp.zeroTicks;
-  return e.sizeOf(s.sp,s.held)+s.sp.zeroTicks+s.jit;
+// A vernier calliper has three measuring faces and they do not work the same way.
+// The outer jaws CLOSE on to a thing and stop when they touch it. The inner jaws
+// OPEN into a bore and stop against its wall. The depth rod RUNS OUT of the tail
+// and stops on the bottom of the hole. So for the outer jaws the specimen sets a
+// lower bound on the reading, and for the other two it sets an upper one.
+const faceOf=k=>{ const t=(cur().targets||[]).find(x=>x.key===k); return (t&&t.face)||'outer'; };
+const curFace=()=>(cur().instrument==='vernier')?(st().face||'outer'):'outer';
+// The depth rod is a separate face with its own zero, which is why the record
+// asks for the height's zero error to be found separately.
+const zeroFor=f=>{ const sp=st().sp;
+  return (f==='depth'&&typeof sp.depthZeroTicks==='number')?sp.depthZeroTicks:sp.zeroTicks; };
+function bounds(){
+  const e=cur(),s=st(),hi=maxTicks();
+  if(e.instrument==='gravesand') return {lo:0,hi:0,stop:0,dir:'min'};
+  const home=zeroFor(curFace());
+  if(s.held==null) return {lo:home,hi:hi,stop:home,dir:'min'};
+  const at=e.sizeOf(s.sp,s.held)+zeroFor(faceOf(s.held))+s.jit;
+  return (faceOf(s.held)==='outer')
+    ? {lo:at,hi:hi,stop:at,dir:'min'}
+    : {lo:home,hi:at,stop:at,dir:'max'};
 }
+function stopTicks(){ return bounds().stop; }
 const gripped=()=>cur().instrument!=='gravesand'&&st().ticks===stopTicks();
 const maxTicks=()=>Math.round(INSTR[cur().instrument].maxMM/INSTR[cur().instrument].lcMM);
 // A fresh grip is never quite the last one: pressure and tilt move it by up to one
@@ -845,15 +881,23 @@ function reJitter(){ const s=st(); s.jit=[-1,0,0,0,1][Math.floor(Math.random()*5
 // The jitter has to be redrawn BEFORE the jaw is clamped, or the clamp would use
 // the old stop and the jaws would end up a hair off the object.
 function setTicks(t){
-  const s=st(),hi=maxTicks(),lo0=stopTicks();
-  t=Math.round(t);
-  if(t<=lo0&&s.ticks>lo0) reJitter();          // closing on to the object: a fresh grip
-  const lo=stopTicks();
-  s.ticks=Math.max(lo,Math.min(hi,t));
-  if(s.ticks>lo) s.logged=false;               // opened again, so the next grip is a new trial
+  const s=st(); t=Math.round(t);
+  let b=bounds();
+  // Coming on to the stop from the free side is a fresh contact, so the jitter is
+  // redrawn first -- before the clamp, or the clamp would use the old stop.
+  const arriving=(b.dir==='min')?(t<=b.stop&&s.ticks>b.stop):(t>=b.stop&&s.ticks<b.stop);
+  if(arriving){ reJitter(); b=bounds(); }
+  s.slip=(s.held!=null)&&((b.dir==='min')?(t<b.stop):(t>b.stop));   // the ratchet is slipping
+  s.ticks=Math.max(b.lo,Math.min(b.hi,t));
+  if(s.ticks!==b.stop) s.logged=false;         // moved off the stop: the next contact is a new trial
 }
-function closeJaws(){ const s=st(); reJitter(); s.ticks=stopTicks(); s.logged=false; }
-function setHeld(k){ const s=st(); s.held=k; reJitter(); s.ticks=stopTicks(); s.logged=false; }
+function seat(){ const s=st(); reJitter(); s.ticks=stopTicks(); s.logged=false; }
+function closeJaws(){ seat(); }
+function setHeld(k){ const s=st(); s.held=k; if(k!=null) s.face=faceOf(k); seat(); }
+function setFace(f){ const s=st(); s.face=f;
+  if(s.held!=null&&faceOf(s.held)!==f) s.held=null;
+  seat();
+}
 
 
 /* ---- the magnifying glass ----
@@ -893,10 +937,10 @@ function lensHome(){
    the coincidence you hunt for here. The ticks are where they are because of
    where the jaw is; nothing about the reading is decided in advance.
    ========================================================= */
-const V_X0=180, V_U=5.4;                        // svg x of the main-scale zero, and units per mm
+const V_X0=180, V_U=5.4, V_TAIL=1008;           // main-scale zero, units per mm, end of the beam
 const vpx=mm=>V_X0+mm*V_U;
 function drawVernier(){
-  const s=st(),e=cur(),x=s.ticks/10,px=vpx(x);
+  const s=st(),e=cur(),x=s.ticks/10,px=vpx(x),face=curFace();
   let ticks='',nums='';
   for(let i=0;i<=150;i++){
     const t=vpx(i).toFixed(1), big=(i%10===0), mid=(i%5===0);
@@ -907,31 +951,70 @@ function drawVernier(){
   for(let k=0;k<=10;k++){ const t=(px+k*0.9*V_U).toFixed(1);
     vt+='M'+t+' 170V'+(k%5===0?200:190);
     if(k%5===0) vn+='<text x="'+t+'" y="218" text-anchor="middle">'+k+'</text>'; }
-  const w=(s.held!=null?e.sizeOf(s.sp,s.held)/10:0);
-  const ow=(w*V_U);
-  const obj=w>0
-   ?'<rect x="'+V_X0+'" y="226" width="'+ow.toFixed(1)+'" height="40" rx="3" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/>'
-    +'<text x="'+(V_X0+ow/2).toFixed(1)+'" y="292" text-anchor="middle" font-size="19" fill="var(--ink)">'+esc(tLabel(s.held))+' of the block</text>'
-   :'<text x="300" y="292" text-anchor="middle" font-size="19" fill="var(--muted)">nothing between the jaws</text>';
+  // The depth rod runs out of the tail by exactly the reading. Past the edge of
+  // the drawing it is cut off rather than drawn short, and said to be.
+  const rodFull=x*V_U, rodMax=1186-V_TAIL, rodLen=Math.min(rodFull,rodMax), cut=rodFull>rodMax+0.5;
+  const rod='<rect x="'+V_TAIL+'" y="122" width="'+Math.max(2,rodLen).toFixed(1)+'" height="22" rx="2"'
+    +' fill="var(--steel2)" stroke="var(--steel-line)" stroke-width="2"/>'
+    +(cut?'<path d="M1186 118l10 7-10 7 10 7-10 7" stroke="var(--steel-line)" stroke-width="2" fill="none"/>':'');
+  const w=(s.held!=null?e.sizeOf(s.sp,s.held)/10:0), ow=w*V_U;
+  let spec='',cap='';
+  if(s.held==null){
+    cap=(face==='depth')?'depth rod home \u2014 read its own zero error'
+       :(face==='inner')?'inner jaws together \u2014 read the zero error'
+       :'jaws closed \u2014 read the zero error';
+  } else if(face==='outer'){
+    spec='<rect x="'+V_X0+'" y="226" width="'+ow.toFixed(1)+'" height="40" rx="3" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/>';
+    cap=esc(tLabel(s.held))+' of the '+esc((s.sp.label||'').toLowerCase());
+  } else if(face==='inner'){
+    // A section through the bore at the jaws. The wall sits just outside each
+    // measuring face, and the dimension read is the distance between those faces.
+    const R=px+60;
+    spec='<g fill="var(--brass)" stroke="var(--brass2)" stroke-width="2">'
+      +'<rect x="'+(V_X0-32)+'" y="4" width="32" height="54" rx="3"/>'
+      +'<rect x="'+R.toFixed(1)+'" y="4" width="32" height="54" rx="3"/></g>'
+      +'<g stroke="var(--accent)" stroke-width="2" fill="none">'
+      +'<path d="M'+V_X0+' 30H'+R.toFixed(1)+'"/>'
+      +'<path d="M'+(V_X0+9)+' 24l-9 6 9 6M'+(R-9).toFixed(1)+' 24l9 6-9 6"/></g>';
+    cap=esc(tLabel(s.held))+' of the '+esc((s.sp.label2||'hollow cylinder').toLowerCase());
+  } else {
+    const bore=w*V_U;
+    spec='<g fill="var(--brass)" stroke="var(--brass2)" stroke-width="2">'
+      +'<rect x="'+V_TAIL+'" y="70" width="'+(bore+24).toFixed(1)+'" height="28" rx="3"/>'
+      +'<rect x="'+V_TAIL+'" y="168" width="'+(bore+24).toFixed(1)+'" height="28" rx="3"/>'
+      +'<rect x="'+(V_TAIL+bore).toFixed(1)+'" y="70" width="24" height="126" rx="3"/></g>';
+    cap=esc(tLabel(s.held))+' of the '+esc((s.sp.label2||'bore').toLowerCase());
+  }
   const scene=
      '<g stroke="var(--steel-line)" stroke-width="2">'
-    +'<rect x="180" y="96" width="1000" height="74" fill="var(--scale-face)"/>'
-    +'<path d="M180 44 H140 V96 H96 V170 H140 V268 H180 Z" fill="var(--steel)"/>'
-    +'<rect x="'+px.toFixed(1)+'" y="44" width="40" height="52" fill="var(--steel)"/>'
+    +'<rect x="180" y="96" width="'+(V_TAIL-180)+'" height="74" fill="var(--scale-face)"/>'
+    +'</g>'+spec+rod
+    +'<g stroke="var(--steel-line)" stroke-width="2">'
+    +'<path d="M180 58 H148 V96 H96 V170 H140 V268 H180 Z" fill="var(--steel)"/>'
+    +'<rect x="180" y="10" width="30" height="48" fill="var(--steel)"/>'
+    +'<rect x="'+px.toFixed(1)+'" y="58" width="60" height="38" fill="var(--steel)"/>'
+    +'<rect x="'+(px+30).toFixed(1)+'" y="10" width="30" height="48" fill="var(--steel)"/>'
     +'<rect x="'+px.toFixed(1)+'" y="96" width="5" height="74" fill="var(--steel-dark)" stroke="none"/>'
     +'<rect x="'+px.toFixed(1)+'" y="170" width="180" height="56" rx="3" fill="var(--vern-face)"/>'
     +'<rect x="'+px.toFixed(1)+'" y="224" width="40" height="44" fill="var(--steel)"/>'
     +'<rect x="'+(px+126).toFixed(1)+'" y="130" width="48" height="96" rx="7" fill="var(--steel2)"/>'
     +'</g>'
     +'<path d="M'+(px+134).toFixed(1)+' 146v64M'+(px+146).toFixed(1)+' 146v64M'+(px+158).toFixed(1)+' 146v64" stroke="var(--steel-line)" stroke-width="1.6"/>'
-    +obj
     +'<g stroke="var(--scale-tick)" stroke-width="1.7" fill="none"><path d="'+ticks+'"/></g>'
     +'<g font-size="19" fill="var(--scale-ink)">'+nums+'</g>'
     +'<g stroke="var(--vern-ink)" stroke-width="1.9" fill="none"><path d="'+vt+'"/></g>'
-    +'<g font-size="17" fill="var(--vern-ink)" font-weight="700">'+vn+'</g>';
-  return '<svg viewBox="0 0 1200 340" role="img" aria-label="Vernier calliper. Drag the sliding jaw; read the magnified scale below.">'
+    +'<g font-size="17" fill="var(--vern-ink)" font-weight="700">'+vn+'</g>'
+    +'<g font-size="15" fill="var(--muted)">'
+    +'<text x="'+(V_X0-34)+'" y="140" text-anchor="end">inner</text>'
+    +'<text x="'+(V_X0-34)+'" y="250" text-anchor="end">outer</text>'
+    +'<text x="'+(V_TAIL+6)+'" y="114">depth rod</text></g>';
+  return '<svg viewBox="0 0 1200 340" role="img" aria-label="Vernier calliper with outer jaws, inner jaws and depth rod. Drag the slider; read the magnified scale below.">'
    +'<g class="grab" data-drag="jaw">'+scene+'</g>'+lensLayer(scene)
-   +'<text x="600" y="330" text-anchor="middle" font-size="18" fill="var(--muted)">drag the sliding jaw \u2014 it stops when it grips</text>'
+   +'<text x="600" y="298" text-anchor="middle" font-size="19" fill="var(--ink)">'+cap+'</text>'
+   +'<text x="600" y="326" text-anchor="middle" font-size="17" fill="var(--muted)">'
+   +(face==='outer'?'drag the slider \u2014 the outer jaws close until they touch'
+    :face==='inner'?'drag the slider \u2014 the inner jaws open until they touch the wall'
+    :'drag the slider \u2014 the rod runs out until it reaches the bottom')+'</text>'
    +'</svg>';
 }
 // The magnified window: 12 mm of main scale, which always contains at least one
@@ -983,11 +1066,21 @@ function drawScrew(){
     if(i%5===0) nums+='<text x="'+t+'" y="110" text-anchor="middle">'+i+'</text>';
   }
   const csr=INSTR.screw.read(s.ticks).csr;
-  let drum='';
-  for(let d=-5;d<=5;d++){
-    const y=(S_AX+d*11).toFixed(1);
-    drum+='M'+(536+adv).toFixed(1)+' '+y+'h'+(((((csr+d)%5)+5)%5===0)?40:22);
+  let drum='',dnum='';
+  for(let d=-4;d<=4;d++){
+    const y=(S_AX+d*11).toFixed(1), five=((((csr+d)%5)+5)%5===0);
+    drum+='M'+(536+adv).toFixed(1)+' '+y+'h'+(five?40:22);
+    if(((((csr+d)%10)+10)%10)===0&&d!==0)
+      dnum+='<text x="'+(584+adv).toFixed(1)+'" y="'+(+y+5)+'" font-size="12" fill="var(--scale-ink)">'
+        +String((((csr+d)%100)+100)%100).padStart(2,'0')+'</text>';
   }
+  // The ratchet does not let you force the spindle on: past contact it slips.
+  const slip=(s.slip&&gripped())
+    ?'<g stroke="var(--warn)" stroke-width="3" fill="none" stroke-linecap="round">'
+     +'<path d="M'+(800+adv).toFixed(1)+' 96a34 34 0 0 1 26 14"/>'
+     +'<path d="M'+(800+adv).toFixed(1)+' 194a34 34 0 0 0 26 -14"/></g>'
+     +'<text x="'+(770+adv).toFixed(1)+'" y="84" text-anchor="middle" font-size="17" font-weight="700" fill="var(--warn)">click</text>'
+    :'';
   const w=(s.held!=null?e.sizeOf(s.sp,s.held)/100:0), ow=Math.max(3,w*S_U);
   const obj=w>0?'<rect x="'+S_ANV+'" y="'+(S_AX-17)+'" width="'+ow.toFixed(1)+'" height="34" rx="3" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/>'
     +'<text x="'+(S_ANV+60)+'" y="'+(S_AX+66)+'" text-anchor="middle" font-size="19" fill="var(--ink)">'+esc(s.sp.label)+'</text>':
@@ -1007,11 +1100,12 @@ function drawScrew(){
     +'<rect x="'+(530+adv).toFixed(1)+'" y="96" width="46" height="98" rx="5" fill="var(--brass2)" opacity=".4" stroke="none"/>'
     +'<rect x="'+(730+adv).toFixed(1)+'" y="112" width="58" height="66" rx="12" fill="var(--steel2)"/>'
     +'</g>'
-    +'<g stroke="var(--scale-ink)" stroke-width="1.8" fill="none" opacity=".85"><path d="'+drum+'"/></g>'
-    +'<path d="M'+(744+adv).toFixed(1)+' 126v38M'+(758+adv).toFixed(1)+' 126v38M'+(772+adv).toFixed(1)+' 126v38" stroke="var(--steel-line)" stroke-width="1.7"/>';
+    +'<g stroke="var(--scale-ink)" stroke-width="1.8" fill="none" opacity=".85"><path d="'+drum+'"/></g>'+dnum
+    +'<path d="M'+(744+adv).toFixed(1)+' 126v38M'+(758+adv).toFixed(1)+' 126v38M'+(772+adv).toFixed(1)+' 126v38" stroke="var(--steel-line)" stroke-width="1.7"/>'+slip;
   return '<svg viewBox="0 0 1200 340" role="img" aria-label="Screw gauge. Drag the thimble; read the magnified sleeve and thimble below.">'
    +'<g class="grab" data-drag="thimble">'+scene+'</g>'+lensLayer(scene)
-   +'<text x="600" y="330" text-anchor="middle" font-size="18" fill="var(--muted)">drag the thimble \u2014 turning it one way only avoids backlash</text>'
+   +'<text x="600" y="330" text-anchor="middle" font-size="18" fill="var(--muted)">'
+   +'drag the thimble to turn it \u2014 down closes, up opens; hold Shift as you start for a fast turn</text>'
    +'</svg>';
 }
 // Magnified: the sleeve on the left, where you count the whole millimetres the
@@ -1372,11 +1466,25 @@ const SPEC_ICON={
 function renderBenchTop(){
   const e=cur(),s=st(),el=$('#benchTop');
   if(e.instrument==='gravesand'){ el.innerHTML=pgBenchTop(); return; }
-  const card=(key,name,note)=>'<button class="spec-card pick'+(s.held===key?' on':'')+'" data-held="'+(key===null?'':key)+'" type="button">'
-    +(key===null?'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 10v28M33 10v28" stroke="var(--steel-line)" stroke-width="4" stroke-linecap="round"/></svg>':SPEC_ICON[e.id])
-    +'<div><b>'+esc(name)+'</b><small>'+esc(note)+'</small></div></button>';
-  el.innerHTML=card(null,'Jaws closed','find the zero error')
-    +(e.targets||[]).map(t=>card(t.key,t.label.charAt(0).toUpperCase()+t.label.slice(1),s.sp.label)).join('');
+  const face=curFace(), vern=(e.instrument==='vernier');
+  const card=(key,name,note,icon)=>'<button class="spec-card pick'+(s.held===key?' on':'')+'" data-held="'+(key===null?'':key)+'" type="button">'
+    +(icon||SPEC_ICON[e.id])
+    +'<div style="min-width:0"><b>'+esc(name)+'</b><small>'+esc(note)+'</small></div></button>';
+  const shut='<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 10v28M33 10v28" stroke="var(--steel-line)" stroke-width="4" stroke-linecap="round"/></svg>';
+  const bore='<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="12" width="34" height="24" rx="3" fill="var(--brass)" stroke="var(--brass2)" stroke-width="2"/><rect x="15" y="12" width="18" height="24" fill="var(--bench-air)" stroke="var(--brass2)" stroke-width="1.5"/></svg>';
+  // Which of the calliper's three faces you are using decides what you can measure
+  // with it, so the face comes first and the specimens follow from it.
+  const faces=!vern?'':'<div class="segs" id="faceSw" role="group" aria-label="Measuring face" style="align-self:center">'
+    +[['outer','Outer jaws'],['inner','Inner jaws'],['depth','Depth rod']]
+      .map(f=>'<button data-face="'+f[0]+'"'+(face===f[0]?' class="on"':'')+' type="button">'+f[1]+'</button>').join('')
+    +'</div>';
+  const shown=(e.targets||[]).filter(t=>!vern||(t.face||'outer')===face);
+  el.innerHTML=faces
+    +card(null,vern&&face==='depth'?'Rod home':'Jaws closed',
+          'find the zero error'+(vern&&face==='depth'?' of the rod':''),shut)
+    +shown.map(t=>card(t.key,t.label.charAt(0).toUpperCase()+t.label.slice(1),
+          (t.face==='outer'||!vern)?s.sp.label:(s.sp.label2||''),
+          (t.face&&t.face!=='outer')?bore:null)).join('');
 }
 function renderInstr(){
   const e=cur(),s=st();
@@ -1398,11 +1506,18 @@ const lensBtn=()=>'<button id="btnLens" type="button"'+(lens.on?' class="primary
 function renderCtrl(){
   const e=cur(),s=st(),c=$('#ctrl');
   if(e.instrument==='gravesand'){ pgCtrl(); return; }
-  const ok=gripped();
-  c.innerHTML=lensBtn()+'<button id="btnClose" type="button">'+ICON('grip')+(e.instrument==='vernier'?'Close the jaws':'Turn the ratchet home')+'</button>'
-    +'<button id="btnOpen" type="button">Open it again</button>'
+  const ok=gripped(),face=curFace(),vern=(e.instrument==='vernier');
+  const seatLbl=!vern?'Turn the ratchet home'
+    :face==='inner'?'Open on to the wall':face==='depth'?'Run the rod down':'Close the jaws';
+  const backLbl=!vern?'Back it off'
+    :face==='inner'?'Bring them together':face==='depth'?'Draw the rod back':'Open them again';
+  const held=(s.held==null)
+    ?(face==='depth'?'rod home — read its own zero error':'closed — read the zero error')
+    :('on the '+esc(tLabel(s.held)));
+  c.innerHTML=lensBtn()+'<button id="btnClose" type="button">'+ICON('grip')+seatLbl+'</button>'
+    +'<button id="btnOpen" type="button">'+backLbl+'</button>'
     +'<span class="sp"></span>'
-    +'<span class="ctag '+(ok?'ok':'warn')+'">'+(ok?(s.held==null?'jaws closed — read the zero error':'gripping the '+esc(tLabel(s.held))):'not gripping')+'</span>';
+    +'<span class="ctag '+(ok?'ok':'warn')+'">'+(ok?held:'not touching')+'</span>';
 }
 // Whether a reading may be taken at all: the instrument has to be gripping
 // something, or the junction has to be hanging in equilibrium.
@@ -1423,9 +1538,15 @@ function renderObsPanel(){
         +'<li>The three directions are marked on the paper.</li>'
         +'<li>Draw OA and OB to scale, complete the parallelogram, then measure OC.</li></ul>';
   } else if(!gripped()){
-    box.innerHTML='<span style="color:var(--warn)">Not gripping — close the instrument before reading it.</span>';
+    const f=curFace();
+    box.innerHTML='<span style="color:var(--warn)">Not touching yet — '
+      +(f==='inner'?'open the inner jaws until they meet the wall.'
+       :f==='depth'?'run the rod down until it reaches the bottom.'
+       :'close the instrument on it.')+'</span>';
   } else if(s.held==null){
-    box.innerHTML='<ul class="oblist"><li>Closed on nothing.</li><li>Find the division that coincides: that is the zero error.</li>'
+    box.innerHTML='<ul class="oblist"><li>'+(curFace()==='depth'?'The rod is home against the tail.':'Closed on nothing.')
+      +'</li><li>Find the division that coincides: that is the zero error'
+      +(curFace()==='depth'?' of the depth rod, which is its own.':'.')+'</li>'
       +'<li>Write it in the Readings tab.</li></ul>';
   } else if(s.logged){
     box.innerHTML='<ul class="oblist"><li>This reading is already in the table.</li>'
@@ -1453,7 +1574,11 @@ function renderBench(){
    LEFT PANEL
    ========================================================= */
 const nRows=e=>e.rows||5;
-function rowsDone(e,s){ let n=0,t=0; (e.targets||[{key:'main'}]).forEach(k=>{ t+=nRows(e); n+=s.rows[k.key].length; }); return {n,t}; }
+// The hollow cylinder is there so the inner jaws and the depth rod have something
+// to do. It is not in the class record, so it stays out of the result, the
+// progress count and the print.
+const recTargets=e=>(e.targets||[]).filter(t=>!t.practice);
+function rowsDone(e,s){ let n=0,t=0; recTargets(e).forEach(k=>{ t+=nRows(e); n+=s.rows[k.key].length; }); return {n,t}; }
 function renderExpList(){
   $('#expList').innerHTML=EXPERIMENTS.map(e=>{
     const s=S[e.id], got=s?Object.values(s.rows).reduce((a,r)=>a+r.length,0):0;
@@ -1556,6 +1681,8 @@ function obsHead(){
     +' &middot; OA = P / scale &middot; OB = Q / scale. Hang the weights, let the junction settle, mark the directions,'
     +' complete the parallelogram on the paper and measure the diagonal OC.</p>';
   const ze=num(s.zeroTyped), zc=isFinite(ze)?signed(-ze)+' div':'—';
+  const hasDepth=(e.targets||[]).some(t=>t.face==='depth');
+  const dze=num(s.depthZeroTyped), dzc=isFinite(dze)?signed(-dze)+' div':'—';
   const fld=(id,val,step,unit,ph)=>'<span style="display:inline-flex;align-items:center;gap:6px">'
     +'<input type="number" id="'+id+'" value="'+esc(val)+'" step="'+step+'" placeholder="'+ph+'" style="width:88px;text-align:right">'
     +'<span>'+unit+'</span></span>';
@@ -1568,14 +1695,20 @@ function obsHead(){
     +'<tr><th style="width:52%">Least count</th><td>'+fld('inLC',s.lcTyped||'','0.01','mm','')+'<span class="mark" id="mkLC"></span></td></tr>'
     +'<tr><th>Zero error</th><td>'+fld('inZE',s.zeroTyped||'','1','divisions','')+'<span class="mark" id="mkZE"></span></td></tr>'
     +'<tr><th>Zero correction</th><td><b id="zcVal">'+zc+'</b> <span style="color:var(--muted);font-size:11.5px">(= &minus; zero error)</span></td></tr>'
+    +(hasDepth?'<tr><th>Zero error of the depth rod</th><td>'+fld('inDZE',s.depthZeroTyped||'','1','divisions','')+'<span class="mark" id="mkDZ"></span></td></tr>'
+      +'<tr><th>Its zero correction</th><td><b id="dzcVal">'+dzc+'</b> <span style="color:var(--muted);font-size:11.5px">found separately — it is a different face</span></td></tr>':'')
     +'</tbody></table>';
 }
 function renderObt(){
   const e=cur(),s=st(),cs=specOf(),show=(mode==='learn');
   const keys=(e.targets||[{key:'main',label:e.short,sym:'R'}]);
-  let h=obsHead();
+  let h=obsHead(),saidPractice=false;
   keys.forEach(tg=>{
     const rows=s.rows[tg.key], n=nRows(e), mean=meanOf(tg.key);
+    if(tg.practice&&!saidPractice){ saidPractice=true;
+      h+='<p class="lead" style="margin-top:16px">The hollow cylinder is not in the record. It is on the bench so that the'
+        +' <b>inner jaws</b> and the <b>depth rod</b> have something to measure — these two tables are practice and'
+        +' are left out of the result.</p>'; }
     h+='<h4>Readings for the '+esc(tg.label)+(s.active===tg.key&&e.instrument!=='gravesand'?' &nbsp;<span class="badge">next reading goes here</span>':'')+'</h4>';
     h+='<table><thead><tr><th class="sn">S.No</th>'
       +cs.cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')
@@ -1642,6 +1775,8 @@ function markConst(){
     el.innerHTML=(!show||typed==='')?'':(ok?'<span class="y">'+ICON('check')+'</span>':'<span class="n">'+ICON('x')+'</span>'); };
   set('#mkLC',close(num(s.lcTyped),I.lcMM,0.0009),s.lcTyped||'');
   set('#mkZE',close(num(s.zeroTyped),s.sp.zeroTicks,0.49),s.zeroTyped||'');
+  if(typeof s.sp.depthZeroTicks==='number')
+    set('#mkDZ',close(num(s.depthZeroTyped),s.sp.depthZeroTicks,0.49),s.depthZeroTyped||'');
 }
 
 /* =========================================================
@@ -1652,14 +1787,14 @@ function markConst(){
    ========================================================= */
 function means(){
   const e=cur(),s=st(),out={};
-  e.targets.forEach(t=>out[t.key]=meanOf(t.key));
+  recTargets(e).forEach(t=>out[t.key]=meanOf(t.key));
   if(e.instrument==='vernier'){ const ze=num(s.zeroTyped);
     Object.keys(out).forEach(k=>out[k]=out[k]-ze*0.01); }   // cm; the screw gauge table corrects in place
   return out;
 }
 function studentResult(){
   const e=cur(),s=st();
-  if(e.targets.some(t=>!isFinite(meanOf(t.key)))) return {err:'Fill in at least one complete reading for every table before the result can be worked out.'};
+  if(recTargets(e).some(t=>!isFinite(meanOf(t.key)))) return {err:'Fill in at least one complete reading for every table in the record before the result can be worked out.'};
   if(e.instrument==='vernier'&&!isFinite(num(s.zeroTyped))) return {err:'Write the zero error in the Readings tab first — the mean has to be corrected for it.'};
   return {R:e.result(s.sp,means())};
 }
@@ -1730,6 +1865,7 @@ function dragMove(ev){
     if(q) R.ang=Math.atan2(q[1]-R.y,q[0]-R.x)*180/Math.PI;
     light=true;
   } else if(drag.kind==='line'||drag.kind==='free'){ paperMove(ev); light=true; }
+  else if(drag.kind==='turn') setTicks(drag.t0-(ev.clientY-drag.y0)*drag.div);
   else setTicks(drag.t0+(ev.clientX-drag.x0)*drag.k);
   if(!raf) raf=requestAnimationFrame(()=>{ raf=0; light?renderInstr():refreshBench(); });
 }
@@ -1739,7 +1875,7 @@ function dragEnd(){
   document.removeEventListener('pointercancel',dragEnd);
   if(!drag){ return; }
   if(drag.kind==='line'||drag.kind==='free') paperUp();
-  drag=null; refreshBench(); save();
+  drag=null; st().slip=false; refreshBench(); save();
 }
 function startDrag(ev,host){
   const g=ev.target.closest('[data-drag]'); if(!g) return;
@@ -1753,8 +1889,15 @@ function startDrag(ev,host){
     drag={kind:'rulerot'};
   } else {
     const e=cur(),I=INSTR[e.instrument]; if(!I) return;
-    const U=(e.instrument==='vernier')?V_U:S_U;
-    drag={kind:'jaw',x0:ev.clientX,t0:st().ticks,k:sc.u/U/I.lcMM};
+    if(e.instrument==='screw'){
+      // A micrometer is turned, not slid. Sliding it geometrically moved about
+      // nineteen divisions per pixel, so the drum flew past whatever you were
+      // aiming at. Turning it moves the divisions at roughly the speed of the
+      // pointer: a quarter of a division per pixel, one full turn per 400 px.
+      drag={kind:'turn',y0:ev.clientY,t0:st().ticks,div:0.25*(ev.shiftKey?8:1)};
+    } else {
+      drag={kind:'jaw',x0:ev.clientX,t0:st().ticks,k:sc.u/V_U/I.lcMM};
+    }
   }
   document.addEventListener('pointermove',dragMove);
   document.addEventListener('pointerup',dragEnd);
@@ -1786,6 +1929,8 @@ $('#instr').addEventListener('keydown',ev=>{
 $('#benchTop').addEventListener('click',ev=>{
   const v=ev.target.closest('[data-view]');
   if(v){ st().view=v.dataset.view; lensHome(); renderBench(); save(); return; }
+  const f=ev.target.closest('[data-face]');
+  if(f){ setFace(f.dataset.face); renderBench(); renderObt(); save(); return; }
   const b=ev.target.closest('[data-held]'); if(!b) return;
   setHeld(b.dataset.held||null);
   if(b.dataset.held) st().active=b.dataset.held;
@@ -1821,8 +1966,9 @@ $('#ctrl').addEventListener('click',ev=>{
     toast(lens.on?'Magnifier on — drag its rim over any part of the drawing.':'Magnifier put away.'); return; }
   if(b.dataset.w){ const k=b.dataset.w, d=+b.dataset.d;
     s[k]=Math.max(20,Math.min(400,s[k]+d)); reJitter(); renderBench(); save(); return; }
-  if(b.id==='btnClose'){ closeJaws(); refreshBench(); save(); return; }
-  if(b.id==='btnOpen'){ setTicks(st().ticks+(e.instrument==='vernier'?40:50)); refreshBench(); save(); }
+  if(b.id==='btnClose'){ seat(); refreshBench(); save(); return; }
+  if(b.id==='btnOpen'){ const bd=bounds(), step=(e.instrument==='vernier')?30:40;
+    setTicks(bd.dir==='min'?s.ticks+step:s.ticks-step); refreshBench(); save(); }
 });
 let wdrag=null;
 function wGhost(ev){ if(wdrag&&wdrag.el) wdrag.el.style.transform='translate('+(ev.clientX-26)+'px,'+(ev.clientY-16)+'px)'; }
@@ -1878,6 +2024,9 @@ $('#btnGrip').onclick=takeReading;
 $('#obt').addEventListener('input',ev=>{
   const el=ev.target,s=st();
   if(el.id==='inLC'){ s.lcTyped=el.value; markConst(); renderProg(); save(); return; }
+  if(el.id==='inDZE'){ s.depthZeroTyped=el.value; markConst(); save();
+    const dz=$('#dzcVal'); if(dz) dz.textContent=isFinite(num(el.value))?signed(-num(el.value))+' div':'—';
+    return; }
   if(el.id==='inZE'){ s.zeroTyped=el.value; markConst(); patchAll(); renderProg(); renderCalc(); save();
     const zc=$('#zcVal'); if(zc) zc.textContent=isFinite(num(el.value))?signed(-num(el.value))+' div':'—';
     return; }
@@ -2034,6 +2183,7 @@ function save(){ try{
   Object.keys(S).forEach(id=>{ const s=S[id];
     out[id]={seed:s.seed,sp:s.sp,rows:s.rows,zeroTyped:s.zeroTyped,lcTyped:s.lcTyped||'',
              ticks:s.ticks,held:s.held,jit:s.jit,P:s.P,Q:s.Q,active:s.active,
+             face:s.face,depthZeroTyped:s.depthZeroTyped||'',
              wP:s.wP,wQ:s.wQ,view:s.view,tool:s.tool,scale:s.scale,
              paper:s.paper?{strokes:s.paper.strokes,ruler:s.paper.ruler}:null}; });
   localStorage.setItem(KEY,JSON.stringify({v:1,mode,theme,cols,folded,expId,step:curStep,lens:lens.on,
@@ -2052,9 +2202,13 @@ function load(){ try{
   if(d.states&&typeof d.states==='object') Object.keys(d.states).forEach(id=>{
     const e=EXP[id],o=d.states[id]; if(!e||!o||typeof o!=='object') return;
     const s=freshState(e,(o.seed>>>0)||1);
-    if(o.sp&&typeof o.sp==='object') s.sp=o.sp;
-    if(o.rows&&typeof o.rows==='object') Object.keys(s.rows).forEach(k=>{ if(Array.isArray(o.rows[k])) s.rows[k]=o.rows[k].slice(0,nRows(e)); });
+    let keep=true;
+    if(spOK(e,o.sp)) s.sp=o.sp;
+    else keep=false;                          // the readings belonged to that specimen
+    if(keep&&o.rows&&typeof o.rows==='object') Object.keys(s.rows).forEach(k=>{ if(Array.isArray(o.rows[k])) s.rows[k]=o.rows[k].slice(0,nRows(e)); });
     if(typeof o.zeroTyped==='string') s.zeroTyped=o.zeroTyped;
+    if(typeof o.depthZeroTyped==='string') s.depthZeroTyped=o.depthZeroTyped;
+    if(['outer','inner','depth'].indexOf(o.face)>=0) s.face=o.face;
     if(typeof o.lcTyped==='string') s.lcTyped=o.lcTyped;
     if(typeof o.jit==='number') s.jit=o.jit;
     if(typeof o.held==='string'&&s.rows[o.held]) s.held=o.held;
@@ -2105,7 +2259,7 @@ function printRecord(){
     +'<br>Least count = '+esc(s.lcTyped||'............')+' mm'
     +'<br>Zero error = '+esc(s.zeroTyped||'............')+' divisions'
     +'<br>Zero correction = '+(isFinite(num(s.zeroTyped))?signed(-num(s.zeroTyped)):'............')+' divisions</p>';
-  e.targets.forEach(tg=>{
+  recTargets(e).forEach(tg=>{
     h+='<h3>Readings for the '+esc(tg.label)+'</h3><table><tr><th>S.No</th>'
       +cs.cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')+'<th>'+esc(cs.totalH)+'</th></tr>';
     for(let i=0;i<nRows(e);i++){ const row=s.rows[tg.key][i];

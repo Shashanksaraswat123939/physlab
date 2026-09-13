@@ -20,8 +20,8 @@ const window={ addEventListener(){}, innerWidth:1600, innerHeight:900, print(){}
 const store={};
 const localStorage={ getItem:k=>(k in store?store[k]:null), setItem:(k,v)=>{store[k]=String(v)}, removeItem:k=>{delete store[k]} };
 const EXPORT='\n;return {VERNIER,SCREW,INSTR,EXPERIMENTS,EXP,S,st,cur,expId,freshState,ensure,'
-  +'setTicks,closeJaws,setHeld,stopTicks,gripped,maxTicks,magVernier,drawVernier,magScrew,drawScrew,'
-  +'gravSolve,gOC,drawBoard,drawPaper,syncWeights,WEIGHTS,SCALES,paperDirs,P_O,snapPoint,snapEnd,nearestPoint,knownPoints,COLSPEC,specOf,meanOf,rowTotal,studentResult,means,num,fx,tolOf,nRows,'
+  +'setTicks,closeJaws,setHeld,setFace,seat,bounds,faceOf,curFace,zeroFor,stopTicks,gripped,maxTicks,magVernier,drawVernier,magScrew,drawScrew,'
+  +'gravSolve,gOC,drawBoard,drawPaper,syncWeights,WEIGHTS,SCALES,paperDirs,P_O,snapPoint,snapEnd,nearestPoint,knownPoints,COLSPEC,specOf,meanOf,rowTotal,studentResult,means,num,fx,tolOf,nRows,rowsDone,recTargets,'
   +'setExp:(id)=>{expId=id;ensure(id);},getExpId:()=>expId,setMode:(m)=>{mode=m;},takeReading,save,load,resetAll,KEY,printRecord,renderObt,renderCalc,renderGuide,obsHead,setModeOnly:(m)=>{mode=m;},mode:()=>mode,theme:()=>theme,cols:()=>cols};';
 const fn=new Function('document','window','localStorage','requestAnimationFrame','cancelAnimationFrame','confirm','alert','Element',
   src+EXPORT);
